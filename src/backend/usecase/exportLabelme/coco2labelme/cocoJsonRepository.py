@@ -1,0 +1,5 @@
+
+class CoCoJsonRepository:
+    @staticmethod
+    def get_coco_json_string():
+        return '{"images":[{"id":3,"dataset_id":2,"path":"/datasets/Dog/index.jpeg","width":198,"height":255,"file_name":"index.jpeg"}],"categories":[{"id":1,"name":"dog","supercategory":"","color":"#de19c9","metadata":{},"keypoint_colors":[]}],"annotations":[{"id":18,"image_id":3,"category_id":1,"segmentation":[[77.1,99.1,77.1,147.7,41.1,147.7,41.1,99.1]],"area":1764,"bbox":[41,99,36,49],"iscrowd":false,"isbbox":true,"color":"#af2704","keypoints":[],"metadata":{}},{"id":19,"image_id":3,"category_id":1,"segmentation":[[101.3,137.3,103.7,125.6,110.1,116,119.6,109.6,131.3,107.3,143,109.6,152.5,116,159,125.6,161.3,137.3,159,148.9,152.5,158.5,143,164.9,131.3,167.3,119.6,164.9,110.1,158.5,103.7,148.9],[64.1,55.3,77.5,45.8,91.4,54.9,133.9,49.2,137.4,65.3,127,83,90.5,96.5,83.2,78.7,68.9,70.9,67.1,59.6,65,57]],"area":5012,"bbox":[64,46,97,121],"iscrowd":false,"isbbox":false,"color":"#0fba58","keypoints":[],"metadata":{}}]}'
