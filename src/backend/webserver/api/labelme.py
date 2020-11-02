@@ -23,7 +23,6 @@ class LabelmeRequestParser:
     def labelme_create_dataset():
         labelme_create_dataset = reqparse.RequestParser()
         labelme_create_dataset.add_argument('name', type=list, required=True, location='json')
-        labelme_create_dataset.add_argument('path', type=str, location='json')
         return labelme_create_dataset
 
     @staticmethod
@@ -104,11 +103,10 @@ class LabelmeId(Resource):
     @api.expect(LabelmeRequestParser.labelme_create_dataset())
     def post(self):
         args = LabelmeRequestParser.labelme_create_dataset().parse_args()
-        root_directory = args['path']
         dataset_names = args['name']
 
         result = self.create_user()\
-            .flat_map(lambda _: self.add_shared_folder_to_user(root_directory, dataset_names)\
+            .flat_map(lambda _: self.add_shared_folder_to_user(dataset_names)\
             .flat_map(lambda user: self.create_all_dataset(dataset_names)\
             .flat_map(lambda dataset_id_list: self.scanning_images_and_json(dataset_id_list, user)) 
             ))
@@ -154,7 +152,7 @@ class LabelmeId(Resource):
         email = "gay88358@yahoo.com.tw"
         return CreateUserUsecase(EncryptionService()).create(username, password, name, email)
 
-    def add_shared_folder_to_user(self, dataset_source_folder_path, dataset_name_list):
+    def add_shared_folder_to_user(self, dataset_name_list):
         docker_mount_directory = "/worksapce/sharedFolder/ATWEX"
         current_user.add_shared_folder("", dataset_name_list, docker_mount_directory)
         return Result.success(current_user)
