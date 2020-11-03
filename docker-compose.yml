@@ -1,0 +1,95 @@
+version: "3"
+volumes:
+  mongodb_data:
+    external: false
+networks:
+  cocoannotator:
+    external: false
+
+services:
+  frontend:
+    image: ail_frontend:${AIL_FRONTEND_ENV_VER}
+    container_name: ${AIL_CONTAINER_NAME_PREFIX}frontend${AIL_CONTAINER_NAME_POSTFIX}
+    env_file:
+      .env    
+    ports:
+      - "${AIL_FRONTEND_PORT}:8080"
+    volumes:
+      - "./src/client:/workspace/client"
+    depends_on:
+      - webserver
+    networks:
+      - cocoannotator
+  webserver:
+    image: ail_backend:${AIL_BACKEND_ENV_VER}
+    container_name: ${AIL_CONTAINER_NAME_PREFIX}webserver${AIL_CONTAINER_NAME_POSTFIX}
+    env_file:
+      .env
+    environment:
+      - FILE_WATCHER=true
+      - FLASK_APP=webserver
+      - FLASK_ENV=development
+      - DEBUG=true
+      - PYTHONUNBUFFERED=0
+    ports:
+      - ${AIL_BACKEND_PORT}:5000
+    volumes:
+      - "./src/backend/config:/workspace/config"
+      - "./src/backend/webserver:/workspace/webserver"
+      - "./src/backend/workers:/workspace/workers"
+      - "./src/backend/database:/workspace/database"
+      - "./src/backend/usecase:/workspace/usecase"
+      - "./src/backend/sharedFolder:/worksapce/sharedFolder"
+      - "./src/datasets:/datasets"
+      - "./src/models:/models"
+      - "${AIL_STORAGE_PATH}:/worksapce/sharedFolder/ATWEX"
+    depends_on:
+      - database
+      - workers
+    networks:
+      - cocoannotator
+  workers:
+    image: ail_workers:${AIL_WORKERS_ENV_VER}
+    container_name: ${AIL_CONTAINER_NAME_PREFIX}workers${AIL_CONTAINER_NAME_POSTFIX}
+    env_file:
+      .env
+    ports:
+      - "${AIL_WORKERS_PORT}:5555"
+    volumes:
+      - "./src/backend/config:/workspace/config"
+      - "./src/backend/webserver:/workspace/webserver"
+      - "./src/backend/workers:/workspace/workers"
+      - "./src/backend/database:/workspace/database"
+      - "./src/datasets:/datasets"
+    depends_on:
+      - database
+      - messageq
+    networks:
+      - cocoannotator
+  database:
+    image: mongo:4.0
+    container_name: ${AIL_CONTAINER_NAME_PREFIX}mongodb${AIL_CONTAINER_NAME_POSTFIX}
+    env_file:
+      .env
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    ports:
+      - "${AIL_WORKERS_PORT}:5555"
+    volumes:
+      - "mongodb_data:/data/db"
+    command: "mongod --smallfiles --logpath=/dev/null"
+    networks:
+      - cocoannotator
+  messageq:
+    image: rabbitmq:3
+    container_name: ${AIL_CONTAINER_NAME_PREFIX}rabbitmq${AIL_CONTAINER_NAME_POSTFIX}
+    env_file:
+      .env
+    environment:
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=password
+    ports:
+      - "${AIL_RABBITMQ_SERVER_PORT}:5672"
+    networks:
+      - cocoannotator
