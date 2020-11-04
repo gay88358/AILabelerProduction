@@ -11,5 +11,5 @@ docker load < %%i
 echo load all related images done
 
 echo %prefix%%newline%# start all services %newline%%prefix%
-docker-compose up -d
+docker-compose up
 echo start all services done
