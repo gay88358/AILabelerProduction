@@ -5,7 +5,7 @@ set prefix=###########################
 set newline=^& echo.
 
 echo %prefix%%newline%# load all related images %newline%%prefix%
-for /r %%i in (.\image\*.tar) do (
+for /r %%i in (..\image\*.tar) do (
 docker load < %%i
 )
 echo load all related images done
