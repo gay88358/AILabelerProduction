@@ -3,8 +3,6 @@ import Vuex from "vuex";
 
 import user from "./user";
 import info from "./info";
-//import defectCodeCatalog from "./category";
-import saveData from "./saveData";
 import datasetsData from "./datasets";
 import annotator from "./annotator";
 
@@ -14,7 +12,6 @@ export default new Vuex.Store({
   modules: {
     user,
     info,
-    saveData,
     datasetsData,
     annotator
   },

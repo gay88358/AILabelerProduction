@@ -94,8 +94,9 @@ export default {
     saveAggregateData() {
       let result = {
         "state": true,
-        "dataset": this.$store.getters.getAffectedDatasetNameList
+        "result": this.$store.getters.getAffectedDatasetMetadata
       }
+      console.log('sending');
       this.notify(JSON.stringify(result));
     },
     notify(message) {
