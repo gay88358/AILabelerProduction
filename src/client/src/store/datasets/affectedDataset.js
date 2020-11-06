@@ -1,6 +1,10 @@
-class AffectedDataset {
+export default class AffectedDataset {
     constructor() {
         this.affectedDatasetList = []
+    }
+
+    withEmptyDataset() {
+        return new AffectedDataset()
     }
 
     addAffectedDataset(dataset) {
@@ -25,35 +29,16 @@ class AffectedDataset {
     }
 
     getAffectedDatasetNameList() {
-        return this.affectedDatasetList.map(dataset => dataset.name);
+        return this.affectedDatasetList.map(dataset => this.removeStripId(dataset.name));
+    }
+
+    removeStripId(datasetName) {
+        let tokens = datasetName.split('/')
+        let last_index = tokens.length - 1
+        return tokens[last_index]
     }
 
     getAffectedDatasetSize() {
         return this.affectedDatasetList.length
     }
-
 }
-
-
-let datasetData1 = {
-    name: "stripID1/logcase1",
-    id: "1"
-}
-
-let datasetData2 = {
-    name: "stripID1/logcase2",
-    id: "1"
-}
-
-let datasetData3 = {
-    name: "stripID2/logcase3",
-    id: "1"
-}
-
-let assert = require('assert');  
-
-let dataset = new AffectedDataset()
-dataset.addAffectedDataset(datasetData1)
-dataset.addAffectedDataset(datasetData2)
-
-assert.notStrictEqual(dataset.getAffectedDatasetNameList(), [ 'logcase1', 'logcase2', 'logcase3' ])

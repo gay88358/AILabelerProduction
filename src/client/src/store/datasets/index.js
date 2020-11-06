@@ -7,8 +7,9 @@ const state = {
 
 const mutations = {
     UPDATE_CURRENT_STRIP_ID (state, payload) {
-        if (state.current_stripID !== payload) {
-            state.affectedDataset = new AffectedDataset()
+        let different_stripID = state.current_stripID !== payload
+        if (different_stripID) {
+            state.affectedDataset = state.affectedDataset.withEmptyDataset()
         }
         state.current_stripID = payload
     },
@@ -30,11 +31,10 @@ const getters = {
     getDatasetsUrl: state => '/datasets/' + state.current_stripID,
     getAffectedDatasetMetadata: state => {
         return {
-            id: state.affectedDataset.getStripId(),
+            id: state.current_stripID,
             dataset: state.affectedDataset.getAffectedDatasetNameList()
         }
     }
-
 }
 
 const datasetDataModule = {
