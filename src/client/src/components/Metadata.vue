@@ -56,7 +56,7 @@
         <i class="subtitle">No items in metadata.</i>
       </li>
 
-      <li
+     <li
         v-for="(object, index) in getMetadataList"
         :key="index"
         class="list-group-item meta-item">
@@ -68,11 +68,11 @@
 
           <div class="col-sm">
             <p>{{ object.value }}</p>
-
-            
           </div>
         </div>
       </li>
+
+
     </ul>
   </div>
 </template>
@@ -84,8 +84,14 @@ import { mapGetters } from 'vuex';
 export default {
   name: "Metadata",
   props: {
+    categoryId: {
+
+    },
     categoryName: {
       type: String
+    },
+    annotationId: {
+      //required: true
     },
     metadata: {
       type: Object,
@@ -140,6 +146,7 @@ export default {
       this.metadataList.push({ key: "", value: "" });
     },
     loadMetadata() {
+      this.metadataList = [];
       if (this.metadata != null) {
         for (var key in this.metadata) {
           if (!this.metadata.hasOwnProperty(key)) continue;
@@ -156,7 +163,6 @@ export default {
     changeAnnotationType() {
       if (this.annotationType === "")
         return
-      
       this.replaceMetadataWith(this.TYPE_KEY, { key: this.TYPE_KEY, value: this.annotationType });
     },
     changeDefectCode() {
@@ -180,12 +186,15 @@ export default {
     },
     getDefectCodeList() {
       return this.$store.getters.getDefectCodeList(this.categoryName);
+    },
+    getCategories() {
+      return this.$store.getters.getCategories;
     }
   },
   watch: {
     metadata() {
       this.loadMetadata();
-    }
+    },
   },
   created() {
     this.loadMetadata();

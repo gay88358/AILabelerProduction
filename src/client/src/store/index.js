@@ -3,9 +3,10 @@ import Vuex from "vuex";
 
 import user from "./user";
 import info from "./info";
-import defectCodeCatalog from "./category";
+//import defectCodeCatalog from "./category";
 import saveData from "./saveData";
 import datasetsData from "./datasets";
+import annotator from "./annotator";
 
 Vue.use(Vuex);
 
@@ -13,9 +14,9 @@ export default new Vuex.Store({
   modules: {
     user,
     info,
-    defectCodeCatalog,
     saveData,
-    datasetsData
+    datasetsData,
+    annotator
   },
   state: {
     process: [],

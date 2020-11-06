@@ -194,8 +194,10 @@
                 </div>
               </div>
               <Metadata
+                :categoryId="annotation.category_id"
                 :metadata="annotation.metadata"
                 :categoryName="categoryName"
+                :annotationId="annotation.id"
                 ref="metadata"
                 exclude="name"
               />
@@ -330,6 +332,7 @@ export default {
   methods: {
     ...mapMutations(["addUndo"]),
     initAnnotation() {
+
       let metaName = this.annotation.metadata.name;
 
       if (metaName) {
@@ -431,6 +434,8 @@ export default {
       };
     },
     deleteAnnotation() {
+      this.annotation.metadata['Type'] = "circle";
+
       axios.delete("/api/annotation/" + this.annotation.id).then(() => {
         this.$socket.emit("annotation", {
           action: "delete",
@@ -892,7 +897,8 @@ export default {
         this.keypoints.radius = scale * 6;
         this.keypoints.lineWidth = scale * 2;
       }
-    }
+    },
+
   },
   computed: {
     categoryIndex() {
@@ -961,7 +967,7 @@ export default {
       }
 
       return tags;
-    },
+    }
   },
   sockets: {
     annotation(data) {

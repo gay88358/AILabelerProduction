@@ -46,7 +46,7 @@ class AnnotationModel(DynamicDocument):
     @staticmethod
     def remove_by_image_id(image_id):
         AnnotationModel.objects(image_id=image_id).delete()
-        
+
     @staticmethod
     def find_by_image_id(image_id):
         return AnnotationModel.objects(image_id=image_id)[0]

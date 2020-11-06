@@ -1,22 +1,22 @@
 
 const state = {
-    datasetFolders: ""
+    current_stripID: ""
 }
 
 const mutations = {
-    UPDATE_DATASET_FOLDERS (state, payload) {
-        state.datasetFolders = payload
+    UPDATE_CURRENT_STRIP_ID (state, payload) {
+        state.current_stripID = payload
     }
 }
 
 const actions = {
-    updateDatasetFolders({ commit }, payload) {
-        commit('UPDATE_DATASET_FOLDERS', payload)
+    updateCurrentStripID({ commit }, payload) {
+        commit('UPDATE_CURRENT_STRIP_ID', payload)
     }
 }
 
 const getters = {
-    getDatasetsUrl: state => '/datasets/' + state.datasetFolders,
+    getDatasetsUrl: state => '/datasets/' + state.current_stripID,
 }
 
 const datasetDataModule = {

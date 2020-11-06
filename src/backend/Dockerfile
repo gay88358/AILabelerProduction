@@ -7,8 +7,8 @@ RUN apt-get install -y git
 WORKDIR /workspace/
 
 # Copy backend
-COPY ./backend/requirements.txt /workspace/
-
+# COPY ./backend/requirements.txt /workspace/
+COPY ./requirements.txt /workspace/
 # Install python package dependices
 RUN pip install -r requirements.txt && \
     pip install gunicorn[eventlet]==19.9.0 && \

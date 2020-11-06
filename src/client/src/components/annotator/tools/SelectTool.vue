@@ -117,12 +117,12 @@ export default {
       return string.replace(/\n/g, " \n ").slice(0, -2);
     },
     hoverText() {
+      
       if (!this.hover.showText) return;
       if (!this.keypoint) {
         if (this.hover.category == null) return;
         if (this.hover.annotation == null) return;
       }
-
       let position = this.hover.position.add(this.hover.textShift, 0);
 
       if (
@@ -173,11 +173,17 @@ export default {
       if (!paperObject) return false;
       let annotationId = paperObject.data.annotationId;
       let categoryId = paperObject.data.categoryId;
-      let category = this.$parent.getCategory(categoryId);
-      let annotation = category.getAnnotation(annotationId);
+      let category = this.$parent.getCategoryVueComponent(categoryId);
+      let annotation = category.getAnnotationVueComponent(annotationId);
       return annotation.annotation.isbbox;
     },
+    hasSelectedAnnotation() {
+      return this.currentAnnotationAndCategory() != null;
+    },
     onMouseDown(event) {
+      if (this.hasSelectedAnnotation()) {
+        this.$store.dispatch('setSelectedAnnotation', this.currentAnnotationAndCategory());
+      }
       let hitResult = this.$parent.paper.project.hitTest(
         event.point,
         this.hitOptions
@@ -278,6 +284,15 @@ export default {
       this.clear();
     },
 
+    currentAnnotationAndCategory() {
+      if (this.hover.annotation)
+        return {
+          annotationId: this.hover.annotation.annotation.id,
+          categoryId: this.hover.category.category.id
+        }
+      return null;
+    },
+
     onMouseMove(event) {
       // ensures that the initPoint is always tracked. 
       // Necessary for the introduced pan functionality and fixes a bug with selecting and dragging bboxes, since initPoint is initially undefined
@@ -325,12 +340,14 @@ export default {
 
         let categoryId = event.item.data.categoryId;
         let annotationId = event.item.data.annotationId;
+
+
         this.$parent.hover.categoryId = categoryId;
         this.$parent.hover.annotation = annotationId;
 
-        this.hover.category = this.$parent.getCategory(categoryId);
+        this.hover.category = this.$parent.getCategoryVueComponent(categoryId);
         if (this.hover.category != null) {
-          this.hover.annotation = this.hover.category.getAnnotation(
+          this.hover.annotation = this.hover.category.getAnnotationVueComponent(
             annotationId
           );
           event.item.selected = true;

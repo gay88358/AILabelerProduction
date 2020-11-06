@@ -26,7 +26,7 @@ export default new Router({
     },
     {
       alias: "/",
-      path: "/datasets/:dataset_folders",
+      path: "/datasets/:stripID",
       name: "datasets",
       component: Datasets,
       props: true

@@ -4,109 +4,14 @@
             "Label": "wire",
             "Shapes": [
                 {
-                    "Type": "circle",
-                    "points": [
-                        [
-                            947.0,
-                            1127.0
-                        ],
-                        [
-                            943.0,
-                            1126.0
-                        ],
-                        [
-                            922.0,
-                            1151.0
-                        ],
-                        [
-                            922.0,
-                            1156.0
-                        ],
-                        [
-                            925.0,
-                            1155.0
-                        ],
-                        [
-                            945.0,
-                            1133.0
-                        ]
-                    ],
-                    "Attributes": {}
-                },
-                {
                     "Type": "polygon",
-                    "points": [
-                        [
-                            852.0,
-                            1124.0
-                        ],
-                        [
-                            846.0,
-                            1130.0
-                        ],
-                        [
-                            839.0,
-                            1143.0
-                        ],
-                        [
-                            834.0,
-                            1149.0
-                        ],
-                        [
-                            831.0,
-                            1157.0
-                        ],
-                        [
-                            835.0,
-                            1157.0
-                        ],
-                        [
-                            847.0,
-                            1141.0
-                        ],
-                        [
-                            854.0,
-                            1129.0
-                        ],
-                        [
-                            854.0,
-                            1126.0
-                        ]
-                    ],
-                    "Attributes": {}
-                },
-                {
-                    "Type": "circle",
-                    "points": [
-                        [
-                            1031.0,
-                            1114.0
-                        ],
-                        [
-                            1025.0,
-                            1118.0
-                        ],
-                        [
-                            996.0,
-                            1151.0
-                        ],
-                        [
-                            999.0,
-                            1154.0
-                        ],
-                        [
-                            1005.0,
-                            1150.0
-                        ],
-                        [
-                            1033.0,
-                            1119.0
-                        ]
-                    ],
-                    "Attributes": {}
-                },
-                {
-                    "Type": "polygon",
+                    "Score": 100,
+                    "manualPoints": null,
+                    "iou": -1,
+                    "vertex_color": "0,255,0,255",
+                    "line_color": "0,255,0,128",
+                    "fill_color": "255,0,0,128",
+                    "IgnoreShapes": null,
                     "points": [
                         [
                             398.0,
@@ -149,6 +54,13 @@
                 },
                 {
                     "Type": "polygon",
+                    "Score": 100,
+                    "manualPoints": null,
+                    "iou": -1,
+                    "vertex_color": "0,255,0,255",
+                    "line_color": "0,255,0,128",
+                    "fill_color": "255,0,0,128",
+                    "IgnoreShapes": null,
                     "points": [
                         [
                             7.0,
@@ -167,6 +79,13 @@
                 },
                 {
                     "Type": "polygon",
+                    "Score": 100,
+                    "manualPoints": null,
+                    "iou": -1,
+                    "vertex_color": "0,255,0,255",
+                    "line_color": "0,255,0,128",
+                    "fill_color": "255,0,0,128",
+                    "IgnoreShapes": null,
                     "points": [
                         [
                             1003.0,
@@ -217,6 +136,13 @@
                 },
                 {
                     "Type": "polygon",
+                    "Score": 100,
+                    "manualPoints": null,
+                    "iou": -1,
+                    "vertex_color": "0,255,0,255",
+                    "line_color": "0,255,0,128",
+                    "fill_color": "255,0,0,128",
+                    "IgnoreShapes": null,
                     "points": [
                         [
                             1039.0,
@@ -267,6 +193,13 @@
                 },
                 {
                     "Type": "polygon",
+                    "Score": 100,
+                    "manualPoints": null,
+                    "iou": -1,
+                    "vertex_color": "0,255,0,255",
+                    "line_color": "0,255,0,128",
+                    "fill_color": "255,0,0,128",
+                    "IgnoreShapes": null,
                     "points": [
                         [
                             7.0,
@@ -305,6 +238,13 @@
                 },
                 {
                     "Type": "circle",
+                    "Score": 100,
+                    "manualPoints": null,
+                    "iou": -1,
+                    "vertex_color": "0,255,0,255",
+                    "line_color": "0,255,0,128",
+                    "fill_color": "255,0,0,128",
+                    "IgnoreShapes": null,
                     "points": [
                         [
                             7.0,
@@ -335,6 +275,13 @@
                 },
                 {
                     "Type": "polygon",
+                    "Score": 100,
+                    "manualPoints": null,
+                    "iou": -1,
+                    "vertex_color": "0,255,0,255",
+                    "line_color": "0,255,0,128",
+                    "fill_color": "255,0,0,128",
+                    "IgnoreShapes": null,
                     "points": [
                         [
                             699.0,
@@ -381,6 +328,13 @@
                 },
                 {
                     "Type": "polygon",
+                    "Score": 100,
+                    "manualPoints": null,
+                    "iou": -1,
+                    "vertex_color": "0,255,0,255",
+                    "line_color": "0,255,0,128",
+                    "fill_color": "255,0,0,128",
+                    "IgnoreShapes": null,
                     "points": [
                         [
                             799.0,
@@ -439,6 +393,13 @@
                 },
                 {
                     "Type": "polygon",
+                    "Score": 100,
+                    "manualPoints": null,
+                    "iou": -1,
+                    "vertex_color": "0,255,0,255",
+                    "line_color": "0,255,0,128",
+                    "fill_color": "255,0,0,128",
+                    "IgnoreShapes": null,
                     "points": [
                         [
                             316.0,
@@ -489,6 +450,13 @@
                 },
                 {
                     "Type": "polygon",
+                    "Score": 100,
+                    "manualPoints": null,
+                    "iou": -1,
+                    "vertex_color": "0,255,0,255",
+                    "line_color": "0,255,0,128",
+                    "fill_color": "255,0,0,128",
+                    "IgnoreShapes": null,
                     "points": [
                         [
                             795.0,
@@ -547,6 +515,13 @@
                 },
                 {
                     "Type": "polygon",
+                    "Score": 100,
+                    "manualPoints": null,
+                    "iou": -1,
+                    "vertex_color": "0,255,0,255",
+                    "line_color": "0,255,0,128",
+                    "fill_color": "255,0,0,128",
+                    "IgnoreShapes": null,
                     "points": [
                         [
                             795.0,
@@ -613,6 +588,13 @@
                 },
                 {
                     "Type": "polygon",
+                    "Score": 100,
+                    "manualPoints": null,
+                    "iou": -1,
+                    "vertex_color": "0,255,0,255",
+                    "line_color": "0,255,0,128",
+                    "fill_color": "255,0,0,128",
+                    "IgnoreShapes": null,
                     "points": [
                         [
                             807.0,
@@ -663,6 +645,13 @@
                 },
                 {
                     "Type": "polygon",
+                    "Score": 100,
+                    "manualPoints": null,
+                    "iou": -1,
+                    "vertex_color": "0,255,0,255",
+                    "line_color": "0,255,0,128",
+                    "fill_color": "255,0,0,128",
+                    "IgnoreShapes": null,
                     "points": [
                         [
                             314.0,
@@ -741,6 +730,13 @@
                 },
                 {
                     "Type": "polygon",
+                    "Score": 100,
+                    "manualPoints": null,
+                    "iou": -1,
+                    "vertex_color": "0,255,0,255",
+                    "line_color": "0,255,0,128",
+                    "fill_color": "255,0,0,128",
+                    "IgnoreShapes": null,
                     "points": [
                         [
                             1125.0,
@@ -807,6 +803,13 @@
                 },
                 {
                     "Type": "polygon",
+                    "Score": 100,
+                    "manualPoints": null,
+                    "iou": -1,
+                    "vertex_color": "0,255,0,255",
+                    "line_color": "0,255,0,128",
+                    "fill_color": "255,0,0,128",
+                    "IgnoreShapes": null,
                     "points": [
                         [
                             89.0,
@@ -841,6 +844,13 @@
                 },
                 {
                     "Type": "polygon",
+                    "Score": 100,
+                    "manualPoints": null,
+                    "iou": -1,
+                    "vertex_color": "0,255,0,255",
+                    "line_color": "0,255,0,128",
+                    "fill_color": "255,0,0,128",
+                    "IgnoreShapes": null,
                     "points": [
                         [
                             1127.0,
@@ -911,6 +921,13 @@
                 },
                 {
                     "Type": "polygon",
+                    "Score": 100,
+                    "manualPoints": null,
+                    "iou": -1,
+                    "vertex_color": "0,255,0,255",
+                    "line_color": "0,255,0,128",
+                    "fill_color": "255,0,0,128",
+                    "IgnoreShapes": null,
                     "points": [
                         [
                             91.0,
@@ -949,6 +966,13 @@
                 },
                 {
                     "Type": "polygon",
+                    "Score": 100,
+                    "manualPoints": null,
+                    "iou": -1,
+                    "vertex_color": "0,255,0,255",
+                    "line_color": "0,255,0,128",
+                    "fill_color": "255,0,0,128",
+                    "IgnoreShapes": null,
                     "points": [
                         [
                             633.0,
@@ -983,6 +1007,13 @@
                 },
                 {
                     "Type": "circle",
+                    "Score": 100,
+                    "manualPoints": null,
+                    "iou": -1,
+                    "vertex_color": "0,255,0,255",
+                    "line_color": "0,255,0,128",
+                    "fill_color": "255,0,0,128",
+                    "IgnoreShapes": null,
                     "points": [
                         [
                             419.0,
@@ -1013,6 +1044,13 @@
                 },
                 {
                     "Type": "polygon",
+                    "Score": 100,
+                    "manualPoints": null,
+                    "iou": -1,
+                    "vertex_color": "0,255,0,255",
+                    "line_color": "0,255,0,128",
+                    "fill_color": "255,0,0,128",
+                    "IgnoreShapes": null,
                     "points": [
                         [
                             947.0,
@@ -1071,6 +1109,13 @@
                 },
                 {
                     "Type": "polygon",
+                    "Score": 100,
+                    "manualPoints": null,
+                    "iou": -1,
+                    "vertex_color": "0,255,0,255",
+                    "line_color": "0,255,0,128",
+                    "fill_color": "255,0,0,128",
+                    "IgnoreShapes": null,
                     "points": [
                         [
                             855.0,
@@ -1129,6 +1174,13 @@
                 },
                 {
                     "Type": "polygon",
+                    "Score": 100,
+                    "manualPoints": null,
+                    "iou": -1,
+                    "vertex_color": "0,255,0,255",
+                    "line_color": "0,255,0,128",
+                    "fill_color": "255,0,0,128",
+                    "IgnoreShapes": null,
                     "points": [
                         [
                             1035.0,
@@ -1175,6 +1227,13 @@
                 },
                 {
                     "Type": "polygon",
+                    "Score": 100,
+                    "manualPoints": null,
+                    "iou": -1,
+                    "vertex_color": "0,255,0,255",
+                    "line_color": "0,255,0,128",
+                    "fill_color": "255,0,0,128",
+                    "IgnoreShapes": null,
                     "points": [
                         [
                             399.0,
@@ -1222,172 +1281,17 @@
             ]
         },
         {
-            "Label": "bond_rec",
-            "Shapes": [
-                {
-                    "Type": "rectangle",
-                    "points": [
-                        [
-                            534.0,
-                            6.0
-                        ],
-                        [
-                            613.0,
-                            6.0
-                        ],
-                        [
-                            613.0,
-                            117.0
-                        ],
-                        [
-                            534.0,
-                            117.0
-                        ]
-                    ],
-                    "Attributes": {}
-                },
-                {
-                    "Type": "circle",
-                    "points": [
-                        [
-                            438.6,
-                            5.1
-                        ],
-                        [
-                            517.5,
-                            1.5
-                        ],
-                        [
-                            522.6,
-                            112.3
-                        ],
-                        [
-                            443.6,
-                            115.9
-                        ]
-                    ],
-                    "Attributes": {}
-                }
-            ]
-        },
-        {
-            "Label": "wire_2",
-            "Shapes": [
-                {
-                    "Type": "polygon",
-                    "points": [
-                        [
-                            806.0,
-                            580.0
-                        ],
-                        [
-                            804.0,
-                            583.0
-                        ],
-                        [
-                            825.0,
-                            618.0
-                        ],
-                        [
-                            893.0,
-                            721.0
-                        ],
-                        [
-                            899.0,
-                            727.0
-                        ],
-                        [
-                            901.0,
-                            727.0
-                        ],
-                        [
-                            902.0,
-                            723.0
-                        ],
-                        [
-                            852.0,
-                            649.0
-                        ],
-                        [
-                            809.0,
-                            581.0
-                        ]
-                    ],
-                    "Attributes": {}
-                }
-            ]
-        },
-        {
             "Label": "bond_90",
             "Shapes": [
                 {
                     "Type": "polygon",
-                    "points": [
-                        [
-                            227.0,
-                            627.0
-                        ],
-                        [
-                            227.0,
-                            649.0
-                        ],
-                        [
-                            229.0,
-                            653.0
-                        ],
-                        [
-                            247.0,
-                            653.0
-                        ],
-                        [
-                            274.0,
-                            668.0
-                        ],
-                        [
-                            318.0,
-                            668.0
-                        ],
-                        [
-                            327.0,
-                            663.0
-                        ],
-                        [
-                            330.0,
-                            655.0
-                        ],
-                        [
-                            330.0,
-                            620.0
-                        ],
-                        [
-                            326.0,
-                            615.0
-                        ],
-                        [
-                            318.0,
-                            612.0
-                        ],
-                        [
-                            272.0,
-                            611.0
-                        ],
-                        [
-                            249.0,
-                            622.0
-                        ],
-                        [
-                            241.0,
-                            624.0
-                        ],
-                        [
-                            231.0,
-                            623.0
-                        ]
-                    ],
-                    "Attributes": {}
-                },
-                {
-                    "Type": "polygon",
+                    "Score": 100,
+                    "manualPoints": null,
+                    "iou": -1,
+                    "vertex_color": "0,255,0,255",
+                    "line_color": "0,255,0,128",
+                    "fill_color": "255,0,0,128",
+                    "IgnoreShapes": null,
                     "points": [
                         [
                             227.0,
@@ -1454,6 +1358,13 @@
                 },
                 {
                     "Type": "polygon",
+                    "Score": 100,
+                    "manualPoints": null,
+                    "iou": -1,
+                    "vertex_color": "0,255,0,255",
+                    "line_color": "0,255,0,128",
+                    "fill_color": "255,0,0,128",
+                    "IgnoreShapes": null,
                     "points": [
                         [
                             228.0,
@@ -1525,6 +1436,13 @@
             "Shapes": [
                 {
                     "Type": "polygon",
+                    "Score": 100,
+                    "manualPoints": null,
+                    "iou": -1,
+                    "vertex_color": "0,255,0,255",
+                    "line_color": "0,255,0,255",
+                    "fill_color": "255,0,0,128",
+                    "IgnoreShapes": null,
                     "points": [
                         [
                             651.0,
@@ -1607,6 +1525,13 @@
                 },
                 {
                     "Type": "polygon",
+                    "Score": 100,
+                    "manualPoints": null,
+                    "iou": -1,
+                    "vertex_color": "0,255,0,255",
+                    "line_color": "0,255,0,255",
+                    "fill_color": "255,0,0,128",
+                    "IgnoreShapes": null,
                     "points": [
                         [
                             746.9,
@@ -1689,6 +1614,13 @@
                 },
                 {
                     "Type": "polygon",
+                    "Score": 100,
+                    "manualPoints": null,
+                    "iou": -1,
+                    "vertex_color": "0,255,0,255",
+                    "line_color": "0,255,0,255",
+                    "fill_color": "255,0,0,128",
+                    "IgnoreShapes": null,
                     "points": [
                         [
                             843.0,
@@ -1771,6 +1703,13 @@
                 },
                 {
                     "Type": "polygon",
+                    "Score": 100,
+                    "manualPoints": null,
+                    "iou": -1,
+                    "vertex_color": "0,255,0,255",
+                    "line_color": "0,255,0,255",
+                    "fill_color": "255,0,0,128",
+                    "IgnoreShapes": null,
                     "points": [
                         [
                             938.9,
@@ -1853,6 +1792,13 @@
                 },
                 {
                     "Type": "polygon",
+                    "Score": 100,
+                    "manualPoints": null,
+                    "iou": -1,
+                    "vertex_color": "0,255,0,255",
+                    "line_color": "0,255,0,255",
+                    "fill_color": "255,0,0,128",
+                    "IgnoreShapes": null,
                     "points": [
                         [
                             1034.7,

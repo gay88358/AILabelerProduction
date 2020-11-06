@@ -22,7 +22,7 @@ Vue.config.productionTip = false;
 paper.install(window);
 
 window.toastr = require("toastr");
-
+window.EventBus= new Vue();
 Vue.use(VueToastr2);
 Vue.use(VTooltip);
 Vue.use(Loading);

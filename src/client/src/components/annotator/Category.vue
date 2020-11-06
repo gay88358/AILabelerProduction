@@ -24,7 +24,7 @@
           style="color: inherit"
           aria-expanded="false"
           :aria-controls="'collapse' + category.id"
-          @click="onClick"
+          @click="displayAnnotation"
         >
           {{ category.name }} ({{ category.annotations.length }})
         </button>
@@ -60,7 +60,7 @@
       </li>
 
       <Annotation
-        v-for="(annotation, listIndex) in category.annotations"
+        v-for="(annotation, listIndex) in getAnnotations"
         :categoryName="category.name"
         :search="search"
         :key="annotation.id"
@@ -249,7 +249,7 @@ export default {
      */
     createAnnotation() {
       let parent = this.$parent;
-      let annotationId = this.category.annotations.length;
+      let annotationId = this.getAnnotations.length;
       Annotations.create({
         image_id: parent.image.id,
         category_id: this.category.id,
@@ -394,7 +394,7 @@ export default {
     /**
      * Event Handler for category click
      */
-    onClick() {
+    displayAnnotation() {
       let indices = {
         annotation: this.selectedAnnotation,
         category: this.index,
@@ -418,7 +418,7 @@ export default {
     /**
      * @returns {Annotation} returns annotation and provided index
      */
-    getAnnotation(index) {
+    getAnnotationVueComponent(index) {
       let ref = this.$refs.annotation;
       if (ref == null) return null;
       return this.$refs.annotation[index];
@@ -438,9 +438,13 @@ export default {
       } else {
         annotations.forEach(a => {
           if (a) {
-            a.compoundPath.fillColor = this.color;
-            a.keypoints.color = this.darkHSL;
-            a.keypoints.bringToFront();
+            if (a.compoundPath) {
+              a.compoundPath.fillColor = this.color;
+            }
+            if (a.keypoints) {
+              a.keypoints.color = this.darkHSL;
+              a.keypoints.bringToFront();
+            }
           }
         });
       }
@@ -461,6 +465,9 @@ export default {
     }
   },
   computed: {
+    getAnnotations() {
+      return this.category.annotations;
+    },
     ...mapGetters([
       'defectCodeCatalog'
     ]),
@@ -539,7 +546,7 @@ export default {
     },
     category() {
       this.initCategory();
-    }
+    },
   },
   sockets: {
     annotation(data) {

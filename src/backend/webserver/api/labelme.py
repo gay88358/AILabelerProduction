@@ -1,17 +1,16 @@
 
 from usecase.util.result import Result
 from flask_restplus import Namespace, Resource, reqparse
-from flask_login import login_user, current_user
+from flask_login import current_user
 from flask_restplus import Namespace, Resource, reqparse
 
 from usecase.user.encryptionService import EncryptionService
-from usecase.user.jsonPrepare import JsonPrepare
 from usecase.importLabelme.createNewDatasetUsecase import CreateNewDatasetUsecase
 from usecase.importLabelme.scanningImagesAndJsonUsecase import ScanningImagesAndJsonUsecase
+from usecase.importLabelme.addSharedFolderUsecase import AddSharedFolderUsecase
 
 from usecase.user.createUserUsecase import CreateUserUsecase
 
-from database import UserModel
 from usecase.util.jsonHelper import JsonHelper
 
 
@@ -22,7 +21,8 @@ class LabelmeRequestParser:
     @staticmethod
     def labelme_create_dataset():
         labelme_create_dataset = reqparse.RequestParser()
-        labelme_create_dataset.add_argument('name', type=list, required=True, location='json')
+        labelme_create_dataset.add_argument('dataset', type=list, required=True, location='json')
+        labelme_create_dataset.add_argument('id', type=str, required=True, location='json')
         return labelme_create_dataset
 
     @staticmethod
@@ -91,7 +91,7 @@ class DefectCodeParser:
 @api.route('/defect_code')
 class DefectCode(Resource):
     def get(self):
-        defect_code_file_path = "/worksapce/sharedFolder/defectcode.json"
+        defect_code_file_path = "/worksapce/sharedFolder/ATWEX/defectcode.json"
         json_document = JsonHelper.load_json_document(defect_code_file_path)
 
         defect_code = DefectCodeParser(json_document)
@@ -103,16 +103,41 @@ class LabelmeId(Resource):
     @api.expect(LabelmeRequestParser.labelme_create_dataset())
     def post(self):
         args = LabelmeRequestParser.labelme_create_dataset().parse_args()
-        dataset_names = args['name']
+        stripID = args['id']
+        dataset_names = args['dataset']
 
         result = self.create_user()\
-            .flat_map(lambda _: self.add_shared_folder_to_user(dataset_names)\
-            .flat_map(lambda user: self.create_all_dataset(dataset_names)\
-            .flat_map(lambda dataset_id_list: self.scanning_images_and_json(dataset_id_list, user)) 
-            ))
-
+        .flat_map(lambda _: self.add_shared_folder_to_user(stripID, dataset_names)\
+        .flat_map(lambda user: self.create_all_dataset(user)\
+        .flat_map(lambda dataset_id_list: self.scanning_images_and_json(dataset_id_list, user, stripID)) 
+        ))
         return self.response(result)
-        
+      
+    def create_user(self):
+        username = "WebUILabeler"
+        password = "webUILabeler"
+        name = "webUI"
+        email = "gay88358@yahoo.com.tw"
+        return CreateUserUsecase(EncryptionService()).create(username, password, name, email)
+  
+    def add_shared_folder_to_user(self, stripID, dataset_name_list):
+        return AddSharedFolderUsecase()\
+            .execute(current_user, stripID, dataset_name_list)
+        # docker_mount_directory = "/worksapce/sharedFolder/ATWEX" 
+        # current_user.add_shared_folder("", dataset_name_list, docker_mount_directory)
+        # return Result.success(current_user)
+
+    def create_all_dataset(self, user):
+        dataset_name_list = user.get_dataset_name_list()
+        return CreateNewDatasetUsecase().create_all_dataset(dataset_name_list)
+    
+    def scanning_images_and_json(self, dataset_id_list, user, stripID):
+        return ScanningImagesAndJsonUsecase()\
+            .scanning_images_and_json(
+                dataset_id_list, 
+                user.get_shared_folder().mount_root
+            )
+
     def response(self, result):
         if result.is_success():
             return self.success(result)
@@ -135,24 +160,4 @@ class LabelmeId(Resource):
                 "result": result.value
         }
         
-    def scanning_images_and_json(self, dataset_id_list, user):
-        return ScanningImagesAndJsonUsecase()\
-            .scanning_images_and_json(
-                dataset_id_list, 
-                user.get_shared_folder().mount_root
-            )
     
-    def create_all_dataset(self, dataset_name_list):
-        return CreateNewDatasetUsecase().create_all_dataset(dataset_name_list)
-    
-    def create_user(self):
-        username = "WebUILabeler"
-        password = "webUILabeler"
-        name = "webUI"
-        email = "gay88358@yahoo.com.tw"
-        return CreateUserUsecase(EncryptionService()).create(username, password, name, email)
-
-    def add_shared_folder_to_user(self, dataset_name_list):
-        docker_mount_directory = "/worksapce/sharedFolder/ATWEX"
-        current_user.add_shared_folder("", dataset_name_list, docker_mount_directory)
-        return Result.success(current_user)

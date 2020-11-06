@@ -74,7 +74,6 @@
      
 
       <hr />
-
       
       <SaveButton />
      
@@ -124,7 +123,7 @@
         >
           <Category
             v-for="(category, index) in categories"
-            :key="category.id + '-category'"
+            :key="category.id + '-category'" 
             :simplify="simplify"
             :categorysearch="search"
             :category="category"
@@ -140,7 +139,7 @@
             ref="category"
           />
         </div>
-
+        
         <div v-show="mode == 'label'" style="overflow: auto; max-height: 100%">
           <CLabel
             v-for="category in categories"
@@ -151,6 +150,11 @@
           />
         </div>
       </div>
+
+     <MetadataDisplayer></MetadataDisplayer> 
+
+      
+
 
       <div v-show="mode == 'segment'">
         <hr />
@@ -194,7 +198,6 @@
         </div>
       </div>
     </aside>
-
     <div class="middle-panel" :style="{ cursor: cursor }">
     <v-touch @pinch="onpinch" @pinchstart="onpinchstart">
       <div id="frame" class="frame" @wheel="onwheel">
@@ -202,6 +205,7 @@
       </div>
     </v-touch>   
     </div>
+
 
     <div v-show="annotating.length > 0" class="fixed-bottom alert alert-warning alert-dismissible fade show">
       <span>
@@ -221,7 +225,7 @@ import axios from "axios";
 
 import toastrs from "@/mixins/toastrs";
 import shortcuts from "@/mixins/shortcuts";
-
+import MetadataDisplayer from "@/views/MetadataDisplayer";
 import FileTitle from "@/components/annotator/FileTitle";
 import Category from "@/components/annotator/Category";
 import Label from "@/components/annotator/Label";
@@ -257,7 +261,7 @@ import EraserPanel from "@/components/annotator/panels/EraserPanel";
 import KeypointPanel from "@/components/annotator/panels/KeypointPanel";
 import DEXTRPanel from "@/components/annotator/panels/DEXTRPanel";
 
-import { mapMutations } from "vuex";
+import { mapMutations, mapGetters } from "vuex";
 
 export default {
   name: "Annotator",
@@ -291,7 +295,8 @@ export default {
     KeypointPanel,
     AnnotateButton,
     DEXTRTool,
-    DEXTRPanel
+    DEXTRPanel,
+    MetadataDisplayer
   },
   mixins: [toastrs, shortcuts],
   props: {
@@ -302,6 +307,7 @@ export default {
   },
   data() {
     return {
+      count: 0,
       activeTool: "Select",
       paper: null,
       shapeOpacity: 0.6,
@@ -369,7 +375,6 @@ export default {
     },
     save(callback) {
       this.$store.dispatch('addAffectedDataset', { name: this.dataset.name, id: this.dataset.id });
-      console.log(this.$store.getters.getAffectedDatasetList)
       let process = "Saving";
       this.addProcess(process);
       let refs = this.$refs;
@@ -594,10 +599,11 @@ export default {
 
           // Set other data
           this.dataset = data.dataset;
+          // Update status          
+          this.updateAnnotatorData(data.categories);
           this.categories = data.categories;
-
-          // Update status
-
+          
+          
           this.setDataset(this.dataset);
 
           let preferences = data.preferences;
@@ -622,7 +628,11 @@ export default {
         })
         .finally(() => this.removeProcess(process));
     },
+    updateAnnotatorData(annotatorData) {
+      this.$store.dispatch('updateAnnotatorData', annotatorData);
+    },
     onCategoryClick(indices) {
+      return ;
       this.current.annotation = indices.annotation;
       this.current.category = indices.category;
       if (!indices.hasOwnProperty('keypoint')) {
@@ -655,7 +665,7 @@ export default {
       this.activeTool = this.$refs.select;
       this.activeTool.click();
     },
-    getCategory(index) {
+    getCategoryVueComponent(index) {
       if (index == null) return null;
       if (index < 0) return null;
 
@@ -987,6 +997,10 @@ export default {
     }
   },
   computed: {
+    // categories() {
+    //   console.log(this.$store.getters.getCategories);
+    //   return this.$store.getters.getCategories;
+    // },
     doneLoading() {
       return !this.loading.image && !this.loading.data;
     },
@@ -999,13 +1013,13 @@ export default {
       return this.currentAnnotation.annotation.keypoints.length;
     },
     currentCategory() {
-      return this.getCategory(this.current.category);
+      return this.getCategoryVueComponent(this.current.category);
     },
     currentAnnotation() {
       if (this.currentCategory == null) {
         return null;
       }
-      return this.currentCategory.getAnnotation(this.current.annotation);
+      return this.currentCategory.getAnnotationVueComponent(this.current.annotation);
     },
     currentKeypoint() {
       if (this.currentCategory == null) {
@@ -1056,17 +1070,14 @@ export default {
   },
   mounted() {
     this.setDataset(null);
-
-    // this.loading.loader = this.$loading.show({
-    //   color: "white",
-    //   // backgroundColor: "#4b5162",
-    //   height: 150,
-    //   opacity: 0.8,
-    //   width: 150
-    // });
-
     this.initCanvas();
     this.getData();
+    EventBus.$on(
+        "selectedAnnotationUpdate",
+        e => {
+          this.categories = this.$store.getters.getCategories;
+        });
+
 
     this.$socket.emit("annotating", { image_id: this.image.id, active: true });
   },

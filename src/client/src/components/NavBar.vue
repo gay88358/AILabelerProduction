@@ -26,7 +26,7 @@
         <li class="nav-item" :class="{ active: $route.name === 'datasets' || $route.name === 'dataset' }">
           <RouterLink class="nav-link" :to="datasetsUrl">Datasets</RouterLink>
         </li>
-       
+
         <li
           class="nav-item"
           v-show="$route.name === 'annotate'"
@@ -68,15 +68,11 @@
         </li>
 -->
       </ul>
-	  
-	  <div class="nav-link left">	
-		<li class="nav-item" :class="{ active: true }">
-          <p style="cursor: pointer;margin: 8px; color: white" @click="saveAggregateData">Confirmation </p>
-        </li>
-      </div>
-	  <Status class="nav-link left" />
+      <p class="confirmation" style="cursor: pointer;margin: 8px; color: white" @click="saveAggregateData">Confirmation</p>
+      <Status class="nav-link left" />
       <User class="nav-link left" v-if="loginEnabled" />
-	  
+
+
     </div>
   </nav>
 </template>
@@ -163,4 +159,16 @@ export default {
 .left {
   padding: 0;
 }
+
+.confirmation {
+  background-color: green;
+  border-radius: 4px;
+  padding: 5px 10px;
+}
+
+.confirmation:hover {
+  background-color: red;
+}
+
+
 </style>

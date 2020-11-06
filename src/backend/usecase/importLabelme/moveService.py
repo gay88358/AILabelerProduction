@@ -21,8 +21,8 @@ class MoveService:
     def check_copy_success(self, dataset, dataset_source_folder_path):
         source_content_length = len(self.find_file_paths(dataset_source_folder_path))
         dataset_content_length = len(self.find_file_paths(dataset.directory))
-        # if source_content_length != dataset_content_length:
-        #     raise ValueError("Source folder location not found, so that can not copy content from source to dataset")
+        if source_content_length != dataset_content_length:
+            raise ValueError("Source folder location not found, so that can not copy content from source to dataset")
 
     def find_file_paths(self, path):
         return FilePathFinder.find_file_path_in(path)

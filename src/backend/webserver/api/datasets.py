@@ -35,7 +35,7 @@ page_data.add_argument('page', default=1, type=int)
 page_data.add_argument('limit', default=20, type=int)
 page_data.add_argument('folder', default='', help='Folder for data')
 page_data.add_argument('order', default='file_name', help='Order to display images')
-page_data.add_argument('dataset_folders', default='', type=str)
+page_data.add_argument('stripID', default='', type=str)
 
 delete_data = reqparse.RequestParser()
 delete_data.add_argument('fully', default=False, type=bool,
@@ -328,9 +328,9 @@ class DatasetData(Resource):
         limit = args['limit']
         page = args['page']
         folder = args['folder']
-        dataset_folders = self.parse_dataset_folders(args)
+        stripID = args['stripID']
 
-        result = FindPaginationDatasetUsecase().execute(limit, page, dataset_folders, current_user)
+        result = FindPaginationDatasetUsecase().execute(limit, page, stripID, current_user)
         result['categories'] = query_util.fix_ids(current_user.find_all_exist_categories())
         result['folder'] = folder
         return result

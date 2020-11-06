@@ -200,7 +200,7 @@ export default {
   components: { DatasetCard, Pagination, TagsInput },
   mixins: [toastrs],
   props: {
-    dataset_folders: {
+    stripID: {
       type: [String],
       required: true
     }
@@ -232,7 +232,7 @@ export default {
       Datasets.allData({
         limit: this.limit,
         page: page,
-        dataset_folders: this.dataset_folders
+        stripID: this.stripID
       }).then(response => {
         this.datasets = response.data.datasets;
         this.categories = response.data.categories;
@@ -294,9 +294,7 @@ export default {
   },
   created() {
     this.updatePage();
-    this.$store.dispatch('updateDatasetFolders', this.dataset_folders);
-    // parse folders to name
-    // send with endpoint
+    this.$store.dispatch('updateCurrentStripID', this.stripID);
   }
 };
 </script>

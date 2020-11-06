@@ -9,8 +9,8 @@ import json
 
 class FindPaginationDatasetUsecase:
     
-    def execute(self, limit, page, dataset_folders, current_user):
-        datasets = self.find_datasets_by(dataset_folders)
+    def execute(self, limit, page, stripID, current_user):
+        datasets = self.find_datasets_by(stripID)
 
         pagination = self.create_pagination(len(datasets), limit, page)
         
@@ -47,11 +47,14 @@ class FindPaginationDatasetUsecase:
         objects_list = json.loads(objs.to_json().replace('\"_id\"', '\"id\"'))
         return objects_list
 
-    def find_datasets_by(self, dataset_folders):
-        datasets = list(
-            map(
-                lambda name: DatasetModel.find_by_name(name),
-                dataset_folders
-            )
-        )
-        return datasets
+    def find_datasets_by(self, stripID):
+
+        return DatasetModel.find_by_name_contain(stripID)
+
+        # datasets = list(
+        #     map(
+        #         lambda name: DatasetModel.find_by_name(name),
+        #         stripID
+        #     )
+        # )
+        # return datasets

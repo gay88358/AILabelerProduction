@@ -25,6 +25,7 @@ class UserModel(DynamicDocument, UserMixin):
     preferences = DictField(default={})
     permissions = ListField(defualt=[])
     dataset_name_list = ListField(defualt=[])
+
     # meta = {'allow_inheritance': True}
 
     @staticmethod
@@ -102,16 +103,21 @@ class UserModel(DynamicDocument, UserMixin):
     
     def add_shared_folder(self, root, dataset_name_list, mount_root):
         self.__setattr__("root", root)
+        
         self.set_dataset_name_list(dataset_name_list)
+
         self.__setattr__("mount_root", mount_root)
         self.save()
 
     def set_dataset_name_list(self, dataset_name_list):
         if len(self.dataset_name_list) > 0:
             new_dataset_name_list = self.dataset_name_list + dataset_name_list
-            self.__setattr__("dataset_name_list", new_dataset_name_list)
+            self.__setattr__("dataset_name_list", list(set(new_dataset_name_list)))
         else:
             self.__setattr__("dataset_name_list", dataset_name_list)
+
+    def get_dataset_name_list(self):
+        return self.dataset_name_list
 
     def get_shared_folder(self):
         return SharedFolder("", self.dataset_name_list, self.mount_root)

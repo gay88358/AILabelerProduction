@@ -49,6 +49,7 @@ class AnnotatorData(Resource):
         labelme_document = self.convert_labelme_from_database(aggregate)
 
         self.write_back_to_shared_folder(labelme_document, aggregate)
+
         return labelme_document
     
     def save_aggregate_data(self, aggregate):
