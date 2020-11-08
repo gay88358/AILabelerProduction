@@ -192,9 +192,12 @@ export default {
     }
   },
   watch: {
-    metadata() {
-      this.loadMetadata();
-    },
+    metadata: {
+        handler(val){
+          this.loadMetadata();
+        },
+        deep: true
+    }
   },
   created() {
     this.loadMetadata();

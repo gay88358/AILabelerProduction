@@ -1,4 +1,3 @@
-
 import Annotator from './annotatorObject';
 import axios from "axios";
 
@@ -7,7 +6,7 @@ const state = {
     selectedAnnotation: null,
     selectedCategoryName: "",
     defectCodeCatalog: [],
-    categoriesData: []
+    categoriesData: [],
 }
 
 const mutations = {
@@ -22,9 +21,6 @@ const mutations = {
     },
     UPDATE_ANNOTATION_METADATA(state, { annotationType, annotationClass }) {
         state.annotatorData.updateSelectedAnnotationMetadata(annotationType, annotationClass);        
-        state.categoriesData = state.annotatorData.cloneAnnotatorData();
-
-        state.selectedAnnotation = { ...state.annotatorData.getSelectedAnnotation() };
     },
     UPDATE_DEFECT_CODE_CATALOG (state, payload) {
         state.defectCodeCatalog = payload

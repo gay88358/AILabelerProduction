@@ -4,7 +4,6 @@
     <aside v-show="panels.show.left" class="left-panel shadow-lg">
       <div v-show="mode == 'segment'">
         <hr />
-
         <SelectTool
           v-model="activeTool"
           :scale="image.scale"
@@ -13,6 +12,7 @@
         />
         <hr />
 
+        <Test :key="t.title" :annotation="t" v-for="t in testData"></Test>
         <BBoxTool
           v-model="activeTool"
           :scale="image.scale"
@@ -206,7 +206,6 @@
     </v-touch>   
     </div>
 
-
     <div v-show="annotating.length > 0" class="fixed-bottom alert alert-warning alert-dismissible fade show">
       <span>
       This image is being annotated by <b>{{ annotating.join(', ') }}</b>.
@@ -260,12 +259,13 @@ import BrushPanel from "@/components/annotator/panels/BrushPanel";
 import EraserPanel from "@/components/annotator/panels/EraserPanel";
 import KeypointPanel from "@/components/annotator/panels/KeypointPanel";
 import DEXTRPanel from "@/components/annotator/panels/DEXTRPanel";
-
+import Test from "@/views/Test";
 import { mapMutations, mapGetters } from "vuex";
 
 export default {
   name: "Annotator",
   components: {
+    Test,
     FileTitle,
     CopyAnnotationsButton,
     Category,
@@ -997,10 +997,9 @@ export default {
     }
   },
   computed: {
-    // categories() {
-    //   console.log(this.$store.getters.getCategories);
-    //   return this.$store.getters.getCategories;
-    // },
+    testData() {
+      return this.$store.getters.getTestData;
+    },
     doneLoading() {
       return !this.loading.image && !this.loading.data;
     },
