@@ -91,7 +91,7 @@ class DefectCodeParser:
 @api.route('/defect_code')
 class DefectCode(Resource):
     def get(self):
-        defect_code_file_path = "/worksapce/sharedFolder/ATWEX/defectcode.json"
+        defect_code_file_path = "/worksapce/sharedFolder/ATWEX/label_map.json"
         json_document = JsonHelper.load_json_document(defect_code_file_path)
 
         defect_code = DefectCodeParser(json_document)
