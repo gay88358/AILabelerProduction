@@ -4,7 +4,7 @@ from .importAnnotationsToAllImagesUsecase import ImportAnnotationsToAllImagesUse
 from ..util.commandHelper import CommandHelper
 from .jsonFileFinder import JsonFileFinder
 from .filePathFinder import FilePathFinder
-
+from .labelmeChecker import LabelChecker
 from database import (
     ImageModel,
     DatasetModel
@@ -60,7 +60,18 @@ class ScanningImagesAndJsonUsecase:
     def __init__(self):
         self.image_repository = ImageRepository()
         
-    def scanning_images_and_json(self, dataset_id_list, dataset_source_folder_path):
+    def scanning_images_and_json(self, dataset_id_list, dataset_source_folder_path):        
+        for dataset_id in dataset_id_list:  
+            dataset = DatasetModel.find_by(dataset_id)
+            if dataset is None:
+                raise ValueError('dataset is not found by dataset id: '  + str(dataset_id))
+            path = dataset_source_folder_path + '/' + dataset.name
+            labelme_json = self.find_labelme_json_string(path)
+            result = LabelChecker.check_string(labelme_json)
+            if result.is_success() == False:
+                return result
+            
+        
         for dataset_id in dataset_id_list:  
             dataset = DatasetModel.find_by(dataset_id)
             if dataset is None:
@@ -74,12 +85,15 @@ class ScanningImagesAndJsonUsecase:
         self.move_content_from_source_to_dataset(dataset, dataset_source_folder_path)
         self.image_repository.create_images_from(dataset.id)
         self.scan_annotation_from_json(dataset_id, dataset_source_folder_path)
-
+        
     def move_content_from_source_to_dataset(self, dataset, dataset_source_folder_path):
         moveService = MoveService(self.image_repository)
         moveService.move_content_from_source_to_dataset(dataset, dataset_source_folder_path)
 
     def scan_annotation_from_json(self, dataset_id, dataset_source_folder_path):
-        labelme_json_string = JsonFileFinder().find_json_in_the(dataset_source_folder_path)
+        labelme_json_string = self.find_labelme_json_string(dataset_source_folder_path)
         usecase = ImportAnnotationsToAllImagesUsecase.create()
         usecase.execute(dataset_id, labelme_json_string)
+
+    def find_labelme_json_string(self, dataset_source_folder_path):
+        return JsonFileFinder().find_json_in_the(dataset_source_folder_path)

@@ -145,7 +145,7 @@ class LabelmeId(Resource):
         return {
                 "state": False,
                 "code": 400,
-                "message": result.error_messages(),
+                "message": result.error_messages,
                 "result": ""
         }
 
