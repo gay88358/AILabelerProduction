@@ -1,4 +1,6 @@
 import AffectedDataset from './affectedDataset'
+// import { reactive, computed } from '@vue/composition-api';
+
 
 const state = {
     current_stripID: "",

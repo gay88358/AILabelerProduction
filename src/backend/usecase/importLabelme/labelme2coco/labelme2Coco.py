@@ -108,16 +108,16 @@ class Labelme2CoCoConverter:
             annotation['metadata'] = {}
 
     def append_type_code_to(self, annotation, shape):
-        annotation['Type'] = shape['Type']
+        annotation['Type'] = shape.get('Type', "")
 
     def append_labels_metadata_to(self, annotation, shape):
-        annotation['Score'] = shape['Score']
-        annotation['manualPoints'] = shape['manualPoints']
-        annotation['iou'] = shape['iou']
-        annotation['vertex_color'] = shape['vertex_color']
-        annotation['line_color'] = shape['line_color']
-        annotation['fill_color'] = shape['fill_color']
-        annotation['IgnoreShapes'] = shape['IgnoreShapes']
+        annotation['Score'] = shape.get('Score', 0)
+        annotation['manualPoints'] = shape.get('manualPoints', [])
+        annotation['iou'] = shape.get('iou', -1)
+        annotation['vertex_color'] = shape.get('vertex_color', [])
+        annotation['line_color'] = shape.get('line_color', [])
+        annotation['fill_color'] = shape.get('fill_color', [])
+        annotation['IgnoreShapes'] = shape.get('IgnoreShapes', [])
         
     def get_segmentation(self, shape):
         result = []
