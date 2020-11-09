@@ -109,7 +109,7 @@ class LabelmeId(Resource):
         result = self.create_user()\
         .flat_map(lambda _: self.add_shared_folder_to_user(stripID, dataset_names)\
         .flat_map(lambda user: self.create_all_dataset(user)\
-        .flat_map(lambda dataset_id_list: self.scanning_images_and_json(dataset_id_list, user, stripID)) 
+        .flat_map(lambda dataset_id_list: self.scanning_images_and_json(dataset_id_list, user)) 
         ))
         return self.response(result)
       
@@ -123,15 +123,12 @@ class LabelmeId(Resource):
     def add_shared_folder_to_user(self, stripID, dataset_name_list):
         return AddSharedFolderUsecase()\
             .execute(current_user, stripID, dataset_name_list)
-        # docker_mount_directory = "/worksapce/sharedFolder/ATWEX" 
-        # current_user.add_shared_folder("", dataset_name_list, docker_mount_directory)
-        # return Result.success(current_user)
 
     def create_all_dataset(self, user):
         dataset_name_list = user.get_dataset_name_list()
         return CreateNewDatasetUsecase().create_all_dataset(dataset_name_list)
     
-    def scanning_images_and_json(self, dataset_id_list, user, stripID):
+    def scanning_images_and_json(self, dataset_id_list, user):
         return ScanningImagesAndJsonUsecase()\
             .scanning_images_and_json(
                 dataset_id_list, 

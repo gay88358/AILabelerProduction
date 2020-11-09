@@ -96,7 +96,6 @@ export default {
         "state": true,
         "result": this.$store.getters.getAffectedDatasetMetadata
       }
-      console.log('sending');
       this.notify(JSON.stringify(result));
     },
     notify(message) {

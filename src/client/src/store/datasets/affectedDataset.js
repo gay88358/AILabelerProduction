@@ -34,8 +34,8 @@ export default class AffectedDataset {
 
     removeStripId(datasetName) {
         let tokens = datasetName.split('/')
-        let last_index = tokens.length - 1
-        return tokens[last_index]
+        let dataset_name_index = tokens.length - 1
+        return tokens[dataset_name_index]
     }
 
     getAffectedDatasetSize() {
