@@ -72,9 +72,7 @@ export default {
 <style scoped>
 select {
   width: 200px;
-  border: 0;
-  background: transparent;
-  color: white;
+  border: 0;  
   border: 2px solid green;
   padding: 5px;
 }
