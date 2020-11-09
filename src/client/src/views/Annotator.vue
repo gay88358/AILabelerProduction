@@ -12,7 +12,6 @@
         />
         <hr />
 
-        <Test :key="t.title" :annotation="t" v-for="t in testData"></Test>
         <BBoxTool
           v-model="activeTool"
           :scale="image.scale"
@@ -259,13 +258,11 @@ import BrushPanel from "@/components/annotator/panels/BrushPanel";
 import EraserPanel from "@/components/annotator/panels/EraserPanel";
 import KeypointPanel from "@/components/annotator/panels/KeypointPanel";
 import DEXTRPanel from "@/components/annotator/panels/DEXTRPanel";
-import Test from "@/views/Test";
 import { mapMutations, mapGetters } from "vuex";
 
 export default {
   name: "Annotator",
   components: {
-    Test,
     FileTitle,
     CopyAnnotationsButton,
     Category,
@@ -997,9 +994,6 @@ export default {
     }
   },
   computed: {
-    testData() {
-      return this.$store.getters.getTestData;
-    },
     doneLoading() {
       return !this.loading.image && !this.loading.data;
     },

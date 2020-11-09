@@ -1,3 +1,5 @@
+import Vue from 'vue';
+
 export default 
 class Annotator {
     static of(annotatorDataString) {
@@ -8,7 +10,16 @@ class Annotator {
     constructor(annotatorData) {
         this.annotatorData = annotatorData;
         this.currentAnnotationData = null;
-        this.currentCategoryId = null;
+        this.currentCategoryName = "";
+    }
+
+    setSelectedAnnotationAndCategory(categoryId, annotationId) {
+        this.setSelectedAnnotation(categoryId, annotationId);
+        this.currentCategoryName = this.getCategoryName(categoryId);
+    }
+
+    getCurrentCategoryName() {
+        return this.currentCategoryName;
     }
 
     getAnnotatorData() {
@@ -41,13 +52,25 @@ class Annotator {
         return result[0].name;
     }
 
+    hasSelectedAnnotation() {
+        return this.currentAnnotationData != null;
+    }
+
     getSelectedAnnotation() {
-        return this.currentAnnotationData;
+        if (!this.hasSelectedAnnotation())
+            return {
+                Type: "",
+                Class: ""
+            }
+        //let annotation = state.annotatorData.getSelectedAnnotation();
+        return { 
+                Type: this.currentAnnotationData.metadata['Type'],
+                Class: this.currentAnnotationData.metadata['class'] || ''
+        };
     }
 
     updateSelectedAnnotationMetadata(typeValue, classValue) {
-        // this.currentAnnotationData.metadata['Type'] = typeValue;
-        this.currentAnnotationData.metadata['class'] = classValue;
+        Vue.set(this.currentAnnotationData.metadata, 'class', classValue)
     }
 
     findAnnotationMetadataBy(categoryId, annotationId) {

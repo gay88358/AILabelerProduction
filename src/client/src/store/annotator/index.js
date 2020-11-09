@@ -1,23 +1,29 @@
 import Annotator from './annotatorObject';
 import axios from "axios";
 
+
+class NullAnnotator {
+    hasSelectedAnnotation() {
+        return false;
+    }
+
+    getCurrentCategoryName() {
+        return "";
+    }
+}
+
 const state = {
-    annotatorData: null,
-    selectedAnnotation: null,
+    annotatorData: new NullAnnotator(),
     selectedCategoryName: "",
     defectCodeCatalog: [],
-    categoriesData: [],
 }
 
 const mutations = {
     UPDATE_ANNOTATOR_DATA (state, payload) {
         state.annotatorData = new Annotator(payload);
-        state.categoriesData = state.annotatorData.getAnnotatorData();
     },
     SET_SELECTED_ANNOTATION (state, {categoryId, annotationId}) {
-        state.annotatorData.setSelectedAnnotation(categoryId, annotationId);
-        state.selectedAnnotation = state.annotatorData.getSelectedAnnotation();
-        state.selectedCategoryName = state.annotatorData.getCategoryName(categoryId);
+        state.annotatorData.setSelectedAnnotationAndCategory(categoryId, annotationId);
     },
     UPDATE_ANNOTATION_METADATA(state, { annotationType, annotationClass }) {
         state.annotatorData.updateSelectedAnnotationMetadata(annotationType, annotationClass);        
@@ -66,22 +72,19 @@ class DefectCodeCatalog {
 
 const getters = {
     getDefectCodeOfSelectedAnnotation: state => {
-        if (!state.selectedAnnotation == null)
+        if (!state.annotatorData.hasSelectedAnnotation())
             return [];
         return new DefectCodeCatalog(state.defectCodeCatalog)
-        .getDefectCodeListBy(state.selectedCategoryName)
+        .getDefectCodeListBy(state.annotatorData.getCurrentCategoryName())
     },
     hasAnnotationSelected: state => {
-        return state.selectedAnnotation !== null
+        return state.annotatorData.hasSelectedAnnotation();
     },
     getSelectedAnnotation: state => {
-        return  { 
-            Type: state.selectedAnnotation.metadata['Type'],
-            Class: state.selectedAnnotation.metadata['class'] || ''
-        }
+        return state.annotatorData.getSelectedAnnotation();
     },
     getCategories: state => {
-        return state.categoriesData;
+        return state.annotatorData.getAnnotatorData();
     },
     getDefectCodeList: (state) => (categoryName) => {
         return new DefectCodeCatalog(state.defectCodeCatalog)

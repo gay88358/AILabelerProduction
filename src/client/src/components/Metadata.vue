@@ -194,6 +194,7 @@ export default {
   watch: {
     metadata: {
         handler(val){
+          console.log('metadata update');
           this.loadMetadata();
         },
         deep: true
