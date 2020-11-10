@@ -3,6 +3,11 @@ from usecase.importLabelme.labelmeChecker import LabelChecker
 
 class TestCase:
 
+    def test_check_labelme_str(self):
+        labelme_str = '{"Labels": []}'
+        result = LabelChecker.check_string(labelme_str)
+        assert  result.is_success() == True
+
     def test_check_empty_labelme_json(self):
         labelme_json = self.get_empty_labelme_json()
 

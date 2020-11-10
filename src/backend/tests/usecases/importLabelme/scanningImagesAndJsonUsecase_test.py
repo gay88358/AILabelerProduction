@@ -1,6 +1,7 @@
 from usecase.importLabelme.scanningImagesAndJsonUsecase import (
     ImageRepository,
-    FilePathFinder
+    FilePathFinder,
+    ScanningImagesAndJsonUsecase
 )
 
 from ..utility.usecaseFixture import (

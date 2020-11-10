@@ -48,8 +48,9 @@ class FindPaginationDatasetUsecase:
         return objects_list
 
     def find_datasets_by(self, stripID):
-
-        return DatasetModel.find_by_name_contain(stripID)
+            # contain bugs, id need to 123/ exactly
+        key = stripID + "/"
+        return DatasetModel.find_by_name_contain(key)
 
         # datasets = list(
         #     map(

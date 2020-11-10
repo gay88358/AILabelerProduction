@@ -11,4 +11,10 @@ class SharedFolder:
             return self.mount_root + '/' + dataset_name
         raise ValueError('Given dataset name is invlide: ' + dataset_name)
     
+    def contains(self, dataset_name_list):
+        for d in dataset_name_list:
+            if d not in self.dataset_name_list:
+                return False
+        return True
+
 __all__ = ["SharedFolder"]

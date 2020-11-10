@@ -34,7 +34,8 @@ const getters = {
             id: state.current_stripID,
             dataset: state.affectedDataset.getAffectedDatasetNameList()
         }
-    }
+    },
+    getCurrentStripID: state => state.current_stripID
 }
 
 const datasetDataModule = {

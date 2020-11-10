@@ -15,7 +15,7 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
 class ImageModel(DynamicDocument):
-
+    meta = { 'allow_inheritance': True }
     COCO_PROPERTIES = ["id", "width", "height", "file_name", "path", "license",\
                        "flickr_url", "coco_url", "date_captured", "dataset_id"]
 
@@ -115,7 +115,7 @@ class ImageModel(DynamicDocument):
         self.thumbnail_delete()
         AnnotationModel.objects(image_id=self.id).delete()
         return super(ImageModel, self).delete(*args, **kwargs)
-
+    
     def add_num_annotation(self, num_annotation_to_add):
         old_num_annotations = self.num_annotations
         new_num_annotations = old_num_annotations + num_annotation_to_add
@@ -165,7 +165,6 @@ class ImageModel(DynamicDocument):
 
         if not os.path.exists(directory):
             os.makedirs(directory)
-        
         return path
     
     def thumbnail_delete(self):

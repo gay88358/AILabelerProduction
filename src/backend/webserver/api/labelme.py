@@ -1,5 +1,5 @@
 
-from usecase.util.result import Result
+from usecase.importLabelme.datasetRepository import DatasetRepository
 from flask_restplus import Namespace, Resource, reqparse
 from flask_login import current_user
 from flask_restplus import Namespace, Resource, reqparse
@@ -106,9 +106,10 @@ class LabelmeId(Resource):
         stripID = args['id']
         dataset_names = args['dataset']
 
+        
         result = self.create_user()\
         .flat_map(lambda _: self.add_shared_folder_to_user(stripID, dataset_names)\
-        .flat_map(lambda user: self.create_all_dataset(user)\
+        .flat_map(lambda user: self.create_all_dataset(user, stripID)\
         .flat_map(lambda dataset_id_list: self.scanning_images_and_json(dataset_id_list, user)) 
         ))
         return self.response(result)
@@ -121,13 +122,14 @@ class LabelmeId(Resource):
         return CreateUserUsecase(EncryptionService()).create(username, password, name, email)
   
     def add_shared_folder_to_user(self, stripID, dataset_name_list):
-        return AddSharedFolderUsecase()\
+        return AddSharedFolderUsecase(DatasetRepository())\
             .execute(current_user, stripID, dataset_name_list)
 
-    def create_all_dataset(self, user):
-        dataset_name_list = user.get_dataset_name_list()
+    def create_all_dataset(self, user, stripID):
+        # select dataset_name_list by stripId
+        dataset_name_list = user.get_dataset_name_list_with(stripID)
         return CreateNewDatasetUsecase().create_all_dataset(dataset_name_list)
-    
+
     def scanning_images_and_json(self, dataset_id_list, user):
         return ScanningImagesAndJsonUsecase()\
             .scanning_images_and_json(

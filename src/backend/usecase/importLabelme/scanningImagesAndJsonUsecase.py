@@ -5,6 +5,7 @@ from ..util.commandHelper import CommandHelper
 from .jsonFileFinder import JsonFileFinder
 from .filePathFinder import FilePathFinder
 from .labelmeChecker import LabelChecker
+from .mountDirectory import format_mount_directory
 from database import (
     ImageModel,
     DatasetModel
@@ -60,25 +61,38 @@ class ScanningImagesAndJsonUsecase:
     def __init__(self):
         self.image_repository = ImageRepository()
         
-    def scanning_images_and_json(self, dataset_id_list, dataset_source_folder_path):        
-        for dataset_id in dataset_id_list:  
-            dataset = DatasetModel.find_by(dataset_id)
-            if dataset is None:
-                raise ValueError('dataset is not found by dataset id: '  + str(dataset_id))
-            path = dataset_source_folder_path + '/' + dataset.name
-            labelme_json = self.find_labelme_json_string(path)
+    def scanning_images_and_json(self, dataset_id_list, dataset_source_folder_path):                
+        return self.check_all_labelme_json(dataset_id_list, dataset_source_folder_path) \
+            .flat_map(lambda _: self.import_json_to_all_dataset(dataset_id_list, dataset_source_folder_path))
+
+    def import_json_to_all_dataset(self, dataset_id_list, dataset_source_folder_path):
+        for dataset in self.find_dataset_by(dataset_id_list):
+            result = format_mount_directory(dataset_source_folder_path, dataset.name)
+            if result.is_success():
+                self.execute(dataset.id, result.value)
+            else:
+                return result
+        return Result.success(dataset_id_list)
+
+
+    def check_all_labelme_json(self, dataset_id_list, dataset_source_folder_path):
+        for dataset in self.find_dataset_by(dataset_id_list):
+            result = format_mount_directory(dataset_source_folder_path, dataset.name)
+
+            labelme_json = self.find_labelme_json_string(result.value)
             result = LabelChecker.check_string(labelme_json)
             if result.is_success() == False:
                 return result
-            
-        
+        return Result.success('')
+
+    def find_dataset_by(self, dataset_id_list):
+        result = []
         for dataset_id in dataset_id_list:  
             dataset = DatasetModel.find_by(dataset_id)
             if dataset is None:
                 raise ValueError('dataset is not found by dataset id: '  + str(dataset_id))
-            
-            self.execute(dataset_id, dataset_source_folder_path + '/' + dataset.name)
-        return Result.success(dataset_id_list)
+            result.append(dataset)
+        return result
 
     def execute(self, dataset_id, dataset_source_folder_path):
         dataset = DatasetModel.find_by(dataset_id)

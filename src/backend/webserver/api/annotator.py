@@ -30,6 +30,9 @@ class AggregateData:
 
     def get_image_id(self):
         return self.json_data['image']['id']
+    
+    def get_stripID(self):
+        return self.json_data['stripID']
 
 @api.route('/data')
 class AnnotatorData(Resource):
@@ -64,7 +67,7 @@ class AnnotatorData(Resource):
         return usecase.execute(aggregate.get_image_id())
 
     def write_back_to_shared_folder(self, labelme_document, aggregate):
-        file_directory = current_user.get_shared_folder().get_mount_directory(aggregate.get_dataset_name())
+        file_directory = current_user.get_shared_folder_with(aggregate.get_stripID()).get_mount_directory(aggregate.get_dataset_name())
         json_file_finder = JsonFileFinder()
         if json_file_finder.json_file_size(file_directory) > 1:
             raise ValueError("Dataset folder contains atmost one json file, please remove redundant json file")

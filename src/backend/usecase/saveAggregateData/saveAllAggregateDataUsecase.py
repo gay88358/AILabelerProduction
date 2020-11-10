@@ -29,7 +29,6 @@ class SaveAllAggregateDataUsecase:
 
         self.update_all_category(data, current_user)
 
-
         num_annotations = UpdateAnnotationsUsecase().execute(data, current_user)
 
         UpdateAllImagesInTheDatasetUsecase().execute(num_annotations, self.data_hodler)

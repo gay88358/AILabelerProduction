@@ -401,7 +401,8 @@ export default {
           zoom: this.zoom,
           tools: {}
         },
-        categories: []
+        categories: [],
+        stripID: this.$store.getters.getCurrentStripID
       };
 
       if (refs.category != null && this.mode === "segment") {

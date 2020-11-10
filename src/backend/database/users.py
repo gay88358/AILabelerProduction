@@ -26,6 +26,7 @@ class UserModel(DynamicDocument, UserMixin):
     permissions = ListField(defualt=[])
     dataset_name_list = ListField(defualt=[])
 
+    strip_dataset_name_list = DictField(default={})
     # meta = {'allow_inheritance': True}
 
     @staticmethod
@@ -105,7 +106,6 @@ class UserModel(DynamicDocument, UserMixin):
         self.__setattr__("root", root)
         
         self.set_dataset_name_list(dataset_name_list)
-
         self.__setattr__("mount_root", mount_root)
         self.save()
 
@@ -187,4 +187,19 @@ class UserModel(DynamicDocument, UserMixin):
     def is_same_password(self, password, check_password_hash):
         return check_password_hash(self.password, password)
 
+    def add_strip_folder(self, stripID, dataset_name_list, mount_directory):
+        self.strip_dataset_name_list[stripID] = dataset_name_list
+        self.__setattr__("mount_root", mount_directory)
+        self.save()
+
+    def get_shared_folder_with(self, stripID):
+        dataset_name_list = self.strip_dataset_name_list[stripID]
+        return SharedFolder("", dataset_name_list, self.mount_root)
+
+    def get_dataset_name_list_with(self, stripID):
+        if stripID in self.strip_dataset_name_list:
+            return self.strip_dataset_name_list[stripID]
+            
+        err_msg = 'Given stripID: {} is invalid'.format(stripID)
+        raise ValueError(err_msg)
 __all__ = ["UserModel"]

@@ -1,7 +1,6 @@
 from usecase.util.result import Result
 import json
 
-# todo check all shape
 class LabelChecker:
 
     INVALID_TYPE =  'Shape must contain Type property'       
@@ -10,7 +9,8 @@ class LabelChecker:
     
     @staticmethod
     def check_string(labelme_json_string):
-        return LabelChecker.check(json.loads(labelme_json_string))
+        d = json.loads(labelme_json_string)
+        return LabelChecker.check(d)
 
     @staticmethod
     def check(labelme_document):

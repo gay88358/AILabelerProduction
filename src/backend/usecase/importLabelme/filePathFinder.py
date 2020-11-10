@@ -3,6 +3,7 @@ from usecase.util.commandHelper import CommandHelper
 
 class FilePathFinder:
 
+
     @staticmethod
     def delete_all_contents_in(directory):
         for file_path in FilePathFinder.find_file_path_in(directory):

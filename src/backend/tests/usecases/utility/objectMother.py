@@ -2,6 +2,7 @@
 from os import stat
 from database import (ImageModel, CategoryModel, AnnotationModel, UserModel)
 from usecase.importLabelme.addCategoriesToDatasetUseCase import AddCategoriesToDatasetUseCase
+from mongoengine import *
 
 
 class FakeCurrentUser:
@@ -56,6 +57,14 @@ class MockAddCategoriesToDatasetUseCase(AddCategoriesToDatasetUseCase):
         self.fake_dataset = fake_dataset
 
 
+class MockImage(ImageModel):
+    def thumbnail_delete(self):
+        pass
+    
+    @staticmethod
+    def delete_all():
+        MockImage.objects.delete()
+
 class Mother:
 
     @staticmethod
@@ -103,7 +112,7 @@ class Mother:
 
     @staticmethod
     def create_image_by(image_name, dataset_id=1):
-        image_model = ImageModel(
+        image_model = MockImage(
             dataset_id=dataset_id,
             file_name=image_name,
             width=1300,

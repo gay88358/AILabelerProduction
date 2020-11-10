@@ -57,4 +57,7 @@ class Finder:
     
     @staticmethod
     def find_annotation_by(annotation_id):
-        return AnnotationModel.objects.get(id=annotation_id)
+        try:
+            return AnnotationModel.objects.get(id=annotation_id)
+        except:
+            return None

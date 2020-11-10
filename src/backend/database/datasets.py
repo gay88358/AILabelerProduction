@@ -27,6 +27,15 @@ class DatasetModel(DynamicDocument):
     deleted = BooleanField(default=False)
     deleted_date = DateTimeField()
 
+
+    @staticmethod
+    def delete_by_id(dataset_id):
+        try:
+            DatasetModel.objects(id=dataset_id).delete()
+        except:
+            return None
+
+
     @staticmethod
     def find_by_name_contain(stripID):
         try:
