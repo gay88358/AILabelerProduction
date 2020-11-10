@@ -65,6 +65,16 @@ class ScanningImagesAndJsonUsecase:
         return self.check_all_labelme_json(dataset_id_list, dataset_source_folder_path) \
             .flat_map(lambda _: self.import_json_to_all_dataset(dataset_id_list, dataset_source_folder_path))
 
+    # traverse api for functional api
+    def check_all_labelme_json(self, dataset_id_list, dataset_source_folder_path):
+        for dataset in self.find_dataset_by(dataset_id_list):
+            result = format_mount_directory(dataset_source_folder_path, dataset.name)
+            labelme_json = self.find_labelme_json_string(result.value)
+            result = LabelChecker.check_string(labelme_json)
+            if result.is_success() == False:
+                return result
+        return Result.success('')
+
     def import_json_to_all_dataset(self, dataset_id_list, dataset_source_folder_path):
         for dataset in self.find_dataset_by(dataset_id_list):
             result = format_mount_directory(dataset_source_folder_path, dataset.name)
@@ -73,17 +83,6 @@ class ScanningImagesAndJsonUsecase:
             else:
                 return result
         return Result.success(dataset_id_list)
-
-
-    def check_all_labelme_json(self, dataset_id_list, dataset_source_folder_path):
-        for dataset in self.find_dataset_by(dataset_id_list):
-            result = format_mount_directory(dataset_source_folder_path, dataset.name)
-
-            labelme_json = self.find_labelme_json_string(result.value)
-            result = LabelChecker.check_string(labelme_json)
-            if result.is_success() == False:
-                return result
-        return Result.success('')
 
     def find_dataset_by(self, dataset_id_list):
         result = []

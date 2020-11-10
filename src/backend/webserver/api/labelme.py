@@ -13,6 +13,7 @@ from usecase.user.createUserUsecase import CreateUserUsecase
 
 from usecase.util.jsonHelper import JsonHelper
 
+from .common.response import *
 
 import logging
 logger = logging.getLogger('gunicorn.error')
@@ -112,7 +113,7 @@ class LabelmeId(Resource):
         .flat_map(lambda user: self.create_all_dataset(user, stripID)\
         .flat_map(lambda dataset_id_list: self.scanning_images_and_json(dataset_id_list, user)) 
         ))
-        return self.response(result)
+        return response(result)
       
     def create_user(self):
         username = "WebUILabeler"
@@ -136,27 +137,3 @@ class LabelmeId(Resource):
                 dataset_id_list, 
                 user.get_shared_folder().mount_root
             )
-
-    def response(self, result):
-        if result.is_success():
-            return self.success(result)
-        else:
-            return self.error(result)
-
-    def error(self, result):
-        return {
-                "state": False,
-                "code": 400,
-                "message": result.error_messages,
-                "result": ""
-        }
-
-    def success(self, result):
-        return {
-                "state": True,
-                "code": 200,
-                "message": "create success",
-                "result": result.value
-        }
-        
-    
