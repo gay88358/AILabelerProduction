@@ -72,7 +72,7 @@ class TestCase:
     def test_convert_labelme_to_coco_format(self, labelme_json_string):
         image_bound_size = [1200, 1200]
         result = Labelme2CoCoConverter(image_bound_size).convert(labelme_json_string)
-        # JsonHelper.write_json("/Users/koushiken/Desktop/coco-annotator-0.11.1/backend/tests/usecases/format_converter/test_data/parital_coco.json", result)
+        JsonHelper.write_json("/Users/koushiken/Desktop/coco-annotator-0.11.1/backend/tests/usecases/format_converter/test_data/parital_coco.json", result)
         print(result)
         assert result == self.expected_coco_format()
 

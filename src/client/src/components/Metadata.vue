@@ -120,7 +120,7 @@ export default {
       defect_code: "",
       annotationType: "",
       TYPE_KEY: "Type",
-      CLASS_KEY: "class"
+      CLASS_KEY: "Class"
     };
   },
   methods: {

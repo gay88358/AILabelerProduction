@@ -10,7 +10,6 @@ class Annotation:
         self.typeCheckers.append(CircleTypeChecker())
         self.typeCheckers.append(PolygonTypeChecker())
         self.segmentation = Segmentation(self.document['segmentation'])
-        # raise ValueError(jsonDocument['metadata'])
         
     def get_all_shapes(self):
         result = []
@@ -35,12 +34,12 @@ class Annotation:
     
     def append_attributes_to(self, shape):
         shape['Attributes'] = {}
+
+        isAttributes = ["Class", "Vim300_Code", "ID", "object_center", "rotation_center", "rotation_angle"]
         
-        contains_defect_code = 'class' in self.document['metadata']
-        if contains_defect_code:
-            shape['Attributes'] = {
-                "class": self.document['metadata']['class']
-            }
+        for key, value in self.document['metadata'].items():
+            if key in isAttributes:
+                shape['Attributes'][key] = value
 
     def get_shape_type(self, index):
         for checker in self.typeCheckers:

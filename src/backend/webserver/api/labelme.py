@@ -50,7 +50,9 @@ class DefectCode(Resource):
             .map(lambda loader: loader.load_defect_code())
         if result.is_success() == False:
             return []
-        return result.value
+        import json
+        return json.dumps(result.value)
+        # return result.value
         
 @api.route('/create')
 class LabelmeId(Resource):

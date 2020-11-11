@@ -107,7 +107,7 @@ export default {
       } else {
         string += "Metadata \n";
         metadata.forEach(element => {
-          const DEFECT_CODE_KEY = "class"
+          const DEFECT_CODE_KEY = "Class"
           const ANNOTATION_TYPE_KEY = "Type"
           if (element.key == DEFECT_CODE_KEY || element.key == ANNOTATION_TYPE_KEY) {
             string += " " + element.key + " = " + element.value + " \n";

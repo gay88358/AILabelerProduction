@@ -65,12 +65,16 @@ class Annotator {
         //let annotation = state.annotatorData.getSelectedAnnotation();
         return { 
                 Type: this.currentAnnotationData.metadata['Type'],
-                Class: this.currentAnnotationData.metadata['class'] || ''
+                Class: this.currentAnnotationData.metadata['Class'] || ''
         };
     }
 
-    updateSelectedAnnotationMetadata(typeValue, classValue) {
-        Vue.set(this.currentAnnotationData.metadata, 'class', classValue)
+    updateSelectedAnnotationMetadata(typeValue, classValue, defectCodeCatalog) {
+        Vue.set(this.currentAnnotationData.metadata, 'Class', classValue)
+
+        let vim300Code = defectCodeCatalog.getVIM300Code(this.getCurrentCategoryName(), classValue)
+        console.log(vim300Code)
+        Vue.set(this.currentAnnotationData.metadata, 'Vim300_Code', vim300Code)
     }
 
     findAnnotationMetadataBy(categoryId, annotationId) {

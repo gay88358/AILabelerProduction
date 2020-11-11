@@ -43,9 +43,15 @@ class DefectCodeParser:
     
     def to_defect_code_list(self, labels):
         return list(map(
-            lambda l: l['Defect_Code'],
+            lambda l: self.create_defect_code_dict(l),
             labels
         ))
+
+    def create_defect_code_dict(self, label):
+        defect_code_dict = {}
+        defect_code_dict['Defect_Code'] = label['Defect_Code']
+        defect_code_dict['Vim300_Code'] = label['Vim300_Code']
+        return defect_code_dict
 
 class DefectCodeLoader:
     @staticmethod

@@ -21,9 +21,9 @@ class CoCo2LabelmeConverter:
     def appendLabelsTo(self, result):
         result['Labels'] = list(
             map(
-                lambda c: {
-                'Label': c['name'],
-                'Shapes': self.get_shapes_by(c)
+                lambda category: {
+                    'Label': category['name'],
+                    'Shapes': self.get_shapes_by(category)
                 }, 
                 self.get_categories_document()
             )
