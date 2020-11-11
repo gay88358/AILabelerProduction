@@ -15,6 +15,12 @@ class ImageRepository:
     def __init__(self):
         self.dataset = None
 
+    def create_images_from(self, dataset_id):
+        self.set_dataset_by(dataset_id)
+        image_file_paths = FilePathFinder().find_image_file_path_in(self.dataset.directory)
+        self.create_images_by_path_list(image_file_paths)
+        self.create_thumbnail_for_all_images()
+
     def delete_image_in_the(self, dataset):
         self.remove_images_model_in_the(dataset)
         for file_path in FilePathFinder.find_file_path_in(dataset.directory):
@@ -26,21 +32,12 @@ class ImageRepository:
             image.thumbnail_delete()
             image.delete()
 
-    def create_images_from(self, dataset_id):
-        self.set_dataset_by(dataset_id)
-        image_file_paths = FilePathFinder().find_image_file_path_in(self.dataset.directory)
-        self.create_images_by_path_list(image_file_paths)
-        self.create_thumbnail_for_all_images()
-
     def create_images_by_path_list(self, image_file_paths):
         for path in image_file_paths:
             self.create_image_by_path(path)
 
     def set_dataset_by(self, dataset_id):
-        self.dataset = self.find_dataset_by(dataset_id)
-
-    def find_dataset_by(self, dataset_id):
-        return DatasetModel.objects.get(id=dataset_id)
+        self.dataset = DatasetModel.find_by(dataset_id)
 
     def create_image_by_path(self, path):
         if path.endswith(ImageModel.PATTERN):
@@ -67,7 +64,7 @@ class ScanningImagesAndJsonUsecase:
 
     # traverse api for functional api
     def check_labelme_json(self, dataset_id_list, dataset_source_folder_path):
-        for dataset in self.find_dataset_by(dataset_id_list):
+        for dataset in DatasetModel.find_datasets_by_id_list(dataset_id_list):
             result = format_mount_directory(dataset_source_folder_path, dataset.name)\
                 .flat_map(lambda path: self.find_labelme_json(path)\
                 .flat_map(lambda labelme_json: LabelChecker.check_string(labelme_json)))
@@ -76,21 +73,12 @@ class ScanningImagesAndJsonUsecase:
         return Result.success('')
 
     def import_json_to_all_dataset(self, dataset_id_list, dataset_source_folder_path):
-        for dataset in self.find_dataset_by(dataset_id_list):
+        for dataset in DatasetModel.find_datasets_by_id_list(dataset_id_list):
             result = format_mount_directory(dataset_source_folder_path, dataset.name)\
                 .flat_map(lambda path: self.execute(dataset.id, path))
             if result.is_success() == False:
                 return result
         return Result.success(dataset_id_list)
-
-    def find_dataset_by(self, dataset_id_list):
-        result = []
-        for dataset_id in dataset_id_list:  
-            dataset = DatasetModel.find_by(dataset_id)
-            if dataset is None:
-                raise ValueError('dataset is not found by dataset id: '  + str(dataset_id))
-            result.append(dataset)
-        return result
 
     def execute(self, dataset_id, dataset_source_folder_path):
         dataset = DatasetModel.find_by(dataset_id)

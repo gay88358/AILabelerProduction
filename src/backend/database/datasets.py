@@ -27,6 +27,16 @@ class DatasetModel(DynamicDocument):
     deleted = BooleanField(default=False)
     deleted_date = DateTimeField()
 
+    @staticmethod
+    def find_datasets_by_id_list(dataset_id_list):
+        result = []
+        for dataset_id in dataset_id_list:  
+            dataset = DatasetModel.find_by(dataset_id)
+            if dataset is None:
+                raise ValueError('dataset is not found by dataset id: '  + str(dataset_id))
+            result.append(dataset)
+        return result
+
 
     @staticmethod
     def delete_by_id(dataset_id):
