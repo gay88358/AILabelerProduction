@@ -27,12 +27,10 @@ class MockImageCreator(ImageRepository):
     def find_dataset_by(self, dataset_id):
         return self.dataset
 
+    def set_dataset_by(self, dataset_id):
+        pass
 
 class TestCase:
-
-    def test_find_file_path(self):
-        paths = FilePathFinder.find_file_path_in(self.get_directory())
-        assert len(paths) == 4
 
     def test_sanning_image_and_json(self, mongo_connection_setup):
         # Arrange

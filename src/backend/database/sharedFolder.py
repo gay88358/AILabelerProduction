@@ -9,7 +9,8 @@ class SharedFolder:
     def get_mount_directory(self, dataset_name):
         if dataset_name in self.dataset_name_list:
             return self.mount_root + '/' + dataset_name
-        raise ValueError('Given dataset name is invlide: ' + dataset_name)
+        err_msg = 'Given dataset name is not contained in dataset_name_list: {}'.format(dataset_name)
+        raise ValueError(err_msg)
     
     def contains(self, dataset_name_list):
         for d in dataset_name_list:

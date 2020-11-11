@@ -2,8 +2,6 @@ import os
 from usecase.util.jsonHelper import JsonHelper
 from usecase.util.result import Result
 
-
-
 class DefectCodeParser:
     def __init__(self, defect_code_document):
         self.labels = defect_code_document['Label']
@@ -50,7 +48,6 @@ class DefectCodeParser:
         ))
 
 class DefectCodeLoader:
-
     @staticmethod
     def create():
         try:

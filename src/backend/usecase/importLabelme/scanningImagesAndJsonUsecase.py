@@ -14,31 +14,20 @@ from database import (
 class ImageRepository:    
     def __init__(self):
         self.dataset = None
-
+        
     def create_images_from(self, dataset_id):
         self.set_dataset_by(dataset_id)
         image_file_paths = FilePathFinder().find_image_file_path_in(self.dataset.directory)
         self.create_images_by_path_list(image_file_paths)
         self.create_thumbnail_for_all_images()
 
-    def delete_image_in_the(self, dataset):
-        self.remove_images_model_in_the(dataset)
-        for file_path in FilePathFinder.find_file_path_in(dataset.directory):
-            result = CommandHelper.execute(['rm', file_path])
-
-    def remove_images_model_in_the(self, dataset):
-        images = ImageModel.objects(dataset_id=dataset.id)
-        for image in images:
-            image.thumbnail_delete()
-            image.delete()
+    def set_dataset_by(self, dataset_id):
+        self.dataset = DatasetModel.find_by(dataset_id)
 
     def create_images_by_path_list(self, image_file_paths):
         for path in image_file_paths:
             self.create_image_by_path(path)
-
-    def set_dataset_by(self, dataset_id):
-        self.dataset = DatasetModel.find_by(dataset_id)
-
+            
     def create_image_by_path(self, path):
         if path.endswith(ImageModel.PATTERN):
             db_image = ImageModel.objects(path=path).first()
@@ -53,6 +42,18 @@ class ImageRepository:
     def create_thumbnail_for_all_images(self):
         from workers.tasks.thumbnails import thumbnail_generate_single_image
         [thumbnail_generate_single_image.delay(image.id) for image in ImageModel.objects(regenerate_thumbnail=True).all()]
+
+    def delete_image_in_the(self, dataset):
+        self.remove_images_model_in_the(dataset)
+        self.remove_image_files_in_the(dataset)
+
+    def remove_images_model_in_the(self, dataset):
+        for image in ImageModel.find_images_by_dataset_id(dataset.id):
+            image.delete()
+
+    def remove_image_files_in_the(self, dataset):
+        for file_path in FilePathFinder.find_file_path_in(dataset.directory):
+            result = CommandHelper.execute(['rm', file_path])
 
 class ScanningImagesAndJsonUsecase:
     def __init__(self):

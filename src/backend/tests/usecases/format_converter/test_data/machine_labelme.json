@@ -35,7 +35,12 @@
           "manualPoints": [],
           "iou": -1,
           "Attributes": {
-            "class": "first defect"
+            "Class": "first defect",
+            "Vim300_code": "1003",
+            "ID": "1",
+            "object_center": "1159,1474",
+            "rotation_center": "1159,1474",
+            "rotation_angle": "0"
           },
           "vertex_color": [
             0,
@@ -2777,7 +2782,7 @@
           "manualPoints": [],
           "iou": -1,
           "Attributes": {
-            "class": "broken"
+            "Class": "broken"
           },
           "vertex_color": [
             0,

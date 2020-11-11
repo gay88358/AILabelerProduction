@@ -34,6 +34,8 @@ class JsonFileFinder:
 
     def json_file_size(self, directory):
         file_paths = self.get_all_file_path_in_the(directory)
+        # err_msg = 'Directory {} contains no any file'.format(directory)
+        # raise ValueError(err_msg)
         result = list(
             filter(
                 lambda file_path: self.is_json_file(file_path),
