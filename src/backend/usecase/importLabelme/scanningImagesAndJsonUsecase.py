@@ -62,25 +62,24 @@ class ScanningImagesAndJsonUsecase:
         self.image_repository = ImageRepository()
         
     def scanning_images_and_json(self, dataset_id_list, dataset_source_folder_path):                
-        return self.check_all_labelme_json(dataset_id_list, dataset_source_folder_path) \
+        return self.check_labelme_json(dataset_id_list, dataset_source_folder_path) \
             .flat_map(lambda _: self.import_json_to_all_dataset(dataset_id_list, dataset_source_folder_path))
 
     # traverse api for functional api
-    def check_all_labelme_json(self, dataset_id_list, dataset_source_folder_path):
+    def check_labelme_json(self, dataset_id_list, dataset_source_folder_path):
         for dataset in self.find_dataset_by(dataset_id_list):
-            result = format_mount_directory(dataset_source_folder_path, dataset.name)
-            labelme_json = self.find_labelme_json_string(result.value)
-            result = LabelChecker.check_string(labelme_json)
+            result = format_mount_directory(dataset_source_folder_path, dataset.name)\
+                .flat_map(lambda path: self.find_labelme_json(path)\
+                .flat_map(lambda labelme_json: LabelChecker.check_string(labelme_json)))
             if result.is_success() == False:
                 return result
         return Result.success('')
 
     def import_json_to_all_dataset(self, dataset_id_list, dataset_source_folder_path):
         for dataset in self.find_dataset_by(dataset_id_list):
-            result = format_mount_directory(dataset_source_folder_path, dataset.name)
-            if result.is_success():
-                self.execute(dataset.id, result.value)
-            else:
+            result = format_mount_directory(dataset_source_folder_path, dataset.name)\
+                .flat_map(lambda path: self.execute(dataset.id, path))
+            if result.is_success() == False:
                 return result
         return Result.success(dataset_id_list)
 
@@ -97,16 +96,24 @@ class ScanningImagesAndJsonUsecase:
         dataset = DatasetModel.find_by(dataset_id)
         self.move_content_from_source_to_dataset(dataset, dataset_source_folder_path)
         self.image_repository.create_images_from(dataset.id)
-        self.scan_annotation_from_json(dataset_id, dataset_source_folder_path)
+        return self.scan_annotation_from_json(dataset_id, dataset_source_folder_path)
         
     def move_content_from_source_to_dataset(self, dataset, dataset_source_folder_path):
         moveService = MoveService(self.image_repository)
         moveService.move_content_from_source_to_dataset(dataset, dataset_source_folder_path)
 
     def scan_annotation_from_json(self, dataset_id, dataset_source_folder_path):
-        labelme_json_string = self.find_labelme_json_string(dataset_source_folder_path)
+        return self.find_labelme_json(dataset_source_folder_path)\
+            .flat_map(lambda json: self.importAnnotationsToAllImages(dataset_id, json))
+
+    def importAnnotationsToAllImages(self, dataset_id, labelme_json_string):
         usecase = ImportAnnotationsToAllImagesUsecase.create()
         usecase.execute(dataset_id, labelme_json_string)
+        return Result.success('')
 
-    def find_labelme_json_string(self, dataset_source_folder_path):
-        return JsonFileFinder().find_json_in_the(dataset_source_folder_path)
+    def find_labelme_json(self, dataset_source_folder_path):
+        try:
+            return Result.success(JsonFileFinder().find_json_in_the(dataset_source_folder_path))
+        except ValueError:
+            err_msg = 'Decoding json file contained in folder {} has failed, please check the format of json file'.format(dataset_source_folder_path)
+            return Result.failure([err_msg])

@@ -4,14 +4,8 @@
 
 from database.sharedFolder import SharedFolder
 
-from ..usecases.findHelper import Finder
-from ..usecases.objectMother import Mother
-from ..usecases.usecaseFixture import mongo_connection_setup
-
-
 
 class TestCase:
-
     def create_shared_folder(self):
         root = "path root"
         names = ["dataset1", "dataset2", "dataset3"]
