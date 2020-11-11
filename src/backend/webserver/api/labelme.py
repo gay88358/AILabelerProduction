@@ -8,10 +8,9 @@ from usecase.user.encryptionService import EncryptionService
 from usecase.importLabelme.createNewDatasetUsecase import CreateNewDatasetUsecase
 from usecase.importLabelme.scanningImagesAndJsonUsecase import ScanningImagesAndJsonUsecase
 from usecase.importLabelme.addSharedFolderUsecase import AddSharedFolderUsecase
-
+from usecase.importLabelme.loadDefectCode.defectCodeParser import DefectCodeLoader
 from usecase.user.createUserUsecase import CreateUserUsecase
 
-from usecase.util.jsonHelper import JsonHelper
 
 from .common.response import *
 
@@ -44,61 +43,15 @@ class Labelme(Resource):
             "success": "ok"
         }
 
-class DefectCodeParser:
-    def __init__(self, defect_code_document):
-        self.labels = defect_code_document['Label']
-
-    def to_defect_code_catalog(self):
-        result = {}
-
-        result['defectcode_catalog'] = list(
-            map(
-                lambda name: self.create_defect_code_token(name),
-                self.find_all_distinct_category_name()
-            )
-        )
-        return result
-
-    def find_all_distinct_category_name(self):
-        category_name_list = list(map(
-            lambda l: l['Label_Catagory'],
-            self.labels
-        ))
-        return list(set(category_name_list))
-
-    def create_defect_code_token(self, category_name):
-        return {
-            'category_name': category_name,
-            'category_id': 0,
-            'defect_code_list':  self.find_defect_code_list(category_name)
-        }
-
-    def find_defect_code_list(self, category_name):
-        labels_with_same_category_name = self.find_labels_by_category_name(category_name)
-        return self.to_defect_code_list(labels_with_same_category_name)
-
-    def find_labels_by_category_name(self, category_name):
-        return list(filter(
-            lambda l: l['Label_Catagory'] == category_name,
-            self.labels
-        ))
-    
-    def to_defect_code_list(self, labels):
-        return list(map(
-            lambda l: l['Defect_Code'],
-            labels
-        ))
-    
 @api.route('/defect_code')
 class DefectCode(Resource):
     def get(self):
-        defect_code_file_path = "/worksapce/sharedFolder/ATWEX/label_map.json"
-        json_document = JsonHelper.load_json_document(defect_code_file_path)
-
-        defect_code = DefectCodeParser(json_document)
+        result = DefectCodeLoader.create()\
+            .map(lambda loader: loader.load_defect_code())
+        if result.is_success() == False:
+            return []
+        return result.value
         
-        return defect_code.to_defect_code_catalog()
-
 @api.route('/create')
 class LabelmeId(Resource):
     @api.expect(LabelmeRequestParser.labelme_create_dataset())
@@ -107,12 +60,12 @@ class LabelmeId(Resource):
         stripID = args['id']
         dataset_names = args['dataset']
 
-        
-        result = self.create_user()\
+        result = DefectCodeLoader.create()\
+        .flat_map(lambda _: self.create_user()\
         .flat_map(lambda _: self.add_shared_folder_to_user(stripID, dataset_names)\
         .flat_map(lambda user: self.create_all_dataset(user, stripID)\
         .flat_map(lambda dataset_id_list: self.scanning_images_and_json(dataset_id_list, user)) 
-        ))
+        )))
         return response(result)
       
     def create_user(self):

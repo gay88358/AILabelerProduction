@@ -19,6 +19,9 @@ class Result:
 class Success:
     def __init__(self, value):
         self.value = value
+    
+    def map(self, func):
+        return Result.success(func(self.value))
 
     def flat_map(self, func):
         return func(self.value)
@@ -32,6 +35,9 @@ class Failure:
             raise ValueError("Failure object only accept list of string")
 
         self.error_messages = error_messages
+
+    def map(self, func):
+        return self
 
     def flat_map(self, func):
         return self
