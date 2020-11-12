@@ -40,6 +40,10 @@ class TaskModel(DynamicDocument):
     _update_every = 10
     _progress_update = 0
 
+    @staticmethod
+    def find_by(task_id):
+        return TaskModel.objects(id=task_id).first()
+
     def error(self, string):
         self._log(string, level="ERROR")
     

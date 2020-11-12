@@ -52,7 +52,6 @@ class DefectCode(Resource):
             return []
         import json
         return json.dumps(result.value)
-        # return result.value
         
 @api.route('/create')
 class LabelmeId(Resource):
@@ -82,7 +81,6 @@ class LabelmeId(Resource):
             .execute(current_user, stripID, dataset_name_list)
 
     def create_all_dataset(self, user, stripID):
-        # select dataset_name_list by stripId
         dataset_name_list = user.get_dataset_name_list_with(stripID)
         return CreateNewDatasetUsecase().create_all_dataset(dataset_name_list)
 
@@ -90,5 +88,5 @@ class LabelmeId(Resource):
         return ScanningImagesAndJsonUsecase()\
             .scanning_images_and_json(
                 dataset_id_list, 
-                user.get_shared_folder().mount_root
+                user.get_mount_root()
             )

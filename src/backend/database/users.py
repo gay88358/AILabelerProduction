@@ -102,25 +102,8 @@ class UserModel(DynamicDocument, UserMixin):
     def _update_last_seen(self):
         self.update(last_seen=datetime.datetime.utcnow())
     
-    def add_shared_folder(self, root, dataset_name_list, mount_root):
-        self.__setattr__("root", root)
-        
-        self.set_dataset_name_list(dataset_name_list)
-        self.__setattr__("mount_root", mount_root)
-        self.save()
-
-    def set_dataset_name_list(self, dataset_name_list):
-        if len(self.dataset_name_list) > 0:
-            new_dataset_name_list = self.dataset_name_list + dataset_name_list
-            self.__setattr__("dataset_name_list", list(set(new_dataset_name_list)))
-        else:
-            self.__setattr__("dataset_name_list", dataset_name_list)
-
-    def get_dataset_name_list(self):
-        return self.dataset_name_list
-
-    def get_shared_folder(self):
-        return SharedFolder("", self.dataset_name_list, self.mount_root)
+    def get_mount_root(self):
+        return self.mount_root
 
     def get_username(self):
         return self.username
@@ -202,4 +185,5 @@ class UserModel(DynamicDocument, UserMixin):
             
         err_msg = 'Given stripID: {} is invalid'.format(stripID)
         raise ValueError(err_msg)
+    
 __all__ = ["UserModel"]

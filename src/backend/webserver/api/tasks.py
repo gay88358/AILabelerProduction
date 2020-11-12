@@ -26,7 +26,7 @@ class TaskId(Resource):
     @login_required
     def delete(self, task_id):
         """ Deletes task """
-        task = TaskModel.objects(id=task_id).first()
+        task = TaskModel.find_by(task_id)
 
         if task is None:
             return {"message": "Invalid task id"}, 400
@@ -43,7 +43,7 @@ class TaskId(Resource):
     @login_required
     def get(self, task_id):
         """ Deletes task """
-        task = TaskModel.objects(id=task_id).first()
+        task = TaskModel.find_by(task_id)
         if task is None:
             return {"message": "Invalid task id"}, 400
         
