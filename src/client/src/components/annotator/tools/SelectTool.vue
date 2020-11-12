@@ -14,8 +14,6 @@ export default {
   },
   data() {
     return {
-      CLASS: MetadataType.CLASS,
-      TYPE: MetadataType.TYPE,
       icon: "fa-hand-pointer-o",
       name: "Select",
       cursor: "pointer",
@@ -103,19 +101,7 @@ export default {
     // modify hover to display defect code and type
     generateMetadataFormat() {
       if (this.keypoint) return "";
-      let string = "";
-      let metadata = this.hover.annotation.$refs.metadata.metadataList;
-      if (metadata == null || metadata.length === 0) {
-        string += "No Metadata \n";
-      } else {
-        string += "Metadata \n";
-        metadata.forEach(element => {
-          if (element.key == this.CLASS || element.key == this.TYPE) {
-            string += " " + element.key + " = " + element.value + " \n";
-          }
-        });
-      }
-      return string.replace(/\n/g, " \n ").slice(0, -2);
+      return this.hover.annotation.$refs.metadata.metadataString();
     },
     hoverText() {
       

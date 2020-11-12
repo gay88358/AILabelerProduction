@@ -124,6 +124,21 @@ export default {
     };
   },
   methods: {
+    metadataString() {
+      let string = "";
+      let metadata = this.metadataList;
+      if (metadata == null || metadata.length === 0) {
+        string += "No Metadata \n";
+      } else {
+        string += "Metadata \n";
+        metadata.forEach(element => {
+          if (element.key == this.TYPE_KEY || element.key == this.CLASS_KEY) {
+            string += " " + element.key + " = " + element.value + " \n";
+          }
+        });
+      }
+      return string.replace(/\n/g, " \n ").slice(0, -2);
+    },
     export() {
       let metadata = {};
 

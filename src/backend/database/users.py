@@ -1,5 +1,4 @@
 import datetime
-from sys import hash_info
 
 from mongoengine import *
 from flask_login import UserMixin
@@ -114,7 +113,6 @@ class UserModel(DynamicDocument, UserMixin):
     def find_all_annotations(self):
         return self.annotations.exclude("paper_object").all()
 
-
     def find_dataset_by_id(self, dataset_id):
         return self.datasets.filter(id=dataset_id).first()
 
@@ -185,5 +183,5 @@ class UserModel(DynamicDocument, UserMixin):
             
         err_msg = 'Given stripID: {} is invalid'.format(stripID)
         raise ValueError(err_msg)
-    
+
 __all__ = ["UserModel"]
