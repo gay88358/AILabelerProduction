@@ -78,8 +78,8 @@
 </template>
 
 <script>
-import axios from "axios";
-import { mapGetters } from 'vuex';
+
+import MetadataType from "@/models/metadataType";
 
 export default {
   name: "Metadata",
@@ -119,8 +119,8 @@ export default {
       metadataList: [],
       defect_code: "",
       annotationType: "",
-      TYPE_KEY: "Type",
-      CLASS_KEY: "Class"
+      TYPE_KEY: MetadataType.TYPE,
+      CLASS_KEY: MetadataType.CLASS
     };
   },
   methods: {

@@ -1,6 +1,7 @@
 <script>
 import paper from "paper";
 import tool from "@/mixins/toolBar/tool";
+import MetadataType from "@/models/metadataType";
 
 export default {
   name: "SelectTool",
@@ -13,6 +14,8 @@ export default {
   },
   data() {
     return {
+      CLASS: MetadataType.CLASS,
+      TYPE: MetadataType.TYPE,
       icon: "fa-hand-pointer-o",
       name: "Select",
       cursor: "pointer",
@@ -107,9 +110,7 @@ export default {
       } else {
         string += "Metadata \n";
         metadata.forEach(element => {
-          const DEFECT_CODE_KEY = "Class"
-          const ANNOTATION_TYPE_KEY = "Type"
-          if (element.key == DEFECT_CODE_KEY || element.key == ANNOTATION_TYPE_KEY) {
+          if (element.key == this.CLASS || element.key == this.TYPE) {
             string += " " + element.key + " = " + element.value + " \n";
           }
         });

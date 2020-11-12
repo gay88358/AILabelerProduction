@@ -11,11 +11,36 @@ class Annotator {
         this.annotatorData = annotatorData;
         this.currentAnnotationData = null;
         this.currentCategoryName = "";
+        this.CLASS = "Class";
+        this.TYPE = "Type";
+        this.VIM_300_CODE = "Vim300_Code";
     }
 
     setSelectedAnnotationAndCategory(categoryId, annotationId) {
         this.setSelectedAnnotation(categoryId, annotationId);
         this.currentCategoryName = this.getCategoryName(categoryId);
+    }
+
+    setSelectedAnnotation(categoryId, annotationId) {
+        this.currentAnnotationData = this.findAnnotation(categoryId, annotationId);
+        this.categoryId = categoryId;
+    }
+
+    findAnnotation(categoryId, annotationId) {
+        return this.findCategory(categoryId)[0]
+            .annotations
+            .filter(a => a.id === annotationId)[0];
+    }
+
+    getCategoryName(categoryId) {
+        let result = this.findCategory(categoryId);
+        if (result.length === 0)
+            return "";
+        return result[0].name;
+    }
+
+    findCategory(categoryId) {
+        return this.annotatorData.filter(c => c.id === categoryId);
     }
 
     getCurrentCategoryName() {
@@ -30,26 +55,8 @@ class Annotator {
         return JSON.parse(JSON.stringify(annotatorData))
     }
 
-    annotation(categoryId, annotationId) {
-        let category = this.annotatorData.filter(a => a.id === categoryId)[0];
-        return category.annotations.filter(a => a.id === annotationId)[0];
-    }
-
-
     cloneAnnotatorData() {
         return JSON.parse(JSON.stringify(this.annotatorData));
-    }
-
-    setSelectedAnnotation(categoryId, annotationId) {
-        this.currentAnnotationData = this.annotation(categoryId, annotationId);
-        this.categoryId = categoryId;
-    }
-
-    getCategoryName(categoryId) {
-        let result = this.annotatorData.filter(c => c.id === categoryId);
-        if (result.length === 0)
-            return "";
-        return result[0].name;
     }
 
     hasSelectedAnnotation() {
@@ -57,32 +64,28 @@ class Annotator {
     }
 
     getSelectedAnnotation() {
-        if (!this.hasSelectedAnnotation())
-            return {
-                Type: "",
-                Class: ""
-            }
-        //let annotation = state.annotatorData.getSelectedAnnotation();
-        return { 
-                Type: this.currentAnnotationData.metadata['Type'],
-                Class: this.currentAnnotationData.metadata['Class'] || ''
-        };
+        if (!this.hasSelectedAnnotation()) {
+            return this.createAnnotationMetadata("", "");
+        }
+            
+        return this.createAnnotationMetadata(
+            this.currentAnnotationData.metadata[this.TYPE],
+            this.currentAnnotationData.metadata[this.CLASS] || ''
+        );
     }
 
-    updateSelectedAnnotationMetadata(typeValue, classValue, defectCodeCatalog) {
-        Vue.set(this.currentAnnotationData.metadata, 'Class', classValue)
+    createAnnotationMetadata(annotationType, annotationClass) {
+        return {
+            Type: annotationType,
+            Class: annotationClass
+        }
+    }
+
+    updateSelectedAnnotationMetadata(classValue, defectCodeCatalog) {
+        
+        Vue.set(this.currentAnnotationData.metadata, this.CLASS, classValue)
 
         let vim300Code = defectCodeCatalog.getVIM300Code(this.getCurrentCategoryName(), classValue)
-        console.log(vim300Code)
-        Vue.set(this.currentAnnotationData.metadata, 'Vim300_Code', vim300Code)
-    }
-
-    findAnnotationMetadataBy(categoryId, annotationId) {
-        let defectCode = this.annotation(categoryId, annotationId).metadata['class'];
-        let type = this.annotation(categoryId, annotationId).metadata['Type'];
-        return {
-            Type: type,
-            Class: defectCode
-        }
+        Vue.set(this.currentAnnotationData.metadata, this.VIM_300_CODE, vim300Code)
     }
 }

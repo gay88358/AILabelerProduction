@@ -32,8 +32,7 @@ export default {
   name: "MetadataDisplayer",
   data() {
       return {
-          defectCode: "",
-          type: ""
+          defectCode: ""
       }
   },
   methods: {
@@ -51,7 +50,6 @@ export default {
       },
       getMetadataOfSelectedAnnotation() {
         return {
-            annotationType: this.type,
             annotationClass: this.defectCode
         }
       }
@@ -62,9 +60,7 @@ export default {
       'hasAnnotationSelected', 
       'getDefectCodeOfSelectedAnnotation'
       ]),
-  },
-  mounted() {
-  },
+  }
 };
 </script>
 

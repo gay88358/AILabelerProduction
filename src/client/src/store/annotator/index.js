@@ -8,27 +8,35 @@ class DefectCodeCatalog {
     }
 
     getDefectCodeListBy(categoryName) {
-        if (this.defectCodeCatalogDocument.length == 0)
+        if (!this.hasDefectCode(categoryName))
             return []
-
-        let result = this.defectCodeCatalogDocument.defectcode_catalog.filter(
-            defectCode => defectCode.category_name === categoryName
-        )
-        if (result.length == 0)
-            return []
-        return result[0].defect_code_list.map(d => d.Defect_Code);
+        return  this.findDefectCodeTokenBy(categoryName)
+                    .defect_code_list
+                    .map(d => d.Defect_Code);
     }
 
     getVIM300Code(categoryName, defectCode) { 
+        if (!this.hasDefectCode(categoryName))
+            return ""
+        let defect_set = this.findDefectCodeTokenBy(categoryName)
+                             .defect_code_list.filter(d => d.Defect_Code === defectCode)[0]
+        return defect_set.Vim300_Code
+    }
+
+    findDefectCodeTokenBy(categoryName) {
         if (this.defectCodeCatalogDocument.length == 0)
             return []
+
         let result = this.defectCodeCatalogDocument.defectcode_catalog.filter(
             defectCode => defectCode.category_name === categoryName
         )
         if (result.length == 0)
             return []
-        let defect_set = result[0].defect_code_list.filter(d => d.Defect_Code === defectCode)[0]
-        return defect_set.Vim300_Code
+        return result[0]
+    }
+
+    hasDefectCode(categoryName) {
+        return this.findDefectCodeTokenBy(categoryName).length != 0;
     }
 }
 
@@ -55,8 +63,8 @@ const mutations = {
     SET_SELECTED_ANNOTATION (state, {categoryId, annotationId}) {
         state.annotatorData.setSelectedAnnotationAndCategory(categoryId, annotationId);
     },
-    UPDATE_ANNOTATION_METADATA(state, { annotationType, annotationClass }) {
-        state.annotatorData.updateSelectedAnnotationMetadata(annotationType, annotationClass, new DefectCodeCatalog(state.defectCodeCatalog));        
+    UPDATE_ANNOTATION_METADATA(state, { annotationClass }) {
+        state.annotatorData.updateSelectedAnnotationMetadata(annotationClass, new DefectCodeCatalog(state.defectCodeCatalog));        
     },
     UPDATE_DEFECT_CODE_CATALOG (state, payload) {
         state.defectCodeCatalog = JSON.parse(payload)
