@@ -8,15 +8,16 @@ def response_object(state, message, result):
 def error(result):
     return response_object(
         False,
-        result.error_messages,
-        ""
+        result.error_messages[0],
+        []
     )
 
 def success(result):
     return response_object(
         True,
+        "success",
         result.value,
-        "success"
+
     )
     
 def response(result):

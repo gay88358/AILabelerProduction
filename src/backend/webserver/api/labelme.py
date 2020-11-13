@@ -13,6 +13,7 @@ from usecase.user.createUserUsecase import CreateUserUsecase
 
 
 from .common.response import *
+from .common.logger import *
 
 import logging
 logger = logging.getLogger('gunicorn.error')
@@ -46,6 +47,7 @@ class Labelme(Resource):
 @api.route('/defect_code')
 class DefectCode(Resource):
     def get(self):
+        get_logger().info("DefectCode Loading")
         result = DefectCodeLoader.create()\
             .map(lambda loader: loader.load_defect_code())
         if result.is_success() == False:
