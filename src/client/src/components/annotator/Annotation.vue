@@ -43,7 +43,6 @@
         <i v-else style="padding-left: 5px; color: lightgray"
           >(id: {{ annotation.id }})</i
         >
-
         </button>
 
       <i
@@ -434,6 +433,7 @@ export default {
       };
     },
     deleteAnnotation() {
+
       this.annotation.metadata['Type'] = "circle";
 
       axios.delete("/api/annotation/" + this.annotation.id).then(() => {
@@ -898,9 +898,11 @@ export default {
         this.keypoints.lineWidth = scale * 2;
       }
     },
-
   },
   computed: {
+    categories() {
+      return this.$store.getters.categories;
+    },
     categoryIndex() {
       return this.$parent.index;
     },
@@ -993,6 +995,10 @@ export default {
     $(`#keypointSettings${this.annotation.id}`).on("hidden.bs.modal", () => {
       this.currentKeypoint = null;
     });
+  },
+  beforeDestroy() {
+    console.log('annotation is being deleted');
+    this.delete();
   }
 };
 </script>

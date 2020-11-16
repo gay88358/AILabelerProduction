@@ -17,6 +17,7 @@
         
         <div class="col-sm">
           <button class="change-btn" @click="updateAnnotationMetadata">Change</button>
+          <button class="delete-btn" @click="deleteAnnotation">Delete</button>
         </div>
         <hr>
     </div> 
@@ -36,6 +37,19 @@ export default {
       }
   },
   methods: {
+      deleteAnnotation() {
+
+        this.$store.dispatch(
+          'deleteSelectedAnnotation'
+        );
+        // this.$store.dispatch(
+        //         'deleteAnnotationById',
+        //         { 
+        //           annotationId: this.getSelectedAnnotation.id,
+        //           categoryId: this.getSelectedAnnotation.category_id
+        //         }
+        //       );
+      },
       updateAnnotationMetadata() {
           this.$store.dispatch(
             'updateAnnotationMetadata', 

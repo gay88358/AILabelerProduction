@@ -68,6 +68,12 @@ const mutations = {
     },
     UPDATE_DEFECT_CODE_CATALOG (state, payload) {
         state.defectCodeCatalog = JSON.parse(payload)
+    },
+    DELETE_ANNOTATION_BY_ID (state, {categoryId, annotationId}) {
+        state.annotatorData.deleteAnnotationById(categoryId, annotationId);
+    },
+    DELETE_SELECTED_ANNOTATION(state, payload) {
+        state.annotatorData.deleteSelectedAnnotation();
     }
 }
 
@@ -90,6 +96,12 @@ const actions = {
                 commit('UPDATE_DEFECT_CODE_CATALOG', res.data)
             }
         )
+    },
+    deleteAnnotationById({ commit }, payload) {
+        commit('DELETE_ANNOTATION_BY_ID', payload);
+    },
+    deleteSelectedAnnotation({commit}, payload) {
+        commit('DELETE_SELECTED_ANNOTATION', payload);
     }
 }
 

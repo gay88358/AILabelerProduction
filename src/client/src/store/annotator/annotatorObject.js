@@ -21,6 +21,13 @@ class Annotator {
         this.currentCategoryName = this.getCategoryName(categoryId);
     }
 
+    getCategoryName(categoryId) {
+        let result = this.findCategory(categoryId);
+        if (result.length === 0)
+            return "";
+        return result[0].name;
+    }
+
     setSelectedAnnotation(categoryId, annotationId) {
         this.currentAnnotationData = this.findAnnotation(categoryId, annotationId);
         this.categoryId = categoryId;
@@ -32,19 +39,9 @@ class Annotator {
             .filter(a => a.id === annotationId)[0];
     }
 
-    getCategoryName(categoryId) {
-        let result = this.findCategory(categoryId);
-        if (result.length === 0)
-            return "";
-        return result[0].name;
-    }
 
     findCategory(categoryId) {
         return this.annotatorData.filter(c => c.id === categoryId);
-    }
-
-    getCurrentCategoryName() {
-        return this.currentCategoryName;
     }
 
     getAnnotatorData() {
@@ -82,10 +79,36 @@ class Annotator {
     }
 
     updateSelectedAnnotationMetadata(classValue, defectCodeCatalog) {
-        
         Vue.set(this.currentAnnotationData.metadata, this.CLASS, classValue)
-
         let vim300Code = defectCodeCatalog.getVIM300Code(this.getCurrentCategoryName(), classValue)
         Vue.set(this.currentAnnotationData.metadata, this.VIM_300_CODE, vim300Code)
+    }
+
+    getCurrentCategoryName() {
+        return this.currentCategoryName;
+    }
+
+    deleteSelectedAnnotation() {
+        let annotationId = this.currentAnnotationData.id;
+        let categoryId = this.currentAnnotationData.category_id;
+        this.deleteAnnotationById(categoryId, annotationId);
+    }
+
+    deleteAnnotationById(categoryId, annotationId) {
+        let deleteIndex = this.findDeleteAnnotationIndex(categoryId, annotationId);
+        let annotations = this.findAnnotations(categoryId);
+        annotations.splice(deleteIndex, 1);
+    }
+
+    findDeleteAnnotationIndex(categoryId, annotationId) {
+        let annotations = this.findAnnotations(categoryId);
+        for (let i = 0; i < annotations.length; i++)
+            if (annotations[i].id === annotationId)
+                return i;
+        throw new Error('Given categoryId and annotationId is invalid');
+    }
+
+    findAnnotations(categoryId) {
+        return this.findCategory(categoryId)[0].annotations;
     }
 }

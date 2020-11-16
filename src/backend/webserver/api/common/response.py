@@ -17,7 +17,6 @@ def success(result):
         True,
         "success",
         result.value,
-
     )
     
 def response(result):

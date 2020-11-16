@@ -630,7 +630,6 @@ export default {
       this.$store.dispatch('updateAnnotatorData', annotatorData);
     },
     onCategoryClick(indices) {
-      return ;
       this.current.annotation = indices.annotation;
       this.current.category = indices.category;
       if (!indices.hasOwnProperty('keypoint')) {
