@@ -466,6 +466,7 @@ export default {
   },
   computed: {
     getAnnotations() {
+      console.log('annotation changed');
       return this.category.annotations;
     },
     ...mapGetters([

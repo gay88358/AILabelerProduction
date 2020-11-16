@@ -7,7 +7,6 @@
     />
 
     <p class="title" style="margin: 0">{{ title }}</p>
-
     <div class="row">
       <div class="col-sm">
         <p class="subtitle">{{ keyTitle }}</p>
@@ -52,12 +51,12 @@
     </div>
 
     <ul class="list-group" style="height: 50%;">
-      <li v-if="metadataList.length == 0" class="list-group-item meta-item">
+      <li v-if="getMetadataList().length == 0" class="list-group-item meta-item">
         <i class="subtitle">No items in metadata.</i>
       </li>
 
      <li
-        v-for="(object, index) in getMetadataList"
+        v-for="(object, index) in getDisplayMetadata"
         :key="index"
         class="list-group-item meta-item">
         <div class="row" style="cell">
@@ -116,7 +115,6 @@ export default {
   },
   data() {
     return {
-      metadataList: [],
       defect_code: "",
       annotationType: "",
       TYPE_KEY: MetadataType.TYPE,
@@ -126,7 +124,7 @@ export default {
   methods: {
     metadataString() {
       let string = "";
-      let metadata = this.metadataList;
+      let metadata = this.getMetadataList();
       if (metadata == null || metadata.length === 0) {
         string += "No Metadata \n";
       } else {
@@ -141,8 +139,7 @@ export default {
     },
     export() {
       let metadata = {};
-
-      this.metadataList.forEach(object => {
+      this.getMetadataList().forEach(object => {
         if (object.key.length > 0) {
           if (!isNaN(object.value))
             metadata[object.key] = parseInt(object.value);
@@ -158,10 +155,13 @@ export default {
       return metadata;
     },
     createMetadata() {
-      this.metadataList.push({ key: "", value: "" });
     },
-    loadMetadata() {
-      this.metadataList = [];
+    changeAnnotationType() {
+    },
+    changeDefectCode() {
+    },
+    getMetadataList() {
+      let result = [];
       if (this.metadata != null) {
         for (var key in this.metadata) {
           if (!this.metadata.hasOwnProperty(key)) continue;
@@ -171,33 +171,15 @@ export default {
 
           if (value == null) value = "";
           else value = value.toString();
-          this.metadataList.push({ key: key, value: value });
+          result.push({ key: key, value: value });
         }
       }
-    },
-    changeAnnotationType() {
-      if (this.annotationType === "")
-        return
-      this.replaceMetadataWith(this.TYPE_KEY, { key: this.TYPE_KEY, value: this.annotationType });
-    },
-    changeDefectCode() {
-      if (this.defect_code === "")
-        return 
-        
-      this.replaceMetadataWith(this.CLASS_KEY, { key: this.CLASS_KEY, value: this.defect_code });
-    },
-    replaceMetadataWith(keyValue, newMetada) {
-      let newMetadaList = this.removeMetadataBy(keyValue)
-      newMetadaList.push(newMetada);
-      this.metadataList = newMetadaList
-    },
-    removeMetadataBy(keyValue) {
-      return this.metadataList.filter(metadata => metadata.key !== keyValue)
+      return result;
     }
   },
   computed: {
-    getMetadataList() {
-      return this.metadataList.filter(m => m.key === this.TYPE_KEY || m.key === this.CLASS_KEY)
+    getDisplayMetadata() {
+      return this.getMetadataList().filter(m => m.key === this.TYPE_KEY || m.key === this.CLASS_KEY)
     },
     getDefectCodeList() {
       return this.$store.getters.getDefectCodeList(this.categoryName);
@@ -210,14 +192,10 @@ export default {
     metadata: {
         handler(val){
           console.log('metadata update');
-          this.loadMetadata();
         },
         deep: true
     }
   },
-  created() {
-    this.loadMetadata();
-  }
 };
 </script>
 

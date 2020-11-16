@@ -433,7 +433,6 @@ export default {
       };
     },
     deleteAnnotation() {
-
       this.annotation.metadata['Type'] = "circle";
 
       axios.delete("/api/annotation/" + this.annotation.id).then(() => {
@@ -448,6 +447,9 @@ export default {
     },
     delete() {
       this.$parent.category.annotations.splice(this.index, 1);
+      this.clearAnnotationOnCanvas();
+    },
+    clearAnnotationOnCanvas() {
       if (this.compoundPath != null) this.compoundPath.remove();
       if (this.keypoints != null) {
         this.keypoints._keypoints.forEach( keypoint => {
@@ -997,8 +999,9 @@ export default {
     });
   },
   beforeDestroy() {
+    console.log(`annotation id: ${this.annotation.id}`);
     console.log('annotation is being deleted');
-    this.delete();
+    this.clearAnnotationOnCanvas();
   }
 };
 </script>
