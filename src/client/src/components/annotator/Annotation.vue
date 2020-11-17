@@ -364,6 +364,11 @@ export default {
       return this.annotation.height;
     },
     createCompoundPath(json, segments) {
+      console.log('create json');
+      console.log(json);
+      console.log('create segments');
+      console.log(segments);
+
       json = json || null;
       segments = segments || null;
       // Validate json
@@ -411,23 +416,9 @@ export default {
       }
 
       if (json != null) {
-        // Import data directroy from paperjs object
         this.compoundPath.importJSON(json);
       } else if (segments != null) {
-        // Load segments input compound path
-        let center = new paper.Point(this.getAnnotationWidth() / 2, this.getAnnotationHeight() / 2);
-
-        for (let i = 0; i < segments.length; i++) {
-          let polygon = segments[i];
-          let path = new paper.Path();
-
-          for (let j = 0; j < polygon.length; j += 2) {
-            let point = new paper.Point(polygon[j], polygon[j + 1]);
-            path.add(point.subtract(center));
-          }
-          path.closePath();
-          this.compoundPath.addChild(path);
-        }
+        this.loadSegmentsIntoCompoundpath(segments, this.compoundPath);
       }
 
       this.updateCompoundPathData(this.index, this.categoryIndex);
@@ -439,6 +430,25 @@ export default {
       this.compoundPath.onClick = () => {
         this.$emit("click", this.index);
       };
+    },
+    loadSegmentsIntoCompoundpath(segments, compoundPath) {
+        for (let i = 0; i < segments.length; i++) {
+          compoundPath.addChild(
+            this.calculatePath(segments[i])
+          );
+        }
+    },
+    calculatePath(segment) {
+      let path = new paper.Path();
+      let center = new paper.Point(this.getAnnotationWidth() / 2, this.getAnnotationHeight() / 2);
+      for (let j = 0; j < segment.length; j += 2) {
+        let x = segment[j];
+        let y = segment[j + 1]
+        let point = new paper.Point(x, y);
+        path.add(point.subtract(center));
+      }
+      path.closePath();
+      return path
     },
     updateCompoundPathData(annotationIndex, categoryIndex) {
       this.compoundPath.data.annotationId = annotationIndex;
