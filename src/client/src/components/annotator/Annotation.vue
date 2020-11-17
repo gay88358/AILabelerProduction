@@ -12,7 +12,7 @@
         <i
           v-if="isVisible"
           class="fa fa-eye annotation-icon"
-          :style="{ float: 'left', 'padding-right': '10px', color: color }"
+          :style="{ float: 'left', 'padding-right': '10px', color: getAnnotationColor() }"
         />
         <i
           v-else
@@ -300,7 +300,7 @@ export default {
     return {
       isVisible: true,
       showKeypoints: false,
-      color: this.annotation.color,
+      color: this.getAnnotationColor(),
       compoundPath: null,
       keypoints: null,
       metadata: [],
@@ -330,12 +330,15 @@ export default {
   },
   methods: {
     ...mapMutations(["addUndo"]),
+    metadataString() {
+      return this.$refs.metadata.metadataString();
+    },
     initAnnotation() {
       this.deleteMetaName();
       this.removeCompoundPath();
       this.createCompoundPath(
-        this.annotation.paper_object,
-        this.annotation.segmentation
+        this.getAnnotationPaperObject(),
+        this.getAnnotationSegmentation()
       );
     },
     deleteMetaName() {
@@ -343,7 +346,7 @@ export default {
       if (metaName) {
         this.name = metaName;
         delete this.annotation.metadata["name"];
-      }
+      } 
     },
     removeCompoundPath() {
       if (this.isNullCompoundPath()) {
@@ -354,6 +357,9 @@ export default {
     isKeypointsNotNull() {
       return this.keypoints != null;
     },
+    getAnnotationCreator() {
+      return this.annotation.creator;
+    },
     getAnnotationId() {
       return this.annotation.id;
     },
@@ -363,29 +369,45 @@ export default {
     getAnnotationHeight() {
       return this.annotation.height;
     },
-    validateJson(json) {
+    setAnnotationIsBBox(isBBox) {
+      this.annotation.isbbox = isBBox;
+    },
+    getAnnotationIsBBox() {
+      return this.annotation.isbbox;
+    },
+    getAnnotationPaperObject() {
+      return this.annotation.paper_object;
+    },
+    setAnnotationPaperObject(paper_object) {
+      this.annotation.paper_objec = paper_object;
+    },
+    getAnnotation() {
+      return this.annotation;
+    },
+    getAnnotationKeypoints() {
+      return this.annotation.keypoints;
+    },
+    getAnnotationSegmentation() {
+      return this.annotation.segmentation;
+    },
+    getAnnotationColor() {
+      return this.annotation.color;
+    },
+    createCompoundPath(json, segments) {
       json = json || null;
-      // Validate json
       if (json != null) {
         if (json.length !== 2) {
           json = null;
         }
       }
-      return json;
-    },
-    validateSegments(segments) {
+
       segments = segments || null;
-      // Validate segments
       if (segments != null) {
         if (segments.length === 0) {
           segments = null;
         }
       }
-      return segments;
-    },
-    createCompoundPath(json, segments) {
-      json = this.validateJson(json);
-      segments = this.validateJson(segments);
+
       this.removeCompoundPath();;
       if (this.isKeypointsNotNull()) this.keypoints.remove();
 
@@ -403,7 +425,7 @@ export default {
       this.keypoints.radius = this.scale * 6;
       this.keypoints.lineWidth = this.scale * 2;
 
-      let keypoints = this.annotation.keypoints;
+      let keypoints = this.getAnnotationKeypoints();
       if (keypoints) {
         for (let i = 0; i < keypoints.length; i += 3) {
           let x = keypoints[i] - this.getAnnotationWidth() / 2,
@@ -459,7 +481,7 @@ export default {
       axios.delete("/api/annotation/" + this.getAnnotationId()).then(() => {
         this.$socket.emit("annotation", {
           action: "delete",
-          annotation: this.annotation
+          annotation: this.getAnnotation()
         });
         this.delete();
 
@@ -699,7 +721,8 @@ export default {
       newCompound.strokeWidth = 0;
       newCompound.onDoubleClick = this.getCompoundPath().onDoubleClick;
       newCompound.onClick = this.getCompoundPath().onClick;
-      this.annotation.isbbox = isBBox;
+      this.setAnnotationIsBBox(isBBox);
+
       
       if (undoable) this.createUndoAction("Unite");
 
@@ -737,12 +760,12 @@ export default {
       }
 
       this.compoundPath.opacity = this.opacity;
-      this.compoundPath.fillColor = this.color;
+      this.compoundPath.fillColor = this.getAnnotationColor();
       this.keypoints.color = this.darkHSL;
     },
     setCategory(event) {
       const newCategoryName = event.target.value;
-      const annotation = this.annotation;
+      const annotation = this.getAnnotation();
       const oldCategory = this.$parent.category;
 
       this.$parent.$parent.updateAnnotationCategory(
@@ -759,8 +782,8 @@ export default {
       if (this.name.length > 0) metadata.name = this.name;
       let annotationData = {
         id: this.getAnnotationId(),
-        isbbox: this.annotation.isbbox,
-        color: this.color,
+        isbbox: this.getAnnotationIsBBox(),
+        color: this.getAnnotationColor(),
         metadata: metadata
       };
 
@@ -779,7 +802,7 @@ export default {
         );
       }
       this.setCompoundPathFullySelected(this.isCurrent);
-      if (this.annotation.paper_object !== json) {
+      if (this.getAnnotationPaperObject() !== json) {
         annotationData.compoundPath = json;
       }
 
@@ -793,14 +816,18 @@ export default {
       this.uuid = Math.random()
         .toString(36)
         .replace(/[^a-z]+/g, "");
-      this.annotation.paper_object = this.compoundPath.exportJSON({
-        asString: false,
-        precision: 1
-      });
+      
+      this.setAnnotationPaperObject(
+        this.compoundPath.exportJSON({
+          asString: false,
+          precision: 1
+        })
+      );
+
       this.$socket.emit("annotation", {
         uuid: this.uuid,
         action: "modify",
-        annotation: this.annotation
+        annotation: this.getAnnotation()
       });
     },
     getKeypointLabel(keypoint) {
@@ -842,7 +869,6 @@ export default {
         $(`#keypointSettings${this.getAnnotationId()}`).on("hidden.bs.modal", () => {
           this.currentKeypoint = null;
         });
-        console.log(`annotation index is changed from ${oldVal} to ${val}`);
       }
     },
     activeTool(tool) {
@@ -1001,7 +1027,7 @@ export default {
       return this.name.toLowerCase().includes(this.search);
     },
     darkHSL() {
-      let color = new paper.Color(this.color);
+      let color = new paper.Color(this.getAnnotationColor());
       let h = Math.round(color.hue);
       let l = Math.round(color.lightness * 50);
       let s = Math.round(color.saturation * 100);

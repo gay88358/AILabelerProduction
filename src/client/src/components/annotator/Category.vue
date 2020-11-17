@@ -235,6 +235,12 @@ export default {
       if (this.search.length === 0) return true;
       return this.filterFound.indexOf(index) > -1;
     },
+    categoryName() {
+      return this.category.name;
+    },
+    categoryId() {
+      return this.category.id;
+    },
     resetCategorySettings() {
       this.supercategory = this.category.supercategory;
       this.color = this.category.color;

@@ -1,7 +1,6 @@
 <script>
 import paper from "paper";
 import tool from "@/mixins/toolBar/tool";
-import MetadataType from "@/models/metadataType";
 
 export default {
   name: "SelectTool",
@@ -84,13 +83,13 @@ export default {
 
       if (this.hover.category && this.hover.annotation) {
         let id = this.hover.textId;
-        let category = this.hover.category.category.name;
+        let category = this.hover.category.categoryName();
         string += "ID: " + id + " \n";
         string += "Category: " + category + " \n";
       }
 
       if (this.$store.getters["user/loginEnabled"]) {
-        let creator = this.hover.annotation.annotation.creator;
+        let creator = this.hover.annotation.getAnnotationCreator();
         if (creator != null) {
           string += "Created by " + creator + "\n\n";
         }
@@ -98,23 +97,21 @@ export default {
 
       return string.replace(/\n/g, " \n ").slice(0, -2) + " \n ";
     },
-    // modify hover to display defect code and type
     generateMetadataFormat() {
       if (this.keypoint) return "";
-      return this.hover.annotation.$refs.metadata.metadataString();
+      return this.hover.annotation.metadataString();
     },
     hoverText() {
-      
       if (!this.hover.showText) return;
+      
       if (!this.keypoint) {
-        if (this.hover.category == null) return;
-        if (this.hover.annotation == null) return;
+        if (this.hover.category == null || this.hover.annotation == null) return;
       }
       let position = this.hover.position.add(this.hover.textShift, 0);
 
       if (
         this.hover.text == null ||
-        this.hover.annotation.annotation.id !== this.hover.textId ||
+        this.hover.annotation.getAnnotationId() !== this.hover.textId ||
         this.keypoint != null
       ) {
         if (this.hover.text !== null) {
@@ -123,7 +120,7 @@ export default {
         }
         let content = this.generateTitle() + this.generateMetadataFormat();
         if (this.hover.annotation) {
-          this.hover.textId = this.hover.annotation.annotation.id;
+          this.hover.textId = this.hover.annotation.getAnnotationId();
         }
 
         this.hover.text = new paper.PointText(position);
@@ -274,8 +271,8 @@ export default {
     currentAnnotationAndCategory() {
       if (this.hover.annotation)
         return {
-          annotationId: this.hover.annotation.annotation.id,
-          categoryId: this.hover.category.category.id
+          annotationId: this.hover.annotation.getAnnotationId(),
+          categoryId: this.hover.category.categoryId()
         }
       return null;
     },
@@ -326,7 +323,6 @@ export default {
 
         let categoryId = event.item.data.categoryId;
         let annotationId = event.item.data.annotationId;
-
 
         this.$parent.hover.categoryId = categoryId;
         this.$parent.hover.annotation = annotationId;
@@ -411,7 +407,7 @@ export default {
           this.segment = null;
         }
         if (this.hover.annotation) {
-          this.hover.annotation.compoundPath.selected = false;
+          this.hover.annotation.compoundPathUnSelected();
         }
       }
     }

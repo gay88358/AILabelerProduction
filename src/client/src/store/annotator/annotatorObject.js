@@ -17,20 +17,13 @@ class Annotator {
     }
 
     setSelectedAnnotationAndCategory(categoryId, annotationId) {
-        this.setSelectedAnnotation(categoryId, annotationId);
+        this.currentAnnotationData = this.findAnnotation(categoryId, annotationId);
         this.currentCategoryName = this.getCategoryName(categoryId);
     }
 
     getCategoryName(categoryId) {
         let result = this.findCategory(categoryId);
-        if (result.length === 0)
-            return "";
-        return result[0].name;
-    }
-
-    setSelectedAnnotation(categoryId, annotationId) {
-        this.currentAnnotationData = this.findAnnotation(categoryId, annotationId);
-        this.categoryId = categoryId;
+        return result.length === 0 ? "" : result[0].name;
     }
 
     findAnnotation(categoryId, annotationId) {
@@ -38,8 +31,7 @@ class Annotator {
             .annotations
             .filter(a => a.id === annotationId)[0];
     }
-
-
+    
     findCategory(categoryId) {
         return this.annotatorData.filter(c => c.id === categoryId);
     }
