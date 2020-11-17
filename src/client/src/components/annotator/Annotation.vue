@@ -331,37 +331,41 @@ export default {
   methods: {
     ...mapMutations(["addUndo"]),
     initAnnotation() {
-
-      let metaName = this.annotation.metadata.name;
-
-      if (metaName) {
-        this.name = metaName;
-        delete this.annotation.metadata["name"];
-      }
-
-      if (this.compoundPath != null) {
-        this.removeCompoundPath();
-        this.setCompoundPath(null);
-      }
-
+      this.deleteMetaName();
+      this.removeCompoundPath();
       this.createCompoundPath(
         this.annotation.paper_object,
         this.annotation.segmentation
       );
     },
+    deleteMetaName() {
+      let metaName = this.annotation.metadata.name;
+      if (metaName) {
+        this.name = metaName;
+        delete this.annotation.metadata["name"];
+      }
+    },
     removeCompoundPath() {
-      if (this.compoundPath == null) {
+      if (this.isNullCompoundPath()) {
         return;
       }
       this.compoundPath.remove();
     },
+    isKeypointsNotNull() {
+      return this.keypoints != null;
+    },
+    getAnnotationId() {
+      return this.annotation.id;
+    },
+    getAnnotationWidth() {
+      return this.annotation.width;
+    },
+    getAnnotationHeight() {
+      return this.annotation.height;
+    },
     createCompoundPath(json, segments) {
       json = json || null;
       segments = segments || null;
-
-      let width = this.annotation.width;
-      let height = this.annotation.height;
-
       // Validate json
       if (json != null) {
         if (json.length !== 2) {
@@ -377,17 +381,17 @@ export default {
       }
 
       this.removeCompoundPath();;
-      if (this.keypoints != null) this.keypoints.remove();
+      if (this.isKeypointsNotNull()) this.keypoints.remove();
 
       // Create new compoundpath
       this.compoundPath = new paper.CompoundPath();
       this.compoundPath.onDoubleClick = () => {
         if (this.activeTool !== "Select") return;
-        $(`#annotationSettings${this.annotation.id}`).modal("show");
+        $(`#annotationSettings${this.getAnnotationId()}`).modal("show");
       };
       this.keypoints = new Keypoints(this.keypointEdges, this.keypointLabels,
         this.keypointColors, {
-          annotationId: this.annotation.id,
+          annotationId: this.getAnnotationId(),
           categoryName: this.$parent.category.name,
         });
       this.keypoints.radius = this.scale * 6;
@@ -396,8 +400,8 @@ export default {
       let keypoints = this.annotation.keypoints;
       if (keypoints) {
         for (let i = 0; i < keypoints.length; i += 3) {
-          let x = keypoints[i] - width / 2,
-            y = keypoints[i + 1] - height / 2,
+          let x = keypoints[i] - this.getAnnotationWidth() / 2,
+            y = keypoints[i + 1] - this.getAnnotationHeight() / 2,
             v = keypoints[i + 2];
 
           if (keypoints[i] === 0 && keypoints[i + 1] === 0 && v === 0) continue;
@@ -411,7 +415,7 @@ export default {
         this.compoundPath.importJSON(json);
       } else if (segments != null) {
         // Load segments input compound path
-        let center = new paper.Point(width / 2, height / 2);
+        let center = new paper.Point(this.getAnnotationWidth() / 2, this.getAnnotationHeight() / 2);
 
         for (let i = 0; i < segments.length; i++) {
           let polygon = segments[i];
@@ -426,10 +430,8 @@ export default {
         }
       }
 
-      this.compoundPath.data.annotationId = this.index;
-      this.compoundPath.data.categoryId = this.categoryIndex;
-
-      this.compoundPath.fullySelected = this.isCurrent;
+      this.updateCompoundPathData(this.index, this.categoryIndex);
+      this.setCompoundPathFullySelected(this.isCurrent);
       this.compoundPath.opacity = this.opacity;
 
       this.setColor();
@@ -438,10 +440,12 @@ export default {
         this.$emit("click", this.index);
       };
     },
+    updateCompoundPathData(annotationIndex, categoryIndex) {
+      this.compoundPath.data.annotationId = annotationIndex;
+      this.compoundPath.data.categoryId = categoryIndex;
+    },
     deleteAnnotation() {
-      // this.annotation.metadata['Type'] = "circle";
-
-      axios.delete("/api/annotation/" + this.annotation.id).then(() => {
+      axios.delete("/api/annotation/" + this.getAnnotationId()).then(() => {
         this.$socket.emit("annotation", {
           action: "delete",
           annotation: this.annotation
@@ -452,13 +456,12 @@ export default {
       });
     },
     delete() {
-      // delete annotation component ?
       this.$parent.category.annotations.splice(this.index, 1);
       this.clearAnnotationOnCanvas();
     },
     clearAnnotationOnCanvas() {
       this.removeCompoundPath();;
-      if (this.keypoints != null) {
+      if (this.isKeypointsNotNull()) {
         this.keypoints._keypoints.forEach( keypoint => {
           this.keypoints.deleteKeypoint(keypoint);
         });
@@ -525,17 +528,20 @@ export default {
     setCompoundPath(newCompoundPath) {
       this.compoundPath = newCompoundPath;
     },
+    setNullCompoundPath() {
+      this.compoundPath = null;
+    },
+    setCompoundPathFullySelected(isFullySelected) {
+      this.compoundPath.fullySelected = isFullySelected;
+    },
     createUndoAction(actionName) {
-      
-      // if (this.isNullCompoundPath()) this.createCompoundPath();
-
       let copy = this.getCompoundPath().clone();
       copy.fullySelected = false;
       copy.visible = false;
       this.pervious.push(copy);
 
       let action = new UndoAction({
-        name: "Annotation " + this.annotation.id,
+        name: "Annotation " + this.getAnnotationId(),
         action: actionName,
         func: this.undoCompound,
         args: {}
@@ -553,8 +559,7 @@ export default {
 
       if (this.compoundPath instanceof paper.Path) {
         this.compoundPath = new paper.CompoundPath(this.compoundPath);
-        this.compoundPath.data.annotationId = this.index;
-        this.compoundPath.data.categoryId = this.categoryIndex;
+        this.updateCompoundPathData(this.index, this.categoryIndex);
       }
 
       let newChildren = [];
@@ -574,8 +579,7 @@ export default {
 
       this.compoundPath.removeChildren();
       this.compoundPath.addChildren(newChildren);
-
-      this.compoundPath.fullySelected = this.isCurrent;
+      this.setCompoundPathFullySelected(this.isCurrent);
       this.keypoints.bringToFront();
       this.emitModify();
     },
@@ -583,7 +587,7 @@ export default {
       if (this.pervious.length == 0) return;
       this.removeCompoundPath();;
       this.setCompoundPath(this.pervious.pop());
-      this.compoundPath.fullySelected = this.isCurrent;
+      this.setCompoundPathFullySelected(this.isCurrent);
     },
     addKeypoint(point, visibility, label) {
       if (label == null && this.keypoints.contains(point)) return;
@@ -629,7 +633,7 @@ export default {
           if (!this.$parent.isCurrent) return;
           if (!["Select", "Keypoints"].includes(this.activeTool)) return;
           this.currentKeypoint = event.target.keypoint;
-          let id = `#keypointSettings${this.annotation.id}`;
+          let id = `#keypointSettings${this.getAnnotationId()}`;
           let indexLabel = this.currentKeypoint.indexLabel;
 
           this.keypoint.tag = indexLabel == -1 ? [] : [indexLabel.toString()];
@@ -743,14 +747,14 @@ export default {
       let metadata = this.$refs.metadata.export();
       if (this.name.length > 0) metadata.name = this.name;
       let annotationData = {
-        id: this.annotation.id,
+        id: this.getAnnotationId(),
         isbbox: this.annotation.isbbox,
         color: this.color,
         metadata: metadata
       };
 
       this.simplifyPath();
-      this.compoundPath.fullySelected = false;
+      this.setCompoundPathFullySelected(false);
       let json = this.compoundPath.exportJSON({
         asString: false,
         precision: 1
@@ -759,12 +763,11 @@ export default {
       if (!this.keypoints.isEmpty()) {
         annotationData.keypoints = this.keypoints.exportJSON(
           this.keypointLabels,
-          this.annotation.width,
-          this.annotation.height
+          this.getAnnotationWidth(),
+          this.getAnnotationHeight()
         );
       }
-
-      this.compoundPath.fullySelected = this.isCurrent;
+      this.setCompoundPathFullySelected(this.isCurrent);
       if (this.annotation.paper_object !== json) {
         annotationData.compoundPath = json;
       }
@@ -825,7 +828,7 @@ export default {
       handler(val) {
         
         this.initAnnotation();
-        $(`#keypointSettings${this.annotation.id}`).on("hidden.bs.modal", () => {
+        $(`#keypointSettings${this.getAnnotationId()}`).on("hidden.bs.modal", () => {
           this.currentKeypoint = null;
         });
         console.log(`annotation index is changed to ${val}`);
@@ -900,7 +903,7 @@ export default {
       }
 
       if (this.isNullCompoundPath()) return;
-      this.compoundPath.fullySelected = this.isCurrent;
+      this.setCompoundPathFullySelected(this.isCurrent);
     },
     currentKeypoint(point, old) {
       if (old) old.selected = false;
@@ -941,7 +944,7 @@ export default {
     isCurrent() {
       if (this.index === this.current && this.$parent.isCurrent) {
         // if (this.compoundPath != null) this.compoundPath.bringToFront();
-        if (this.keypoints != null) this.keypoints.bringToFront();
+        if (this.isKeypointsNotNull()) this.keypoints.bringToFront();
         return true;
       }
       return false;
@@ -978,7 +981,7 @@ export default {
     showSideMenu() {
       let search = this.search.toLowerCase();
       if (search.length === 0) return true;
-      if (search === String(this.annotation.id)) return true;
+      if (search === String(this.getAnnotationId())) return true;
       if (search === String(this.index + 1)) return true;
       return this.name.toLowerCase().includes(this.search);
     },
@@ -1008,7 +1011,7 @@ export default {
       let annotation = data.annotation;
 
       if (this.uuid == data.uuid) return;
-      if (annotation.id != this.annotation.id) return;
+      if (annotation.id != this.getAnnotationId()) return;
 
       if (data.action == "modify") {
         this.createCompoundPath(
@@ -1024,7 +1027,7 @@ export default {
   },
   mounted() {
     this.initAnnotation();
-    $(`#keypointSettings${this.annotation.id}`).on("hidden.bs.modal", () => {
+    $(`#keypointSettings${this.getAnnotationId()}`).on("hidden.bs.modal", () => {
       this.currentKeypoint = null;
     });
   },
