@@ -30,9 +30,7 @@ class DefectCodeCatalog {
         let result = this.defectCodeCatalogDocument.defectcode_catalog.filter(
             defectCode => defectCode.category_name === categoryName
         )
-        if (result.length == 0)
-            return []
-        return result[0]
+        return result.length == 0 ? [] : result[0];
     }
 
     hasDefectCode(categoryName) {
