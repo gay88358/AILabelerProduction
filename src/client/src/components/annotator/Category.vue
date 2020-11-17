@@ -453,20 +453,17 @@ export default {
       if (this.selectedAnnotation >= index) {
         this.selectedAnnotation--;
       }
-
       let indices = {
         annotation: this.selectedAnnotation,
         category: this.index,
         keypoint: -1,
       };
       this.$emit("click", indices);
-
       if (this.category.annotations.length === 0) this.isVisible = false;
     }
   },
   computed: {
     getAnnotations() {
-      console.log('annotation changed');
       return this.category.annotations;
     },
     ...mapGetters([

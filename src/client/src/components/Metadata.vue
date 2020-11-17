@@ -183,19 +183,8 @@ export default {
     },
     getDefectCodeList() {
       return this.$store.getters.getDefectCodeList(this.categoryName);
-    },
-    getCategories() {
-      return this.$store.getters.getCategories;
     }
-  },
-  watch: {
-    metadata: {
-        handler(val){
-          console.log('metadata update');
-        },
-        deep: true
-    }
-  },
+  }
 };
 </script>
 

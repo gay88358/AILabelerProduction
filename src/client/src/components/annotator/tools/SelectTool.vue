@@ -284,7 +284,6 @@ export default {
       // ensures that the initPoint is always tracked. 
       // Necessary for the introduced pan functionality and fixes a bug with selecting and dragging bboxes, since initPoint is initially undefined
       this.initPoint = event.point;  
-
       let hitResult = this.$parent.paper.project.hitTest(
         event.point,
         this.hitOptions
@@ -318,11 +317,11 @@ export default {
 
       this.keypoint = null;
 
-      if (
-        item &&
+      let annotationSelected = item &&
         item.data.hasOwnProperty("annotationId") &&
         item.data.hasOwnProperty("categoryId")
-      ) {
+
+      if (annotationSelected) {
         this.hover.position = event.point;
 
         let categoryId = event.item.data.categoryId;

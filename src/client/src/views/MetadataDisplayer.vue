@@ -1,6 +1,5 @@
 <template>
   <div>
-    
     <div class="row" v-if="hasAnnotationSelected">
         <div class="col-sm">
           <label>DefectCode</label>
@@ -11,10 +10,8 @@
 
           <input :value="getSelectedAnnotation.Type"></input>
           <input :value="getSelectedAnnotation.Class"></input>
-
         </div>
 
-        
         <div class="col-sm">
           <button class="change-btn" @click="updateAnnotationMetadata">Change</button>
           <button class="delete-btn" @click="deleteAnnotation">Delete</button>
@@ -38,22 +35,16 @@ export default {
   },
   methods: {
       deleteAnnotation() {
-
         this.$store.dispatch(
           'deleteSelectedAnnotation'
         );
-        // this.$store.dispatch(
-        //         'deleteAnnotationById',
-        //         { 
-        //           annotationId: this.getSelectedAnnotation.id,
-        //           categoryId: this.getSelectedAnnotation.category_id
-        //         }
-        //       );
       },
       updateAnnotationMetadata() {
           this.$store.dispatch(
             'updateAnnotationMetadata', 
-            this.getMetadataOfSelectedAnnotation()
+            {
+              annotationClass: this.defectCode
+            }
           );
           EventBus.$emit(
               "selectedAnnotationUpdate", 
@@ -62,11 +53,6 @@ export default {
 
           this.defectCode = "";
       },
-      getMetadataOfSelectedAnnotation() {
-        return {
-            annotationClass: this.defectCode
-        }
-      }
   },
   computed: {
     ...mapGetters([

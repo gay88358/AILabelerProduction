@@ -766,20 +766,20 @@ export default {
       }
     },
     moveUp() {
-      if (this.currentCategory != null) {
-        if (this.currentAnnotation != null) {
-          if (this.currentKeypoint != null) {
-            this.decrementKeypoint();
-          } else if (this.currentAnnotation.showKeypoints && this.current.keypoint == -1) {
-            this.decrementKeypoint();
-          } else {
-            this.decrementAnnotation();
-          }
-        } else if (this.current.annotation == -1) {
-          this.decrementAnnotation();
+      if (this.currentCategory == null) {
+        this.decrementCategory();
+        return;
+      }
+      if (this.currentAnnotation != null) {
+        if (this.currentKeypoint != null) {
+          this.decrementKeypoint();
+        } else if (this.currentAnnotation.showKeypoints && this.current.keypoint == -1) {
+          this.decrementKeypoint();
         } else {
-          this.decrementCategory();
+          this.decrementAnnotation();
         }
+      } else if (this.current.annotation == -1) {
+        this.decrementAnnotation();
       } else {
         this.decrementCategory();
       }

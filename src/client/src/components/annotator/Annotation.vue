@@ -433,7 +433,7 @@ export default {
       };
     },
     deleteAnnotation() {
-      this.annotation.metadata['Type'] = "circle";
+      // this.annotation.metadata['Type'] = "circle";
 
       axios.delete("/api/annotation/" + this.annotation.id).then(() => {
         this.$socket.emit("annotation", {
@@ -446,6 +446,7 @@ export default {
       });
     },
     delete() {
+      // delete annotation component ?
       this.$parent.category.annotations.splice(this.index, 1);
       this.clearAnnotationOnCanvas();
     },
@@ -491,23 +492,32 @@ export default {
       }
     },
     onMouseEnter() {
-      if (this.compoundPath == null) return;
+      if (this.isNullCompoundPath()) return;
 
+      this.compoundPathSelected()
+    },
+    compoundPathSelected() {
       this.compoundPath.selected = true;
     },
     onMouseLeave() {
-      if (this.compoundPath == null) return;
+      if (this.isNullCompoundPath()) return;
 
+      this.compoundPathUnSelected()
+    },
+    compoundPathUnSelected() {
       this.compoundPath.selected = false;
     },
+    isNullCompoundPath() {
+      return this.compoundPath == null;
+    },
     getCompoundPath() {
-      if (this.compoundPath == null) {
+      if (this.isNullCompoundPath()) {
         this.createCompoundPath();
       }
       return this.compoundPath;
     },
     createUndoAction(actionName) {
-      if (this.compoundPath == null) this.createCompoundPath();
+      if (this.isNullCompoundPath()) this.createCompoundPath();
 
       let copy = this.compoundPath.clone();
       copy.fullySelected = false;
@@ -657,7 +667,7 @@ export default {
      * @param {isBBox} isBBox mark annotation as bbox.
      */
     unite(compound, simplify = true, undoable = true, isBBox = false) {
-      if (this.compoundPath == null) this.createCompoundPath();
+      if (this.isNullCompoundPath()) this.createCompoundPath();
 
       let newCompound = this.compoundPath.unite(compound);
       newCompound.strokeColor = null;
@@ -681,7 +691,7 @@ export default {
      * @param {undoable} undoable add an undo action
      */
     subtract(compound, simplify = true, undoable = true) {
-      if (this.compoundPath == null) this.createCompoundPath();
+      if (this.isNullCompoundPath()) this.createCompoundPath();
 
       let newCompound = this.compoundPath.subtract(compound);
       newCompound.onDoubleClick = this.compoundPath.onDoubleClick;
@@ -694,7 +704,7 @@ export default {
       if (simplify) this.simplifyPath();
     },
     setColor() {
-      if (this.compoundPath == null) return;
+      if (this.isNullCompoundPath()) return;
 
       if (!this.$parent.showAnnotations) {
         this.$parent.setColor();
@@ -718,7 +728,7 @@ export default {
       $(`#annotationSettings${annotation.id}`).modal("hide");
     },
     export() {
-      if (this.compoundPath == null) this.createCompoundPath();
+      if (this.isNullCompoundPath()) this.createCompoundPath();
       let metadata = this.$refs.metadata.export();
       if (this.name.length > 0) metadata.name = this.name;
       let annotationData = {
@@ -789,7 +799,6 @@ export default {
     },
     getKeypointBackgroundColor(index) {
       if (this.isHover && this.$parent.isHover) return "#646c82";
-
       // if (this.keypoint.tag == index + 1) return "#4b624c";
       let activeIndex = this.keypoint.next.label;
       if (this.activeTool === "Select") {
@@ -801,6 +810,16 @@ export default {
     }
   },
   watch: {
+    index: {
+      handler(val) {
+        
+        this.initAnnotation();
+        $(`#keypointSettings${this.annotation.id}`).on("hidden.bs.modal", () => {
+          this.currentKeypoint = null;
+        });
+        console.log(`annotation index is changed to ${val}`);
+      }
+    },
     activeTool(tool) {
       if (this.isCurrent) {
         this.session.tools.push(tool);
@@ -837,13 +856,13 @@ export default {
       this.setColor();
     },
     isVisible(newVisible) {
-      if (this.compoundPath == null) return;
+      if (this.isNullCompoundPath()) return;
 
       this.compoundPath.visible = newVisible;
       this.keypoints.visible = newVisible;
     },
     compoundPath() {
-      if (this.compoundPath == null) return;
+      if (this.isNullCompoundPath()) return;
 
       this.compoundPath.visible = this.isVisible;
       this.setColor();
@@ -869,7 +888,7 @@ export default {
         this.sessions.push(this.session);
       }
 
-      if (this.compoundPath == null) return;
+      if (this.isNullCompoundPath()) return;
       this.compoundPath.fullySelected = this.isCurrent;
     },
     currentKeypoint(point, old) {
@@ -999,8 +1018,6 @@ export default {
     });
   },
   beforeDestroy() {
-    console.log(`annotation id: ${this.annotation.id}`);
-    console.log('annotation is being deleted');
     this.clearAnnotationOnCanvas();
   }
 };
