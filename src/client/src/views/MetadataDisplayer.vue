@@ -46,13 +46,19 @@ export default {
               annotationClass: this.defectCode
             }
           );
+
+          this.notifyAnnotationUpdated();
+          this.clearDropdwonContent();
+      },
+      notifyAnnotationUpdated() {
           EventBus.$emit(
               "selectedAnnotationUpdate", 
               {}
           );
-
-          this.defectCode = "";
       },
+      clearDropdwonContent() {
+        this.defectCode = "";
+      }
   },
   computed: {
     ...mapGetters([

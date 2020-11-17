@@ -363,28 +363,29 @@ export default {
     getAnnotationHeight() {
       return this.annotation.height;
     },
-    createCompoundPath(json, segments) {
-      console.log('create json');
-      console.log(json);
-      console.log('create segments');
-      console.log(segments);
-
+    validateJson(json) {
       json = json || null;
-      segments = segments || null;
       // Validate json
       if (json != null) {
         if (json.length !== 2) {
           json = null;
         }
       }
-
+      return json;
+    },
+    validateSegments(segments) {
+      segments = segments || null;
       // Validate segments
       if (segments != null) {
         if (segments.length === 0) {
           segments = null;
         }
       }
-
+      return segments;
+    },
+    createCompoundPath(json, segments) {
+      json = this.validateJson(json);
+      segments = this.validateJson(segments);
       this.removeCompoundPath();;
       if (this.isKeypointsNotNull()) this.keypoints.remove();
 
@@ -835,13 +836,13 @@ export default {
   },
   watch: {
     index: {
-      handler(val) {
+      handler(val, oldVal) {
         
         this.initAnnotation();
         $(`#keypointSettings${this.getAnnotationId()}`).on("hidden.bs.modal", () => {
           this.currentKeypoint = null;
         });
-        console.log(`annotation index is changed to ${val}`);
+        console.log(`annotation index is changed from ${oldVal} to ${val}`);
       }
     },
     activeTool(tool) {
@@ -963,12 +964,7 @@ export default {
       let listView = [];
       for (let i=0; i < this.keypointLabels.length; ++i) {
         let visibility = this.getKeypointVisibility(i);
-        let iconColor = 'rgb(40, 42, 49)';
-        if (visibility == 1) {
-          iconColor = 'lightgray';
-        } else if (visibility == 2) {
-          iconColor = this.keypointColors[i];
-        }
+        let iconColor = this.getIconColor(visibility);
         listView.push({
           label: this.keypointLabels[i],
           visibility,
@@ -977,6 +973,15 @@ export default {
         });
       }
       return listView;
+    },
+    getIconColor(visibility) {
+        let result = 'rgb(40, 42, 49)';
+        if (visibility == 1) {
+          result = 'lightgray';
+        } else if (visibility == 2) {
+          result = this.keypointColors[i];
+        }
+        return result;
     },
     isHover() {
       return this.index === this.hover;
