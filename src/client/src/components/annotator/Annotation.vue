@@ -340,14 +340,20 @@ export default {
       }
 
       if (this.compoundPath != null) {
-        this.compoundPath.remove();
-        this.compoundPath = null;
+        this.removeCompoundPath();
+        this.setCompoundPath(null);
       }
 
       this.createCompoundPath(
         this.annotation.paper_object,
         this.annotation.segmentation
       );
+    },
+    removeCompoundPath() {
+      if (this.compoundPath == null) {
+        return;
+      }
+      this.compoundPath.remove();
     },
     createCompoundPath(json, segments) {
       json = json || null;
@@ -370,7 +376,7 @@ export default {
         }
       }
 
-      if (this.compoundPath != null) this.compoundPath.remove();
+      this.removeCompoundPath();;
       if (this.keypoints != null) this.keypoints.remove();
 
       // Create new compoundpath
@@ -451,7 +457,7 @@ export default {
       this.clearAnnotationOnCanvas();
     },
     clearAnnotationOnCanvas() {
-      if (this.compoundPath != null) this.compoundPath.remove();
+      this.removeCompoundPath();;
       if (this.keypoints != null) {
         this.keypoints._keypoints.forEach( keypoint => {
           this.keypoints.deleteKeypoint(keypoint);
@@ -516,10 +522,14 @@ export default {
       }
       return this.compoundPath;
     },
+    setCompoundPath(newCompoundPath) {
+      this.compoundPath = newCompoundPath;
+    },
     createUndoAction(actionName) {
-      if (this.isNullCompoundPath()) this.createCompoundPath();
+      
+      // if (this.isNullCompoundPath()) this.createCompoundPath();
 
-      let copy = this.compoundPath.clone();
+      let copy = this.getCompoundPath().clone();
       copy.fullySelected = false;
       copy.visible = false;
       this.pervious.push(copy);
@@ -571,8 +581,8 @@ export default {
     },
     undoCompound() {
       if (this.pervious.length == 0) return;
-      this.compoundPath.remove();
-      this.compoundPath = this.pervious.pop();
+      this.removeCompoundPath();;
+      this.setCompoundPath(this.pervious.pop());
       this.compoundPath.fullySelected = this.isCurrent;
     },
     addKeypoint(point, visibility, label) {
@@ -669,17 +679,17 @@ export default {
     unite(compound, simplify = true, undoable = true, isBBox = false) {
       if (this.isNullCompoundPath()) this.createCompoundPath();
 
-      let newCompound = this.compoundPath.unite(compound);
+      let newCompound = this.getCompoundPath().unite(compound);
       newCompound.strokeColor = null;
       newCompound.strokeWidth = 0;
-      newCompound.onDoubleClick = this.compoundPath.onDoubleClick;
-      newCompound.onClick = this.compoundPath.onClick;
+      newCompound.onDoubleClick = this.getCompoundPath().onDoubleClick;
+      newCompound.onClick = this.getCompoundPath().onClick;
       this.annotation.isbbox = isBBox;
       
       if (undoable) this.createUndoAction("Unite");
 
-      this.compoundPath.remove();
-      this.compoundPath = newCompound;
+      this.getCompoundPath().remove();
+      this.setCompoundPath(newCompound);
       this.keypoints.bringToFront();
 
       if (simplify) this.simplifyPath();
@@ -692,13 +702,13 @@ export default {
      */
     subtract(compound, simplify = true, undoable = true) {
       if (this.isNullCompoundPath()) this.createCompoundPath();
-
+      
       let newCompound = this.compoundPath.subtract(compound);
       newCompound.onDoubleClick = this.compoundPath.onDoubleClick;
       if (undoable) this.createUndoAction("Subtract");
 
-      this.compoundPath.remove();
-      this.compoundPath = newCompound;
+      this.removeCompoundPath();;
+      this.setCompoundPath(newCompound);
       this.keypoints.bringToFront();
 
       if (simplify) this.simplifyPath();
@@ -729,6 +739,7 @@ export default {
     },
     export() {
       if (this.isNullCompoundPath()) this.createCompoundPath();
+
       let metadata = this.$refs.metadata.export();
       if (this.name.length > 0) metadata.name = this.name;
       let annotationData = {
