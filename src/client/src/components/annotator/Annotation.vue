@@ -348,12 +348,6 @@ export default {
         delete this.annotation.metadata["name"];
       } 
     },
-    removeCompoundPath() {
-      if (this.isNullCompoundPath()) {
-        return;
-      }
-      this.compoundPath.remove();
-    },
     isKeypointsNotNull() {
       return this.keypoints != null;
     },
@@ -408,9 +402,8 @@ export default {
         }
       }
 
-      this.removeCompoundPath();;
-      if (this.isKeypointsNotNull()) this.keypoints.remove();
-
+      this.clearAnnotationOnCanvas();
+    
       // Create new compoundpath
       this.compoundPath = new paper.CompoundPath();
       this.compoundPath.onDoubleClick = () => {
@@ -462,16 +455,16 @@ export default {
         }
     },
     calculatePath(segment) {
-      let path = new paper.Path();
+      let result = new paper.Path();
       let center = new paper.Point(this.getAnnotationWidth() / 2, this.getAnnotationHeight() / 2);
       for (let j = 0; j < segment.length; j += 2) {
         let x = segment[j];
         let y = segment[j + 1]
         let point = new paper.Point(x, y);
-        path.add(point.subtract(center));
+        result.add(point.subtract(center));
       }
-      path.closePath();
-      return path
+      result.closePath();
+      return result;
     },
     updateCompoundPathData(annotationIndex, categoryIndex) {
       this.compoundPath.data.annotationId = annotationIndex;
@@ -493,11 +486,20 @@ export default {
       this.clearAnnotationOnCanvas();
     },
     clearAnnotationOnCanvas() {
-      this.removeCompoundPath();;
+      this.removeCompoundPath();
+      this.removeKeypoints();
+    },
+    removeCompoundPath() {
+      if (this.isNullCompoundPath()) {
+        return;
+      }
+      this.compoundPath.remove();
+    },
+    removeKeypoints() {
       if (this.isKeypointsNotNull()) {
-        this.keypoints._keypoints.forEach( keypoint => {
-          this.keypoints.deleteKeypoint(keypoint);
-        });
+        // this.keypoints._keypoints.forEach( keypoint => {
+        //   this.keypoints.deleteKeypoint(keypoint);
+        // });
         this.keypoints.remove();
       }
     },
