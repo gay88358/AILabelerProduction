@@ -161,20 +161,29 @@ export default {
     changeDefectCode() {
     },
     getMetadataList() {
+      if (this.metadata == null)
+        return [];
       let result = [];
-      if (this.metadata != null) {
-        for (var key in this.metadata) {
-          if (!this.metadata.hasOwnProperty(key)) continue;
-          if (key === this.exclude) continue;
-
-          let value = this.metadata[key];
-
-          if (value == null) value = "";
-          else value = value.toString();
-          result.push({ key: key, value: value });
+      for (var key in this.metadata) {
+        if (key === this.exclude) {
+          continue;
         }
+        result.push(
+          { 
+            key: key, 
+            value: this.getMetadataValueBy(key) 
+          }
+        );
       }
       return result;
+    },
+    getMetadataValueBy(key) {
+        let value = this.metadata[key];
+        if (value == null) {
+          return ""
+        } else {
+          return value.toString();
+        }
     }
   },
   computed: {
