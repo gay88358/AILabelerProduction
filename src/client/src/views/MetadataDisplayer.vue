@@ -14,7 +14,7 @@
 
         <div class="col-sm">
           <button class="change-btn" @click="updateAnnotationMetadata">Change</button>
-          <button class="delete-btn" @click="deleteAnnotation">Delete</button>
+          <!--<button class="delete-btn" @click="deleteAnnotation">Delete</button>-->
         </div>
         <hr>
     </div> 

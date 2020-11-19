@@ -7,8 +7,8 @@ Features:
 - When user save modified annotation, changes to annotations will write back to shared folder (mount directory)
 - Wehn user click annotation, metadata displayer will display "type" and "class" of the annotation
 - User can use Metadata displayer to change the defectCode of the annotation
-- User can use Metadata displayer to delete selected annotation
 - The changes to one image will sync with another images in the same dataset
+
  
 
 

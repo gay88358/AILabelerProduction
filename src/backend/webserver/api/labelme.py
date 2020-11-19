@@ -11,7 +11,7 @@ from usecase.importLabelme.addSharedFolderUsecase import AddSharedFolderUsecase
 from usecase.importLabelme.loadDefectCode.defectCodeParser import DefectCodeLoader
 from usecase.user.createUserUsecase import CreateUserUsecase
 
-
+from .userInfo import *
 from .common.response import *
 from .common.logger import *
 
@@ -72,10 +72,10 @@ class LabelmeId(Resource):
         return response(result)
       
     def create_user(self):
-        username = "WebUILabeler"
-        password = "webUILabeler"
-        name = "webUI"
-        email = "gay88358@yahoo.com.tw"
+        username = get_user_name()
+        password = get_user_password()
+        name = get_name()
+        email = get_email()
         return CreateUserUsecase(EncryptionService()).create(username, password, name, email)
   
     def add_shared_folder_to_user(self, stripID, dataset_name_list):

@@ -6,23 +6,19 @@ def get_tag():
     result = subprocess.run(["git", "describe", "--abbrev=0", "--tags"], stdout=subprocess.PIPE)
     return str(result.stdout.decode("utf-8")).strip()
 
-def _get_bool(key, default_value):
+def get_bool(key, default_value):
     if key in os.environ:
         value = os.environ[key]
-        if value == 'True' or value == 'true' or value == '1':
-            return True
-        return False
+        isTrueValue = (value == 'True' or value == 'true' or value == '1')
+        return isTrueValue
     return default_value
 
 class Config:
-
     NAME = os.getenv("NAME", "COCO Annotator")
     VERSION = get_tag()
-
     ### File Watcher
     FILE_WATCHER = os.getenv("FILE_WATCHER", False)
     IGNORE_DIRECTORIES = ["_thumbnail", "_settings"]
-
     # Flask/Gunicorn
     #
     #   LOG_LEVEL - The granularity of log output
@@ -60,8 +56,8 @@ class Config:
     INITIALIZE_FROM_FILE = os.getenv("INITIALIZE_FROM_FILE")
 
     ### User Options
-    LOGIN_DISABLED = _get_bool("LOGIN_DISABLED", False)
-    ALLOW_REGISTRATION = _get_bool('ALLOW_REGISTRATION', True)
+    LOGIN_DISABLED = get_bool("LOGIN_DISABLED", False)
+    ALLOW_REGISTRATION = get_bool('ALLOW_REGISTRATION', True)
 
     ### Models
     MASK_RCNN_FILE = os.getenv("MASK_RCNN_FILE", "")
