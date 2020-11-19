@@ -1,15 +1,17 @@
+class UserCredential:
+    def get_user_name(self):
+        return "admin"
 
+    def get_user_password(self):
+        return "webUILabeler"
 
-def get_user_name():
-    return "admin"
+    def get_name(self):
+        return "admin"
 
-def get_user_password():
-    return "webUILabeler"
+    def get_email(self):
+        return "gay88358@yahoo.com.tw"
 
-def get_name():
-    return "admin"
+# Singleton design pattern
+user_credential = UserCredential()
 
-def get_email():
-    return "gay88358@yahoo.com.tw"
-
-__all__ = ["get_user_name", "get_user_password", "get_name", "get_email"]
+__all__ = ["user_credential"]

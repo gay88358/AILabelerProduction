@@ -69,11 +69,11 @@ login_manager.anonymous_user = AnonymousUser
 
 @login_manager.user_loader
 def load_user(user_id):
-    return UserModel.objects(username=get_user_name()).first()
+    return UserModel.objects(username=user_credential.get_user_name()).first()
 
 @login_manager.request_loader
 def load_user(request):
-    return UserModel.objects(username=get_user_name()).first()
+    return UserModel.objects(username=user_credential.get_user_name()).first()
 
 @login_manager.unauthorized_handler
 def unauthorized():

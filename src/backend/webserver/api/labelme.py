@@ -72,10 +72,10 @@ class LabelmeId(Resource):
         return response(result)
       
     def create_user(self):
-        username = get_user_name()
-        password = get_user_password()
-        name = get_name()
-        email = get_email()
+        username = user_credential.get_user_name()
+        password = user_credential.get_user_password()
+        name = user_credential.get_name()
+        email = user_credential.get_email()
         return CreateUserUsecase(EncryptionService()).create(username, password, name, email)
   
     def add_shared_folder_to_user(self, stripID, dataset_name_list):
