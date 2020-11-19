@@ -9,6 +9,8 @@ Features:
 - User can use Metadata displayer to change the defectCode of the annotation
 - The changes to one image will sync with another images in the same dataset
 
- 
+v1.0.0.1
 
-
+Date of Release: 2020/11/19
+Bug Fixed:
+- Add error handling for wrong format of label_map.json file

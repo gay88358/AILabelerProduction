@@ -60,6 +60,8 @@ class DefectCodeLoader:
             return Result.success(DefectCodeLoader())
         except FileNotFoundError as e:
             return Result.failure(['Please put label_map.json into root folder'])
+        except ValueError as e:
+            return Result.failure(['The format of given label_map.json is invalid, please check and fix the format of json file'])
 
     def __init__(self):
         self.json_document = self.load_json_document()
@@ -68,7 +70,7 @@ class DefectCodeLoader:
         defect_code_file_path = "/worksapce/sharedFolder/ATWEX/label_map.json"
         json_document = JsonHelper.load_json_document(defect_code_file_path)
         return json_document
-            
+
     def load_defect_code(self):        
         defect_code = DefectCodeParser(self.json_document)
         return defect_code.to_defect_code_catalog()
