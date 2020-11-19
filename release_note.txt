@@ -1,0 +1,14 @@
+v1.0.0.0
+
+Date of Release: 2020/11/19
+Features:
+- Load label_map.json file from specific directory, and display defectCode on metadata displayer drop-down list
+- Create dataset with /api/create/labelme api
+- When user save modified annotation, changes to annotations will write back to shared folder (mount directory)
+- Wehn user click annotation, metadata displayer will display "type" and "class" of the annotation
+- User can use Metadata displayer to change the defectCode of the annotation
+- User can use Metadata displayer to delete selected annotation
+- The changes to one image will sync with another images in the same dataset
+ 
+
+
