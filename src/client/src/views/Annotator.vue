@@ -74,7 +74,7 @@
 
       <hr />
       
-      <SaveButton />
+      <SaveButton @save-clicked="saveAndUpdateAnnotations" />
      
       <SettingsButton
         :metadata="image.metadata"

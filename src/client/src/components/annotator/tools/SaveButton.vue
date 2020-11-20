@@ -12,7 +12,7 @@ export default {
   },
   methods: {
     execute() {
-      this.$parent.saveAndUpdateAnnotations();
+      this.$emit('save-clicked');
     }
   }
 };
