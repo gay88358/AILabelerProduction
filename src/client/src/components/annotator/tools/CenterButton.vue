@@ -12,7 +12,7 @@ export default {
   },
   methods: {
     execute() {
-      this.$parent.fit();
+      this.$emit('center-clicked');
     }
   }
 };

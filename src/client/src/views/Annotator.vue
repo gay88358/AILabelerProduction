@@ -69,7 +69,7 @@
       </div>
 
       <hr>
-      <CenterButton />
+      <CenterButton @center-clicked="fit" />
      
 
       <hr />
