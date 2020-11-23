@@ -28,6 +28,16 @@ class UserModel(DynamicDocument, UserMixin):
     strip_dataset_name_list = DictField(default={})
     # meta = {'allow_inheritance': True}
 
+
+    @staticmethod
+    def create(username, password, name, email):
+        user = UserModel()
+        user.username = username
+        user.password = password
+        user.name = name
+        user.email = email
+        return user
+
     @staticmethod
     def user_already_exists(username):
         return UserModel.objects(username__iexact=username).first()

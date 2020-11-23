@@ -6,7 +6,8 @@ class LabelChecker:
     INVALID_TYPE =  'Shape must contain Type property'       
     INVALID_POINTS =  'Shape must contain points property'       
     INVALID_ATTRIBUTES =  'Shape must contain Attributes property'       
-    
+    EMPTY_POINT = 'The point of shape can not be empty'
+
     @staticmethod
     def check_string(labelme_json_string):
         d = json.loads(labelme_json_string)
@@ -29,19 +30,33 @@ class LabelChecker:
     def check_shape(shapes):
         errors = []
         for shape in shapes:
-            if 'Type' not in shape:
-                errors.append(LabelChecker.INVALID_TYPE)
-            
-            if 'points' not in shape:
-                errors.append(LabelChecker.INVALID_POINTS)
-            
-            if 'Attributes' not in shape:
-                errors.append(LabelChecker.INVALID_ATTRIBUTES)
-
+            LabelChecker.check_type(shape, errors)
+            LabelChecker.check_point(shape, errors)
+            LabelChecker.check_attribute(shape, errors)
+        
         if len(errors) > 0:
             return Result.failure(LabelChecker.remove_duplicate_error_message(errors))
         return Result.success('success')
     
+    @staticmethod
+    def check_type(shape, errors):
+        if 'Type' not in shape:
+            errors.append(LabelChecker.INVALID_TYPE)
+
+    @staticmethod
+    def check_attribute(shape, errors):
+        if 'Attributes' not in shape:
+            errors.append(LabelChecker.INVALID_ATTRIBUTES)
+
+    @staticmethod
+    def check_point(shape, errors):
+        if 'points' not in shape:
+            errors.append(LabelChecker.INVALID_POINTS)
+            return
+        
+        if len(shape['points']) == 0:
+            errors.append(LabelChecker.EMPTY_POINT)
+
     @staticmethod
     def remove_duplicate_error_message(errors):
         return list(

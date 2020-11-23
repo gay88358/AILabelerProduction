@@ -123,19 +123,31 @@ export default {
   },
   methods: {
     metadataString() {
-      let string = "";
       let metadata = this.getMetadataList();
-      if (metadata == null || metadata.length === 0) {
-        string += "No Metadata \n";
+      let isEmptyMetadata = (metadata == null || metadata.length === 0)
+      if (isEmptyMetadata) {
+        return this.emptyMetadataString();
       } else {
-        string += "Metadata \n";
+        return this.metadataBodyString();
+      }
+    },
+    emptyMetadataString() {
+      let result = "";
+      result += "No Metadata \n";
+      result.replace(/\n/g, " \n ").slice(0, -2);
+      return result;
+    },
+    metadataBodyString() {
+        let metadata = this.getMetadataList();
+        let result = "";
+        result += "Metadata \n";
         metadata.forEach(element => {
           if (element.key == this.TYPE_KEY || element.key == this.CLASS_KEY) {
-            string += " " + element.key + " = " + element.value + " \n";
+            result += " " + element.key + " = " + element.value + " \n";
           }
         });
-      }
-      return string.replace(/\n/g, " \n ").slice(0, -2);
+        result.replace(/\n/g, " \n ").slice(0, -2);
+        return result;
     },
     export() {
       let metadata = {};

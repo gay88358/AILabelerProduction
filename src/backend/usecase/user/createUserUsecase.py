@@ -49,9 +49,5 @@ class CreateUserUsecase:
         return user
     
     def create_user_model(self, username, password, name, email):
-        user = UserModel()
-        user.username = username
-        user.password = self.encryption_service.hash_password(password)
-        user.name = name
-        user.email = email
-        return user
+        hash_password = self.encryption_service.hash_password(password)
+        return UserModel.create(username, hash_password, name, email)

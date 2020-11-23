@@ -63,11 +63,10 @@ class SaveAllAggregateDataUsecase:
                 continue
             self.update_category(db_category, category_data, current_user)
 
-    def update_category(self, db_category, category_data, current_user):
-        category_update = {'color': category_data.get('color')}
-        if current_user.can_edit(db_category):
-            category_update['keypoint_edges'] = category_data.get('keypoint_edges', [])
-            category_update['keypoint_labels'] = category_data.get('keypoint_labels', [])
-            category_update['keypoint_colors'] = category_data.get('keypoint_colors', [])
-        db_category.update(**category_update)
-    
+    def update_category(self, category, category_data, current_user):
+        update_data = {'color': category_data.get('color')}
+        if current_user.can_edit(category):
+            update_data['keypoint_edges'] = category_data.get('keypoint_edges', [])
+            update_data['keypoint_labels'] = category_data.get('keypoint_labels', [])
+            update_data['keypoint_colors'] = category_data.get('keypoint_colors', [])
+        category.update(**update_data)

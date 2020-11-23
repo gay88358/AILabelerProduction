@@ -3,6 +3,32 @@ from usecase.importLabelme.labelmeChecker import LabelChecker
 
 class TestCase:
 
+    def test_check_empty_point_labelme_json(self):
+        labelme_json = self.get_empty_point_labelme_json()
+
+        result = LabelChecker.check(labelme_json)
+
+        assert result.is_success() == False
+        assert LabelChecker.EMPTY_POINT in result.error_messages
+
+    def get_empty_point_labelme_json(self):
+        return {
+            'Labels': [
+                {
+                    "Label": "wire",
+                    "Shapes": [
+                        {
+                            'Type': "",
+                            'points': [],
+                            'Score': 0,
+                            'Attributes': {}
+                        }
+                    ]
+                }
+            ]
+        }
+ 
+
     def test_check_labelme_str(self):
         labelme_str = '{"Labels": []}'
         result = LabelChecker.check_string(labelme_str)
@@ -35,7 +61,7 @@ class TestCase:
                     "Shapes": [
                         {
                             'Type': "",
-                            'points': [],
+                            'points': [1, 2],
                             'Score': 0,
                             'Attributes': {}
                         }

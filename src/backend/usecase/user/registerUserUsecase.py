@@ -16,7 +16,6 @@ class RegisterUserUsecase:
             return {'success': False, 'message': 'Username already exists.'}, 400
         
         user = self.create_user(username, password, name, email)
-        # self.login_user_callback(user)
 
         return {
             'success': True, 
