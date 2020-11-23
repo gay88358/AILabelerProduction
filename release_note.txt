@@ -14,3 +14,10 @@ v1.0.0.1
 Date of Release: 2020/11/19
 Bug Fixed:
 - Add error handling for wrong format of label_map.json file
+
+v1.0.0.2
+
+Date of Release: 2020/11/19
+Bug Fixed:
+- Add error handling for shape contains empty point
+- Add error handling for shape contains point which is out of image width or height 
