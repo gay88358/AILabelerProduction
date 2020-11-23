@@ -45,7 +45,7 @@ class TestCase:
         # Act
         result = repository.delete_by_stripId(invalid_stripID)
         # Assert
-        assert result.is_success() == False
+        assert result.is_failure()
 
     def test_remove_dataset(self, mongo_connection_setup):
         # Arrange

@@ -69,7 +69,7 @@ class ScanningImagesAndJsonUsecase:
             result = format_mount_directory(dataset_source_folder_path, dataset.name)\
                 .flat_map(lambda path: self.find_labelme_json(path)\
                 .flat_map(lambda labelme_json: LabelChecker.check_string(labelme_json)))
-            if result.is_success() == False:
+            if result.is_failure():
                 return result
         return Result.success('')
 
@@ -77,7 +77,7 @@ class ScanningImagesAndJsonUsecase:
         for dataset in DatasetModel.find_datasets_by_id_list(dataset_id_list):
             result = format_mount_directory(dataset_source_folder_path, dataset.name)\
                 .flat_map(lambda path: self.execute(dataset.id, path))
-            if result.is_success() == False:
+            if result.is_failure():
                 return result
         return Result.success(dataset_id_list)
 
@@ -97,8 +97,7 @@ class ScanningImagesAndJsonUsecase:
 
     def importAnnotationsToAllImages(self, dataset_id, labelme_json_string):
         usecase = ImportAnnotationsToAllImagesUsecase.create()
-        usecase.execute(dataset_id, labelme_json_string)
-        return Result.success('')
+        return usecase.execute(dataset_id, labelme_json_string)
 
     def find_labelme_json(self, dataset_source_folder_path):
         try:

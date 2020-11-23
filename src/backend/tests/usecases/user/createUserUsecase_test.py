@@ -23,7 +23,7 @@ class TestCase:
         # Act
         result = usecase.create(self.get_user_name(), self.get_password(), self.get_name(), self.get_email())
         # Assert
-        assert result.is_success() == True
+        assert result.is_success()
         self.assert_user_create_successfully(result)
 
     def assert_user_create_successfully(self, result):
@@ -42,7 +42,7 @@ class TestCase:
         # Act
         result = usecase.create(username, password, name, email)
         # Assert
-        assert result.is_success() == True
+        assert result.is_success()
         assert result.value == user_id
 
     def create_user_usecase(self):

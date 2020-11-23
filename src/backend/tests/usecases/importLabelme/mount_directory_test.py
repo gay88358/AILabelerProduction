@@ -8,12 +8,12 @@ class TestCase:
         mount_directory = "sdf"
         dataset_name = "sdf"
         result = format_mount_directory(mount_directory, dataset_name)
-        assert result.is_success() == False
+        assert result.is_failure()
     
     def test_format_mount_directory(self):
         base_dir = os.path.dirname(__file__)
         mount_directory = base_dir
         dataset_name = "fakeDatasetDirectory"
         result = format_mount_directory(mount_directory, dataset_name)
-        assert result.is_success() == True
+        assert result.is_success()
     

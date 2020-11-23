@@ -33,7 +33,7 @@ class TestCase:
         # Act
         result = usecase.create_all_dataset(dataset_name_list)
         # Assert
-        assert result.is_success() == False
+        assert result.is_failure()
         assert result.error_messages == ['Dataset name is duplicate: first dataset']
         
     def test_create_all_dataset_with_result(self):
@@ -44,7 +44,7 @@ class TestCase:
         # Act
         result = usecase.create_all_dataset(dataset_name_list)
         assert result.value == [1, 1]
-        assert result.is_success() == True
+        assert result.is_success()
         self.assert_dataset_length(2, result)
         
     def assert_dataset_length(self, expected_length, result):

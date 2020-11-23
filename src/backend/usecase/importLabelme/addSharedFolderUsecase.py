@@ -43,13 +43,13 @@ class AddSharedFolderUsecase:
     def check_mount_directory(self, stripID, dataset_name_list, mount_directory):
         for dataset_name in self.format_dataset_name_list(stripID, dataset_name_list):
             result = format_mount_directory(mount_directory, dataset_name)
-            if result.is_success() == False:
+            if result.is_failure():
                 return result
         return Result.success(dataset_name_list)
 
     def add_shared_folder_to_user(self, user, stripID, dataset_name_list, mount_directory):        
         result = self.dataset_repository.delete_by_stripId(stripID)
-        if result.is_success() == False:
+        if result.is_failure():
             return result
 
         user.add_strip_folder(stripID, self.format_dataset_name_list(stripID, dataset_name_list), mount_directory)

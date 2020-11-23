@@ -8,7 +8,7 @@ class TestCase:
 
         result = LabelChecker.check(labelme_json)
 
-        assert result.is_success() == False
+        assert result.is_failure()
         assert LabelChecker.EMPTY_POINT in result.error_messages
 
     def get_empty_point_labelme_json(self):
@@ -32,14 +32,14 @@ class TestCase:
     def test_check_labelme_str(self):
         labelme_str = '{"Labels": []}'
         result = LabelChecker.check_string(labelme_str)
-        assert  result.is_success() == True
+        assert result.is_success()
 
     def test_check_empty_labelme_json(self):
         labelme_json = self.get_empty_labelme_json()
 
         result = LabelChecker.check(labelme_json)
 
-        assert result.is_success() == True
+        assert result.is_success()
     
     def get_empty_labelme_json(self):
         return {
@@ -51,7 +51,7 @@ class TestCase:
 
         result = LabelChecker.check(labelme_json)
 
-        assert result.is_success() == True
+        assert result.is_success()
 
     def get_normal_labelme_json(self):
         return {
@@ -74,7 +74,7 @@ class TestCase:
         labelme_json = self.get_invalid_labelme_json()
         result = LabelChecker.check(labelme_json)
 
-        assert result.is_success() == False
+        assert result.is_failure()
         assert LabelChecker.INVALID_TYPE in result.error_messages
         assert LabelChecker.INVALID_POINTS in result.error_messages
         assert LabelChecker.INVALID_ATTRIBUTES in result.error_messages

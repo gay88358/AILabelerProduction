@@ -50,7 +50,7 @@ class DefectCode(Resource):
         get_logger().info("DefectCode Loading")
         result = DefectCodeLoader.create()\
             .map(lambda loader: loader.load_defect_code())
-        if result.is_success() == False:
+        if result.is_failure():
             return []
         import json
         return json.dumps(result.value)

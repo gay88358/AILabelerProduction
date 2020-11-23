@@ -16,6 +16,9 @@ class Result:
     def is_success(self):
         raise ValueError('is_success need to implemented')
 
+    def is_failure(self):
+        raise ValueError('is_failure need to implemented')
+
 class Success:
     def __init__(self, value):
         self.value = value
@@ -28,6 +31,10 @@ class Success:
     
     def is_success(self):
         return True
+
+    def is_failure(self):
+        return False
+
 
 class Failure:
     def __init__(self, error_messages):
@@ -44,3 +51,6 @@ class Failure:
     
     def is_success(self):
         return False
+
+    def is_failure(self):
+        return True

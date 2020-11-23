@@ -25,8 +25,9 @@ class TestCase:
         mock_add_category_to_dataset_usecase.set_fake_dataset_to_return(fakeDataset)
         usecase = ImportAnnotationsToAllImagesUsecase.create_by(mock_add_category_to_dataset_usecase)
         # Act
-        usecase.execute(dataset_id, labelme_json_string)
+        result = usecase.execute(dataset_id, labelme_json_string)
         # Assert
+        assert result.is_success()
         self.assert_import_annotations_to_all_images(dataset_id)
         fakeDataset.categories_size_should_be(5)
 
