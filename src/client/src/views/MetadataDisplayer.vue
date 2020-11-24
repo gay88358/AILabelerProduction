@@ -8,8 +8,8 @@
             <option v-for="defectCode in getDefectCodeOfSelectedAnnotation">{{defectCode}}</option> 
           </select>
 
-          <input :value="getSelectedAnnotation.Type"></input>
-          <input :value="getSelectedAnnotation.Class"></input>
+          <input :value="getSelectedAnnotation.Type" readonly></input>
+          <input :value="getSelectedAnnotation.Class" readonly></input>
         </div>
 
         <div class="col-sm">
