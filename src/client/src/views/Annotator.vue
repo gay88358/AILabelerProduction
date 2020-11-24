@@ -259,6 +259,7 @@ import EraserPanel from "@/components/annotator/panels/EraserPanel";
 import KeypointPanel from "@/components/annotator/panels/KeypointPanel";
 import DEXTRPanel from "@/components/annotator/panels/DEXTRPanel";
 import { mapMutations, mapGetters } from "vuex";
+import { recordModifiedDataset, updateAnnotatorData } from '../models/actionDispatcher';
 
 export default {
   name: "Annotator",
@@ -371,7 +372,7 @@ export default {
       });
     },
     save(callback) {
-      this.$store.dispatch('addAffectedDataset', { name: this.dataset.name, id: this.dataset.id });
+      recordModifiedDataset(this.$store, this.dataset.name, this.dataset.id);
       let process = "Saving";
       this.addProcess(process);
       let refs = this.$refs;
@@ -627,7 +628,7 @@ export default {
         .finally(() => this.removeProcess(process));
     },
     updateAnnotatorData(annotatorData) {
-      this.$store.dispatch('updateAnnotatorData', annotatorData);
+      updateAnnotatorData(this.$store, annotatorData);
     },
     onCategoryClick(indices) {
       this.current.annotation = indices.annotation;

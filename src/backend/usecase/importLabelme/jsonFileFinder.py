@@ -7,17 +7,28 @@ class JsonFileFinder:
 
     def find_result_json_in_the(self, directory):
         try:
-            return self.find_json_in_the(directory)
+            return self.find_label_json_in_the(directory)
         except ValueError:
             err_msg = 'Decoding json file contained in folder {} has failed, please check the format of json file'.format(dataset_source_folder_path)
             return Result.failure([err_msg])
         
-    def find_json_in_the(self, directory):
-        if self.there_is_no_json_file_contained_in(directory):
-            err_msg = "Given directory {} must contains Labelme.json".format(directory)
+    def find_label_json_in_the(self, directory):
+        if self.not_included_label_json(directory):
+            err_msg = "Given directory {} must contains Label.json".format(directory)
             return Result.failure([err_msg])
+
         json_file_path = self.find_json_file_path_in_the(directory)
         return Result.success(JsonHelper.load_json_string(json_file_path))
+
+    def not_included_label_json(self, directory):
+        label_json_not_included = self.there_is_no_json_file_contained_in(directory)
+        json_file_path = self.find_json_file_path_in_the(directory)
+        return not self.is_label_json(json_file_path) or label_json_not_included
+         
+    def is_label_json(self, directory):
+        tokens = directory.split("/")
+        file_name = tokens[-1]
+        return file_name == "Label.json"
 
     def find_json_file_path_in_the(self, directory):
         file_path_list = self.get_all_file_path_in_the(directory)

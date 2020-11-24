@@ -222,11 +222,10 @@ import paper from "paper";
 import axios from "axios";
 import simplifyjs from "simplify-js";
 import JQuery from "jquery";
-
+import { setSelectedAnnotation } from "../../models/actionDispatcher";
 import { Keypoint, Keypoints, VisibilityOptions } from "@/libs/keypoints";
 import { mapMutations } from "vuex";
 import UndoAction from "@/undo";
-
 import TagsInput from "@/components/TagsInput";
 import Metadata from "@/components/Metadata";
 
@@ -503,7 +502,18 @@ export default {
         this.keypoints.remove();
       }
     },
+    getCategoryId() {
+      return this.annotation.category_id;
+    },
     onAnnotationClick(showKeypoints) {
+
+      setSelectedAnnotation(
+        this.$store,
+        this.getAnnotationId(),
+        this.getCategoryId()
+      )
+
+      
       if (this.keypointLabels.length) {
         this.showKeypoints = showKeypoints;
       }

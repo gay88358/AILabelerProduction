@@ -192,7 +192,7 @@ import AdminPanel from "@/models/admin";
 import DatasetCard from "@/components/cards/DatasetCard";
 import Pagination from "@/components/Pagination";
 import TagsInput from "@/components/TagsInput";
-
+import { updateCurrentStripID } from '../models/actionDispatcher';
 import { mapMutations } from "vuex";
 
 export default {
@@ -294,7 +294,7 @@ export default {
   },
   created() {
     this.updatePage();
-    this.$store.dispatch('updateCurrentStripID', this.stripID);
+    updateCurrentStripID(this.$store, this.stripID);
   }
 };
 </script>

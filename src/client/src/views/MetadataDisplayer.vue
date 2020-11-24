@@ -24,6 +24,7 @@
 
 <script>
 
+import { updateAnnotationMetadata, deleteSelectedAnnotation } from '../models/actionDispatcher';
 import { mapGetters } from "vuex";
 
 export default {
@@ -35,18 +36,10 @@ export default {
   },
   methods: {
       deleteAnnotation() {
-        this.$store.dispatch(
-          'deleteSelectedAnnotation'
-        );
+        deleteSelectedAnnotation(this.$store);
       },
       updateAnnotationMetadata() {
-          this.$store.dispatch(
-            'updateAnnotationMetadata', 
-            {
-              annotationClass: this.defectCode
-            }
-          );
-
+          updateAnnotationMetadata(this.$store, this.defectCode);
           this.notifyAnnotationUpdated();
           this.clearDropdwonContent();
       },

@@ -1,7 +1,7 @@
 <script>
 import paper from "paper";
 import tool from "@/mixins/toolBar/tool";
-
+import { setSelectedAnnotation } from "../../../models/actionDispatcher";
 export default {
   name: "SelectTool",
   mixins: [tool],
@@ -166,7 +166,11 @@ export default {
     },
     onMouseDown(event) {
       if (this.hasSelectedAnnotation()) {
-        this.$store.dispatch('setSelectedAnnotation', this.currentAnnotationAndCategory());
+        setSelectedAnnotation(
+          this.$store,
+          this.currentAnnotationAndCategory().annotationId,
+          this.currentAnnotationAndCategory().categoryId
+        )
       }
       let hitResult = this.$parent.paper.project.hitTest(
         event.point,

@@ -25,6 +25,11 @@ Bug Fixed:
 v1.0.0.3
 
 Date of Release: 2020/11/24
+Features:
+- Click annotation on the category will display metadata information on the right down corner
 Bug Fixed:
-- Add error handling for labelme.json file is not included in dataset folder
+- Add error handling for Label.json file is not included in dataset folder
+- Add error handling for the name of the json file is not equals to Label.json
+
+
 
