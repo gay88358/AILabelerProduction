@@ -7,21 +7,17 @@ class JsonFileFinder:
 
     def find_result_json_in_the(self, directory):
         try:
-            json = self.find_json_in_the(directory)
-            if json == "":
-                err_msg = "Given directory {} must contains Labelme.json".format(directory)
-                return Result.failure([err_msg])
-            return Result.success(json)
+            return self.find_json_in_the(directory)
         except ValueError:
             err_msg = 'Decoding json file contained in folder {} has failed, please check the format of json file'.format(dataset_source_folder_path)
             return Result.failure([err_msg])
         
     def find_json_in_the(self, directory):
         if self.there_is_no_json_file_contained_in(directory):
-            return ""
-
+            err_msg = "Given directory {} must contains Labelme.json".format(directory)
+            return Result.failure([err_msg])
         json_file_path = self.find_json_file_path_in_the(directory)
-        return JsonHelper.load_json_string(json_file_path)
+        return Result.success(JsonHelper.load_json_string(json_file_path))
 
     def find_json_file_path_in_the(self, directory):
         file_path_list = self.get_all_file_path_in_the(directory)
