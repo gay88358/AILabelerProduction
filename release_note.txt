@@ -21,3 +21,10 @@ Date of Release: 2020/11/23
 Bug Fixed:
 - Add error handling for shape contains empty point
 - Add error handling for shape contains point which is out of image width or height 
+
+v1.0.0.3
+
+Date of Release: 2020/11/24
+Bug Fixed:
+- Add error handling for labelme.json file is not included in dataset folder
+

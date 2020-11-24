@@ -1,9 +1,21 @@
 import os
 from usecase.util.jsonHelper import JsonHelper
-
+from usecase.util.result import Result
 
 
 class JsonFileFinder:
+
+    def find_result_json_in_the(self, directory):
+        try:
+            json = self.find_json_in_the(directory)
+            if json == "":
+                err_msg = "Given directory {} must contains Labelme.json".format(directory)
+                return Result.failure([err_msg])
+            return Result.success(json)
+        except ValueError:
+            err_msg = 'Decoding json file contained in folder {} has failed, please check the format of json file'.format(dataset_source_folder_path)
+            return Result.failure([err_msg])
+        
     def find_json_in_the(self, directory):
         if self.there_is_no_json_file_contained_in(directory):
             return ""
