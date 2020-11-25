@@ -26,5 +26,10 @@ class JsonHelper:
         with open(json_file, 'w') as outfile:
             json.dump(json_document, outfile)
 
+    @staticmethod
+    def write_json_str(json_file, json_document_str):
+        with open(json_file, 'w') as outfile:
+            outfile.write(json_document_str)
+
 
     

@@ -5,22 +5,23 @@ from usecase.util.result import Result
 
 class JsonFileFinder:
 
-    def find_result_json_in_the(self, directory):
-        try:
-            return self.find_label_json_in_the(directory)
-        except ValueError:
-            err_msg = 'Decoding json file contained in folder {} has failed, please check the format of json file'.format(dataset_source_folder_path)
-            return Result.failure([err_msg])
-        
     def find_label_json_in_the(self, directory):
-        if self.not_included_label_json(directory):
+        if self.is_not_include_label_json(directory):
             err_msg = "Given directory {} must contains Label.json".format(directory)
             return Result.failure([err_msg])
 
         json_file_path = self.find_json_file_path_in_the(directory)
-        return Result.success(JsonHelper.load_json_string(json_file_path))
+        return self.load_json_string(json_file_path)
+        
+    def load_json_string(self, json_file_path):
+        try:
+            return Result.success(JsonHelper.load_json_string(json_file_path))
+        except ValueError:
+            err_msg = 'Decoding json file contained in folder {} has failed, please check the format of json file'.format(json_file_path)
+            return Result.failure([err_msg])
 
-    def not_included_label_json(self, directory):
+
+    def is_not_include_label_json(self, directory):
         label_json_not_included = self.there_is_no_json_file_contained_in(directory)
         json_file_path = self.find_json_file_path_in_the(directory)
         return not self.is_label_json(json_file_path) or label_json_not_included

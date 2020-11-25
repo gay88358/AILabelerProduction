@@ -16,11 +16,14 @@ class ImageRepository:
         self.dataset = None
         
     def create_images_from(self, dataset_id):
-        self.dataset = DatasetModel.find_by(dataset_id)
-        
+        self.set_dataset_by(dataset_id)
+
         image_file_paths = FilePathFinder().find_image_file_path_in(self.dataset.directory)
         self.create_images_by_path_list(image_file_paths)
         self.create_thumbnail_for_all_images()
+
+    def set_dataset_by(self, dataset_id):
+        self.dataset = DatasetModel.find_by(dataset_id)
 
     def create_images_by_path_list(self, image_file_paths):
         for path in image_file_paths:
@@ -98,4 +101,4 @@ class ScanningImagesAndJsonUsecase:
         return usecase.execute(dataset_id, labelme_json_string)
 
     def find_labelme_json(self, dataset_source_folder_path):
-        return JsonFileFinder().find_result_json_in_the(dataset_source_folder_path)
+        return JsonFileFinder().find_label_json_in_the(dataset_source_folder_path)
