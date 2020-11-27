@@ -69,7 +69,6 @@ export default {
       this.polygon.path = new paper.Path(this.polygon.pathOptions);
       this.bbox = new BBox(event.point);
       this.addPointsToPolygonPath();
-      // this.bbox.getPoints().forEach(point => this.polygon.path.add(point));
     },
     modifyBBox(event) {
       this.polygon.path = new paper.Path(this.polygon.pathOptions);
@@ -92,7 +91,7 @@ export default {
     },
     autoStrokeColor(point) {
       if (this.color.circle == null) return;
-      if (this.polygon.path == null) return;
+      if (this.isNullPolygonPath()) return;
       if (!this.color.auto) return;
 
       this.color.circle.position = point;
@@ -129,7 +128,7 @@ export default {
       }
     },
     onMouseMove(event) {
-      if (this.polygon.path == null) return;
+      if (this.isNullPolygonPath()) return;
       if (this.polygon.path.segments.length === 0) return;
       this.autoStrokeColor(event.point);
 
@@ -143,7 +142,7 @@ export default {
      * Undo points
      */
     undoPoints(args) {
-      if (this.polygon.path == null) return;
+      if (this.isNullPolygonPath()) return;
 
       let points = args.points;
       let length = this.polygon.path.segments.length;
@@ -155,7 +154,7 @@ export default {
      * @returns {boolean} sucessfully closes object
      */
     canAddBBoxToAnnotation() {
-      if (this.polygon.path == null) return false;
+      if (this.isNullPolygonPath()) return false;
       return true;
     },
     addBBoxToAnnotation() {
@@ -207,7 +206,7 @@ export default {
         this.polygon.path.strokeWidth = newScale * this.scaleFactor;
     },
     "polygon.pathOptions.strokeColor"(newColor) {
-      if (this.polygon.path == null) return;
+      if (this.isNullPolygonPath()) return;
 
       this.polygon.path.strokeColor = newColor;
     },
