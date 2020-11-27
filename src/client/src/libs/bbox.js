@@ -7,41 +7,45 @@ class Point{
 
 export class BBox {
     constructor(point) {
-        this.point1 = new Point(point); //one corner point.
-        this.point2 = null;
+        this.startPoint = new Point(point); //one corner point.
+        this.endPoint = null;
     }
     
-    addPoint(point){
-        this.point2 = new Point(point);
-        this.point1_2 = new Point({x: this.point1.x, y: this.point2.y});
-        this.point2_1 = new Point({x: this.point2.x, y: this.point1.y});
+
+    getStartPoint() {
+        return this.startPoint;
+    }
+
+    getEndPoint() {
+        return this.endPoint;
     }
 
     modifyPoint(point){
-        this.point2 = null;
-        this.addPoint(point);
+        this.endPoint = new Point(point);
+        this.startXEndYPoint = new Point({x: this.getStartPoint().x, y: this.getEndPoint().y});
+        this.startYEndXPoint = new Point({x: this.getEndPoint().x, y: this.getStartPoint().y});
     }
 
     getPoints(){
         if(!this.isComplete()){
-            return [this.point1];
+            return [this.getStartPoint()];
         }
-        var points = [];
-        points[0] = this.point1;
-        points[1] = this.point1_2;
-        points[2] = this.point2;
-        points[3] = this.point2_1;
-        points[4] = this.point1;
+        let points = [];
+        points[0] = this.getStartPoint();
+        points[1] = this.startXEndYPoint;
+        points[2] = this.getEndPoint();
+        points[3] = this.startYEndXPoint;
+        points[4] = this.getStartPoint();
         return points;
     }
 
     removePoint() {
-        this.point2 = null;
-        this.point1_2 = null;
-        this.point2_1 = null;
+        this.endPoint = null;
+        this.startXEndYPoint = null;
+        this.startYEndXPoint = null;
     }
 
     isComplete() {
-        return !!this.point2;
+        return !!this.getEndPoint();
     }
 }

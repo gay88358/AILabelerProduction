@@ -371,6 +371,15 @@ export default {
           this.getData();
       });
     },
+    createAnnotationOnCurrentCategory() {
+      this.currentCategory.createAnnotation();
+    },
+    checkAnnotationExist() {
+      return (
+        !!this.currentAnnotation &&
+        !!this.currentAnnotation.annotation.paper_object.length
+      );
+    },
     save(callback) {
       recordModifiedDataset(this.$store, this.dataset.name, this.dataset.id);
       let process = "Saving";

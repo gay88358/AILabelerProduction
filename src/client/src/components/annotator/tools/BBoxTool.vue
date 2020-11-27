@@ -65,22 +65,6 @@ export default {
       this.color.auto = pref.auto || this.color.auto;
       this.color.radius = pref.radius || this.color.radius;
     },
-    createBBox(event) {
-      this.polygon.path = new paper.Path(this.polygon.pathOptions);
-      this.bbox = new BBox(event.point);
-      this.addPointsToPolygonPath();
-    },
-    modifyBBox(event) {
-      this.polygon.path = new paper.Path(this.polygon.pathOptions);
-      this.changePointsOfBBox(event);
-      this.addPointsToPolygonPath();
-    },
-    changePointsOfBBox(event) {
-      this.bbox.modifyPoint(event.point);
-    },
-    addPointsToPolygonPath() {
-      this.bbox.getPoints().forEach(point => this.polygon.path.add(point));
-    },
     /**
      * Frees current bbox
      */
@@ -89,73 +73,34 @@ export default {
       this.removePolygon();
       this.removeColor();
     },
-    autoStrokeColor(point) {
-      if (this.color.circle == null) return;
-      if (this.isNullPolygonPath()) return;
-      if (!this.color.auto) return;
-
-      this.color.circle.position = point;
-      let raster = this.$parent.image.raster;
-      let color = raster.getAverageColor(this.color.circle);
-      if (color) {
-        this.polygon.pathOptions.strokeColor = invertColor(
-          color.toCSS(true),
-          this.color.blackOrWhite
-        );
-      }
-    },
-    checkAnnotationExist() {
-      return (
-        !!this.$parent.currentAnnotation &&
-        !!this.$parent.currentAnnotation.annotation.paper_object.length
-      );
-    },
     isNullPolygonPath() {
       return this.polygon.path == null;
     },
     onMouseDown(event) {
-      if (this.isNullPolygonPath() && this.checkAnnotationExist()) {
-        console.log('add annotation to current category');
-        this.$parent.currentCategory.createAnnotation();
+      if (this.isNullPolygonPath() && this.$parent.checkAnnotationExist()) {
+        this.$parent.createAnnotationOnCurrentCategory();
       }
       if (this.isNullPolygonPath()) {
-        this.createBBox(event);
+        this.createBBox(event.point);
         return;
       }
+
       this.updateCurrentBBox(event);
       if (this.canAddBBoxToAnnotation()) {
         this.addBBoxToAnnotation();
       }
     },
-    onMouseMove(event) {
-      if (this.isNullPolygonPath()) return;
-      if (this.polygon.path.segments.length === 0) return;
-      this.autoStrokeColor(event.point);
-
-      this.updateCurrentBBox(event);
-    },
-    updateCurrentBBox(event) {
-      this.removeLastBBox();
-      this.modifyBBox(event);
-    },
-    /**
-     * Undo points
-     */
-    undoPoints(args) {
-      if (this.isNullPolygonPath()) return;
-
-      let points = args.points;
-      let length = this.polygon.path.segments.length;
-
-      this.polygon.path.removeSegments(length - points, length);
+    createBBox(point) {
+      this.polygon.path = this.createPaperPath();
+      this.bbox = new BBox(point);
+      this.addPointsToPolygonPath();
     },
     /**
      * Closes current polygon and unites it with current annotaiton.
      * @returns {boolean} sucessfully closes object
      */
     canAddBBoxToAnnotation() {
-      if (this.isNullPolygonPath()) return false;
-      return true;
+      return !this.isNullPolygonPath();
     },
     addBBoxToAnnotation() {
       if (!this.canAddBBoxToAnnotation())
@@ -181,8 +126,61 @@ export default {
         this.color.circle = null;
       }
     },
+    onMouseMove(event) {
+      if (this.isNullPolygonPath() || this.polygonContainsNoSegments()) return;
+      
+      this.autoStrokeColor(event.point);
+      this.updateCurrentBBox(event);
+    },
+    polygonContainsNoSegments() {
+      return this.polygon.path.segments.length === 0;
+    },
+    autoStrokeColor(point) {
+      if (this.color.circle == null) return;
+      if (this.isNullPolygonPath()) return;
+      if (!this.color.auto) return;
+
+      this.color.circle.position = point;
+      let raster = this.$parent.image.raster;
+      let color = raster.getAverageColor(this.color.circle);
+      if (color) {
+        this.polygon.pathOptions.strokeColor = invertColor(
+          color.toCSS(true),
+          this.color.blackOrWhite
+        );
+      }
+    },
+    updateCurrentBBox(event) {
+      this.removeLastBBox();
+      this.modifyBBox(event);
+    },
     removeLastBBox() {
       this.polygon.path.removeSegments();
+    },
+    modifyBBox(event) {
+      this.polygon.path = this.createPaperPath();
+      this.changePointsOfBBox(event);
+      this.addPointsToPolygonPath();
+    },
+    createPaperPath() {
+      return new paper.Path(this.polygon.pathOptions);
+    },
+    changePointsOfBBox(event) {
+      this.bbox.modifyPoint(event.point);
+    },
+    addPointsToPolygonPath() {
+      this.bbox.getPoints().forEach(point => this.polygon.path.add(point));
+    },
+    /**
+     * Undo points
+     */
+    undoPoints(args) {
+      if (this.isNullPolygonPath()) return;
+
+      let points = args.points;
+      let length = this.polygon.path.segments.length;
+
+      this.polygon.path.removeSegments(length - points, length);
     }
   },
   computed: {
