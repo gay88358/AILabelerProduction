@@ -127,13 +127,10 @@ export default {
       }
     },
     onMouseMove(event) {
-      if (this.isNullPolygonPath() || this.polygonContainsNoSegments()) return;
+      if (this.isNullPolygonPath() || this.polygonSegmentLength() === 0) return;
       
       this.autoStrokeColor(event.point);
       this.updateCurrentBBox(event);
-    },
-    polygonContainsNoSegments() {
-      return this.polygon.path.segments.length === 0;
     },
     autoStrokeColor(point) {
       if (this.color.circle == null) return;
@@ -169,7 +166,7 @@ export default {
       this.bbox.modifyPoint(event.point);
     },
     addPointsToPolygonPath() {
-      this.bbox.getPoints().forEach(point => this.polygon.path.add(point));
+      this.bbox.addPointsTo(this.polygon.path);
     },
     /**
      * Undo points
@@ -178,9 +175,12 @@ export default {
       if (this.isNullPolygonPath()) return;
 
       let points = args.points;
-      let length = this.polygon.path.segments.length;
+      let length = this.polygonSegmentLength();
 
       this.polygon.path.removeSegments(length - points, length);
+    },
+    polygonSegmentLength() {
+      return this.polygon.path.segments.length;
     }
   },
   computed: {

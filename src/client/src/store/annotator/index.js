@@ -46,6 +46,10 @@ class NullAnnotator {
     getCurrentCategoryName() {
         return "";
     }
+
+    getAnnotatorData() {
+        return [];
+    }
 }
 
 const state = {

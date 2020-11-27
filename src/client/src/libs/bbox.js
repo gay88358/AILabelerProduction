@@ -7,19 +7,17 @@ class Point{
 
 export class BBox {
     constructor(point) {
-        this.startPoint = new Point(point); //one corner point.
+        this.startPoint = new Point(point);
         this.endPoint = null;
     }
+
+    addPointsTo(path) {
+        this.getPoints()
+            .forEach(
+                point => path.add(point)
+            );
+    }
     
-
-    getStartPoint() {
-        return this.startPoint;
-    }
-
-    getEndPoint() {
-        return this.endPoint;
-    }
-
     modifyPoint(point){
         this.endPoint = new Point(point);
         this.startXEndYPoint = new Point({x: this.getStartPoint().x, y: this.getEndPoint().y});
@@ -27,7 +25,7 @@ export class BBox {
     }
 
     getPoints(){
-        if(!this.isComplete()){
+        if(!this.isComplete()) {
             return [this.getStartPoint()];
         }
         let points = [];
@@ -39,13 +37,21 @@ export class BBox {
         return points;
     }
 
+    isComplete() {
+        return this.getEndPoint() != null;
+    }
+
+    getStartPoint() {
+        return this.startPoint;
+    }
+
+    getEndPoint() {
+        return this.endPoint;
+    }
+
     removePoint() {
         this.endPoint = null;
         this.startXEndYPoint = null;
         this.startYEndXPoint = null;
-    }
-
-    isComplete() {
-        return !!this.getEndPoint();
     }
 }

@@ -95,7 +95,7 @@
         ref="filetitle"
       />
 
-      <div v-if="categories.length > 5">
+      <div v-if="categoryLength() > 5">
         <div style="padding: 0px 5px">
           <input
             v-model="search"
@@ -110,7 +110,7 @@
         :style="{ 'max-height': mode == 'label' ? '100%' : '57%' }"
       >
         <p
-          v-if="categories.length == 0"
+          v-if="categoryLength() == 0"
           style="color: lightgray; font-size: 12px"
         >
           No categories have been enabled for this image.
@@ -121,7 +121,7 @@
           style="overflow: auto; max-height: 100%"
         >
           <Category
-            v-for="(category, index) in categories"
+            v-for="(category, index) in vuexCategories"
             :key="category.id + '-category'" 
             :simplify="simplify"
             :categorysearch="search"
@@ -141,7 +141,7 @@
         
         <div v-show="mode == 'label'" style="overflow: auto; max-height: 100%">
           <CLabel
-            v-for="category in categories"
+            v-for="category in vuexCategories"
             v-model="image.categoryIds"
             :key="category.id + '-label'"
             :category="category"
@@ -553,7 +553,12 @@ export default {
 
         this.image.data = tempCtx.getImageData(0, 0, width, height);
         let fontSize = width * 0.025;
-
+        this.creteTopLeftText(width, height, fontSize);
+        this.createTopRightText(width, height, fontSize);
+        this.loading.image = false;
+      };
+    },
+    creteTopLeftText(width, height, fontSize) {
         let positionTopLeft = new paper.Point(
           -width / 2,
           -height / 2 - fontSize * 0.5
@@ -562,19 +567,18 @@ export default {
         this.text.topLeft.fontSize = fontSize;
         this.text.topLeft.fillColor = "white";
         this.text.topLeft.content = this.image.filename;
-
+    },
+    createTopRightText(width, height, fontSize) {
         let positionTopRight = new paper.Point(
           width / 2,
           -height / 2 - fontSize * 0.4
         );
+
         this.text.topRight = new paper.PointText(positionTopRight);
         this.text.topRight.justification = "right";
         this.text.topRight.fontSize = fontSize;
         this.text.topRight.fillColor = "white";
         this.text.topRight.content = width + "x" + height;
-
-        this.loading.image = false;
-      };
     },
     setPreferences(preferences) {
       let refs = this.$refs;
@@ -586,6 +590,9 @@ export default {
       refs.brush.setPreferences(preferences.brush || {});
       refs.eraser.setPreferences(preferences.eraser || {});
     },
+    setAnnotating(data) {
+      this.annotating = data.image.annotating || [];
+    },
     getData(callback) {
       let process = "Loading annotation data";
       this.addProcess(process);
@@ -596,30 +603,15 @@ export default {
           let data = response.data;
 
           this.loading.data = false;
-          // Set image data
-          this.image.metadata = data.image.metadata || {};
-          this.image.filename = data.image.file_name;
-          this.image.next = data.image.next;
-          this.image.previous = data.image.previous;
-          this.image.categoryIds = data.image.category_ids || [];
-
-          this.annotating = data.image.annotating || [];
-
-          // Set other data
-          this.dataset = data.dataset;
-          // Update status          
+          
+          this.setImageData(data);
+          this.setAnnotating(data);
+          this.dataset = data.dataset;          
           this.updateAnnotatorData(data.categories);
-          this.categories = data.categories;
-          
-          
+          this.setCategories(data.categories);
           this.setDataset(this.dataset);
-
-          let preferences = data.preferences;
-          this.setPreferences(preferences);
-
-          if (this.text.topLeft != null) {
-            this.text.topLeft.content = this.image.filename;
-          }
+          this.setPreferences(data.preferences);
+          this.setTextTopLeft();
 
           this.$nextTick(() => {
             this.showAll();
@@ -635,6 +627,18 @@ export default {
           this.$router.go(-1);
         })
         .finally(() => this.removeProcess(process));
+    },
+    setTextTopLeft() {
+      if (this.text.topLeft != null) {
+        this.text.topLeft.content = this.image.filename;
+      }
+    },
+    setImageData(data) {
+      this.image.metadata = data.image.metadata || {};
+      this.image.filename = data.image.file_name;
+      this.image.next = data.image.next;
+      this.image.previous = data.image.previous;
+      this.image.categoryIds = data.image.category_ids || [];
     },
     updateAnnotatorData(annotatorData) {
       updateAnnotatorData(this.$store, annotatorData);
@@ -701,7 +705,7 @@ export default {
       this.cursor = newCursor;
     },
     incrementCategory() {
-      if (this.current.category >= this.categories.length - 1) {
+      if (this.current.category >= this.categoryLength() - 1) {
         this.current.category = -1;
       } else {
         this.current.category += 1;
@@ -710,9 +714,16 @@ export default {
         }
       }
     },
+    setCategories(newCategories) {
+      this.categories = newCategories;
+    },
+    categoryLength() {
+      return this.vuexCategories.length;
+      // return this.categories.length;
+    },
     decrementCategory() {
       if (this.current.category === -1) {
-        this.current.category = this.categories.length - 1;
+        this.current.category = this.categoryLength() - 1;
         let annotationCount = this.currentCategory.category.annotations.length;
         if (annotationCount > 0) {
           this.current.annotation = annotationCount - 1;
@@ -973,7 +984,7 @@ export default {
     },
     "current.category"(cc) {
       if (cc < -1) this.current.category = -1;
-      let max = this.categories.length;
+      let max = this.categoryLength();
       if (cc > max) {
         this.current.category = -1;
       }
@@ -1004,6 +1015,9 @@ export default {
     }
   },
   computed: {
+    vuexCategories() {
+      return this.$store.getters.getCategories;
+    },
     doneLoading() {
       return !this.loading.image && !this.loading.data;
     },
@@ -1075,11 +1089,11 @@ export default {
     this.setDataset(null);
     this.initCanvas();
     this.getData();
-    EventBus.$on(
-        "selectedAnnotationUpdate",
-        e => {
-          this.categories = this.$store.getters.getCategories;
-        });
+    // EventBus.$on(
+    //     "selectedAnnotationUpdate",
+    //     e => {
+    //       this.setCategories(this.$store.getters.getCategories);
+    //     });
 
 
     this.$socket.emit("annotating", { image_id: this.image.id, active: true });
