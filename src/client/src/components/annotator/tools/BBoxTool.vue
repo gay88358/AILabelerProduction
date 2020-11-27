@@ -110,24 +110,31 @@ export default {
         !!this.$parent.currentAnnotation.annotation.paper_object.length
       );
     },
+    isNullPolygonPath() {
+      return this.polygon.path == null;
+    },
     onMouseDown(event) {
-      if (this.polygon.path == null && this.checkAnnotationExist()) {
+      if (this.isNullPolygonPath() && this.checkAnnotationExist()) {
+        console.log('add annotation to current category');
         this.$parent.currentCategory.createAnnotation();
       }
-      if (this.polygon.path == null) {
+      if (this.isNullPolygonPath()) {
         this.createBBox(event);
         return;
       }
-      this.removeLastBBox();
-      this.modifyBBox(event);
-
-      if (this.completeBBox()) return;
+      this.updateCurrentBBox(event);
+      if (this.canAddBBoxToAnnotation()) {
+        this.addBBoxToAnnotation();
+      }
     },
     onMouseMove(event) {
       if (this.polygon.path == null) return;
       if (this.polygon.path.segments.length === 0) return;
       this.autoStrokeColor(event.point);
 
+      this.updateCurrentBBox(event);
+    },
+    updateCurrentBBox(event) {
       this.removeLastBBox();
       this.modifyBBox(event);
     },
@@ -146,24 +153,33 @@ export default {
      * Closes current polygon and unites it with current annotaiton.
      * @returns {boolean} sucessfully closes object
      */
-    completeBBox() {
+    canAddBBoxToAnnotation() {
       if (this.polygon.path == null) return false;
+      return true;
+    },
+    addBBoxToAnnotation() {
+      if (!this.canAddBBoxToAnnotation())
+        throw new Error("Check can add bbox to annotation before add bbox to annotation");
 
+      this.addAnnotation(this.polygon.path);
+      this.removePolygon();
+      this.removeColor();
+      this.removeUndos(this.actionTypes.ADD_POINTS);
+    },
+    addAnnotation(path) {
+      this.$parent.uniteCurrentAnnotation(path, true, true, true);
+    },
+    removePolygon() {
       this.polygon.path.fillColor = "black";
       this.polygon.path.closePath();
-
-      this.$parent.uniteCurrentAnnotation(this.polygon.path, true, true, true);
-
       this.polygon.path.remove();
       this.polygon.path = null;
+    },
+    removeColor() {
       if (this.color.circle) {
         this.color.circle.remove();
         this.color.circle = null;
       }
-
-      this.removeUndos(this.actionTypes.ADD_POINTS);
-
-      return true;
     },
     removeLastBBox() {
       this.polygon.path.removeSegments();

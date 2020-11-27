@@ -285,11 +285,11 @@ export default {
         if (annotations == null) return;
 
         let annotation = annotations[annotationId - 1];
-        if (annotation == null) {
-          this.$parent.scrollElement(this.$el);
-        } else {
-          this.$parent.scrollElement(annotation.$el);
-        }
+        // if (annotation == null) {
+        //   this.$parent.scrollElement(this.$el);
+        // } else {
+        //   this.$parent.scrollElement(annotation.$el);
+        // }
       });
     },
     onUpdateClick() {
