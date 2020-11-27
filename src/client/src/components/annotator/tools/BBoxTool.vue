@@ -68,26 +68,27 @@ export default {
     createBBox(event) {
       this.polygon.path = new paper.Path(this.polygon.pathOptions);
       this.bbox = new BBox(event.point);
-      this.bbox.getPoints().forEach(point => this.polygon.path.add(point));
+      this.addPointsToPolygonPath();
+      // this.bbox.getPoints().forEach(point => this.polygon.path.add(point));
     },
-
     modifyBBox(event) {
       this.polygon.path = new paper.Path(this.polygon.pathOptions);
+      this.changePointsOfBBox(event);
+      this.addPointsToPolygonPath();
+    },
+    changePointsOfBBox(event) {
       this.bbox.modifyPoint(event.point);
+    },
+    addPointsToPolygonPath() {
       this.bbox.getPoints().forEach(point => this.polygon.path.add(point));
     },
     /**
      * Frees current bbox
      */
     deleteBbox() {
-      if (this.polygon.path == null) return;
-
-      this.polygon.path.remove();
-      this.polygon.path = null;
-
-      if (this.color.circle == null) return;
-      this.color.circle.remove();
-      this.color.circle = null;
+      if (this.isNullPolygonPath()) return;
+      this.removePolygon();
+      this.removeColor();
     },
     autoStrokeColor(point) {
       if (this.color.circle == null) return;
