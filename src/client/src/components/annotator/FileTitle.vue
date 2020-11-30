@@ -47,16 +47,19 @@ export default {
      * @param {Number} identifer id of a file
      */
     route(identifier) {
-      // Make sure we pop the latest session before annotations
       this.$parent.current.annotation = -1;
-      
-      this.$nextTick(() => {
+      this.savePromise()
+          .then(_ => this.changeAnnotate(identifier))
+    },
+    savePromise() {
+      return new Promise((resolve, reject) => {
         this.$parent.save(() => {
-
-          clearAnnotatorData(this.$store);
-          this.$router.push({ name: "annotate", params: { identifier } });
+         resolve(); 
         });
       });
+    },
+    changeAnnotate(identifier) {
+      this.$router.push({ name: "annotate", params: { identifier } });
     }
   }
 };

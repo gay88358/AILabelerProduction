@@ -1086,6 +1086,9 @@ export default {
       this.save(next);
     });
   },
+  beforeMount() {
+    clearAnnotatorData(this.$store);
+  },
   mounted() {
     this.setDataset(null);
     this.initCanvas();
