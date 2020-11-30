@@ -593,40 +593,44 @@ export default {
     setAnnotating(data) {
       this.annotating = data.image.annotating || [];
     },
+    loadAnnotatorData(image_id, process, callback) {
+      axios
+      .get("/api/annotator/data/" + image_id)
+      .then(response => {
+        let data = response.data;
+        this.loading.data = false;
+        this.setImageData(data);
+        this.setAnnotating(data);
+        this.dataset = data.dataset;          
+        this.updateAnnotatorData(data.categories);
+        this.setCategories(data.categories);
+        this.setDataset(this.dataset);
+        this.setPreferences(data.preferences);
+        this.setTextTopLeft();
+
+        this.$nextTick(() => {
+          this.showAll();
+        });
+
+        if (callback != null) callback();
+      })
+      .catch(() => {
+        this.axiosReqestError(
+          "Could not find requested image",
+          "Redirecting to previous page."
+        );
+        this.backToLastPage();
+      })
+      .finally(() => this.removeProcess(process));
+    },
+    backToLastPage() {
+      this.$router.go(-1);
+    },
     getData(callback) {
       let process = "Loading annotation data";
       this.addProcess(process);
       this.loading.data = true;
-      axios
-        .get("/api/annotator/data/" + this.image.id)
-        .then(response => {
-          let data = response.data;
-
-          this.loading.data = false;
-          
-          this.setImageData(data);
-          this.setAnnotating(data);
-          this.dataset = data.dataset;          
-          this.updateAnnotatorData(data.categories);
-          this.setCategories(data.categories);
-          this.setDataset(this.dataset);
-          this.setPreferences(data.preferences);
-          this.setTextTopLeft();
-
-          this.$nextTick(() => {
-            this.showAll();
-          });
-
-          if (callback != null) callback();
-        })
-        .catch(() => {
-          this.axiosReqestError(
-            "Could not find requested image",
-            "Redirecting to previous page."
-          );
-          this.$router.go(-1);
-        })
-        .finally(() => this.removeProcess(process));
+      this.loadAnnotatorData(this.image.id, process, callback);
     },
     setTextTopLeft() {
       if (this.text.topLeft != null) {
@@ -649,23 +653,26 @@ export default {
       if (!indices.hasOwnProperty('keypoint')) {
         indices.keypoint = -1;
       }
-      if (indices.keypoint !== -1) {
+
+      let hasKeypoint = indices.keypoint !== -1;
+      if (hasKeypoint) {
         this.current.keypoint = indices.keypoint;
-        let ann = this.currentCategory.category.annotations[this.current.annotation];
-        let kpTool = this.$refs.keypoint;
-        let selectTool = this.$refs.select;
-        let category = this.$refs.category[this.current.category];
-        let annotation = category.$refs.annotation[this.current.annotation];
-        annotation.showKeypoints = true;
+
+        let category = this.allCategoryComponents()[this.current.category];
+        let annotation = category.getAnnotationComponent(this.current.annotation);
+        annotation.startShowKeypoints();
+
         let keypoints = annotation.keypoints;
         if (keypoints._labelled[indices.keypoint + 1]) {
           let indexLabel = String(this.current.keypoint + 1);
           let keypoint = keypoints._labelled[indexLabel];
           keypoint.selected = true;
+          let selectTool = this.$refs.select;
           this.activeTool = selectTool;
           this.activeTool.click();
         } else {
           this.currentAnnotation.keypoint.next.label = String(indices.keypoint + 1);
+          let kpTool = this.$refs.keypoint;
           this.activeTool = kpTool;
           this.activeTool.click();
         }
@@ -680,12 +687,15 @@ export default {
       if (index == null) return null;
       if (index < 0) return null;
 
-      let ref = this.$refs.category;
+      let ref = this.allCategoryComponents();
 
       if (ref == null) return null;
       if (ref.length < 1 || index >= ref.length) return null;
 
-      return this.$refs.category[index];
+      return this.allCategoryComponents()[index];
+    },
+    allCategoryComponents() {
+      return this.$refs.category;
     },
     // Current Annotation Operations
     uniteCurrentAnnotation(compound, simplify = true, undoable = true, isBBox = false) {
@@ -872,22 +882,22 @@ export default {
       });
     },
     showAll() {
-      if (this.$refs.category == null) return;
+      if (this.allCategoryComponents() == null) return;
 
-      this.$refs.category.forEach(category => {
+      this.allCategoryComponents().forEach(category => {
         category.isVisible = category.category.annotations.length > 0;
       });
     },
     hideAll() {
-      if (this.$refs.category == null) return;
+      if (this.allCategoryComponents() == null) return;
 
-      this.$refs.category.forEach(category => {
+      this.allCategoryComponents().forEach(category => {
         category.isVisible = false;
         category.showAnnotations = false;
       });
     },
     findCategoryByName(categoryName) {
-      let categoryComponent = this.$refs.category.find(
+      let categoryComponent = this.allCategoryComponents().find(
         category =>
           category.category.name.toLowerCase() === categoryName.toLowerCase()
       );

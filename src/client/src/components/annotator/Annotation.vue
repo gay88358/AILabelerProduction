@@ -402,12 +402,8 @@ export default {
       }
 
       this.clearAnnotationOnCanvas();
-    
-      
-      console.log('create compund path');
-      console.log(this.compoundPath);
       this.compoundPath = new paper.CompoundPath();
-      console.log('create compund path done');
+
       this.compoundPath.onDoubleClick = () => {
         if (this.activeTool !== "Select") return;
         $(`#annotationSettings${this.getAnnotationId()}`).modal("show");
@@ -504,6 +500,9 @@ export default {
         // });
         this.keypoints.remove();
       }
+    },
+    startShowKeypoints() {
+      this.showKeypoints = true;
     },
     getCategoryId() {
       return this.annotation.category_id;
@@ -906,7 +905,8 @@ export default {
       
         if (tool === "Keypoints") {
           if (!this.showKeypoints) {
-            this.showKeypoints = true;
+            this.startShowKeypoints();
+            // this.showKeypoints = true;
           }
           var labelIndex = -1;
           for(let i=0; i < this.keypointLabels.length; ++i) {

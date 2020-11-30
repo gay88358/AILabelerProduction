@@ -235,6 +235,9 @@ export default {
       if (this.search.length === 0) return true;
       return this.filterFound.indexOf(index) > -1;
     },
+    getAnnotationComponent(annotationIndex) {
+      return this.$refs.annotation[annotationIndex];
+    },
     categoryName() {
       return this.category.name;
     },
@@ -253,11 +256,13 @@ export default {
     /**
      * Created
      */
+    annotationIndex() {
+      return this.getAnnotations.length;
+    },
     createAnnotation() {
-      let parent = this.$parent;
-      let annotationId = this.getAnnotations.length;
+      let annotationId = this.annotationIndex();
       Annotations.create({
-        image_id: parent.image.id,
+        image_id: this.$parent.image.id,
         category_id: this.category.id,
       }).then(response => {
         this.$socket.emit("annotation", {
@@ -284,7 +289,7 @@ export default {
         let annotations = this.$refs.annotation;
         if (annotations == null) return;
 
-        let annotation = annotations[annotationId - 1];
+        // let annotation = annotations[annotationId - 1];
         // if (annotation == null) {
         //   this.$parent.scrollElement(this.$el);
         // } else {
@@ -305,7 +310,6 @@ export default {
     export() {
       let refs = this.$refs;
       let categoryData = {
-        // Category Identification
         id: this.category.id,
         name: this.category.name,
         // Show in side bar
