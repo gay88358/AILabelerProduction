@@ -885,15 +885,14 @@ export default {
       if (this.allCategoryComponents() == null) return;
 
       this.allCategoryComponents().forEach(category => {
-        category.isVisible = category.category.annotations.length > 0;
+        category.showIfContainsAnnotation();
       });
     },
     hideAll() {
       if (this.allCategoryComponents() == null) return;
 
       this.allCategoryComponents().forEach(category => {
-        category.isVisible = false;
-        category.showAnnotations = false;
+        category.hideAll()
       });
     },
     findCategoryByName(categoryName) {

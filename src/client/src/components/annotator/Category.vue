@@ -235,6 +235,16 @@ export default {
       if (this.search.length === 0) return true;
       return this.filterFound.indexOf(index) > -1;
     },
+    showIfContainsAnnotation() {
+      this.isVisible = this.containsAnnotations();
+    },
+    hideAll() {
+      this.isVisible = false;
+      this.showAnnotations = false;
+    },
+    containsAnnotations() {
+      return this.category.annotations.length > 0;
+    },
     getAnnotationComponent(annotationIndex) {
       return this.$refs.annotation[annotationIndex];
     },
