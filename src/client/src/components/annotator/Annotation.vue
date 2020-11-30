@@ -403,8 +403,11 @@ export default {
 
       this.clearAnnotationOnCanvas();
     
-      // Create new compoundpath
+      
+      console.log('create compund path');
+      console.log(this.compoundPath);
       this.compoundPath = new paper.CompoundPath();
+      console.log('create compund path done');
       this.compoundPath.onDoubleClick = () => {
         if (this.activeTool !== "Select") return;
         $(`#annotationSettings${this.getAnnotationId()}`).modal("show");

@@ -259,7 +259,7 @@ import EraserPanel from "@/components/annotator/panels/EraserPanel";
 import KeypointPanel from "@/components/annotator/panels/KeypointPanel";
 import DEXTRPanel from "@/components/annotator/panels/DEXTRPanel";
 import { mapMutations, mapGetters } from "vuex";
-import { recordModifiedDataset, updateAnnotatorData } from '../models/actionDispatcher';
+import { recordModifiedDataset, updateAnnotatorData, clearAnnotatorData } from '../models/actionDispatcher';
 
 export default {
   name: "Annotator",
@@ -1016,6 +1016,7 @@ export default {
   },
   computed: {
     vuexCategories() {
+      //return this.categories;
       return this.$store.getters.getCategories;
     },
     doneLoading() {
@@ -1089,11 +1090,11 @@ export default {
     this.setDataset(null);
     this.initCanvas();
     this.getData();
-    // EventBus.$on(
-    //     "selectedAnnotationUpdate",
-    //     e => {
-    //       this.setCategories(this.$store.getters.getCategories);
-    //     });
+    EventBus.$on(
+        "selectedAnnotationUpdate",
+        e => {
+          this.setCategories(this.$store.getters.getCategories);
+        });
 
 
     this.$socket.emit("annotating", { image_id: this.image.id, active: true });

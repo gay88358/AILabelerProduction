@@ -22,6 +22,8 @@
 </template>
 
 <script>
+import { clearAnnotatorData } from '../../models/actionDispatcher';
+
 export default {
   name: "FileTitle",
   props: {
@@ -47,9 +49,11 @@ export default {
     route(identifier) {
       // Make sure we pop the latest session before annotations
       this.$parent.current.annotation = -1;
-
+      
       this.$nextTick(() => {
         this.$parent.save(() => {
+
+          clearAnnotatorData(this.$store);
           this.$router.push({ name: "annotate", params: { identifier } });
         });
       });

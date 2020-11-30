@@ -33,3 +33,7 @@ export const updateAnnotatorData = (store, annotatorData) => {
 export const recordModifiedDataset = (store, datasetName, datasetId) => {
     store.dispatch('addAffectedDataset', { name: datasetName, id: datasetId });
 }
+
+export const clearAnnotatorData = (store) => {
+    store.dispatch('clearAnnotatorData');
+}

@@ -76,6 +76,9 @@ const mutations = {
     },
     DELETE_SELECTED_ANNOTATION(state, payload) {
         state.annotatorData.deleteSelectedAnnotation();
+    },
+    CLEAR_ANNOTATOR_DATA(state) {
+        state.annotatorData = new NullAnnotator();
     }
 }
 
@@ -104,6 +107,9 @@ const actions = {
     },
     deleteSelectedAnnotation({commit}, payload) {
         commit('DELETE_SELECTED_ANNOTATION', payload);
+    },
+    clearAnnotatorData({ commit }) {
+        commit('CLEAR_ANNOTATOR_DATA');
     }
 }
 
