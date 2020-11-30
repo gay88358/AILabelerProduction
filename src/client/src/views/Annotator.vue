@@ -1098,8 +1098,6 @@ export default {
         e => {
           this.setCategories(this.$store.getters.getCategories);
         });
-
-
     this.$socket.emit("annotating", { image_id: this.image.id, active: true });
   },
   created() {

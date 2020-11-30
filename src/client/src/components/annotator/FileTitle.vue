@@ -22,8 +22,6 @@
 </template>
 
 <script>
-import { clearAnnotatorData } from '../../models/actionDispatcher';
-
 export default {
   name: "FileTitle",
   props: {
@@ -46,19 +44,19 @@ export default {
      *
      * @param {Number} identifer id of a file
      */
-    route(identifier) {
+    async route(identifier) {
       this.$parent.current.annotation = -1;
-      this.savePromise()
-          .then(_ => this.changeAnnotate(identifier))
+      await this.saveCurrentData();
+      this.changeAnnotatorImage(identifier);
     },
-    savePromise() {
+    async saveCurrentData() {
       return new Promise((resolve, reject) => {
         this.$parent.save(() => {
          resolve(); 
         });
       });
     },
-    changeAnnotate(identifier) {
+    changeAnnotatorImage(identifier) {
       this.$router.push({ name: "annotate", params: { identifier } });
     }
   }
