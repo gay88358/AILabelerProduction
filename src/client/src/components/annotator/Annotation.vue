@@ -741,11 +741,14 @@ export default {
       
       if (undoable) this.createUndoAction("Unite");
 
-      this.getCompoundPath().remove();
+      this.removeCurrentCompoundPath();
       this.setCompoundPath(newCompound);
       this.keypoints.bringToFront();
 
       if (simplify) this.simplifyPath();
+    },
+    removeCurrentCompoundPath() {
+      this.getCompoundPath().remove();
     },
     /**
      * Subtract current annotation path with anyother path.
@@ -791,16 +794,28 @@ export default {
       $(`#annotationSettings${annotation.id}`).modal("hide");
     },
     export() {
-      if (this.isNullCompoundPath()) this.createCompoundPath();
-
+      let annotationData = {}
+      this.appendMetadataTo(annotationData);
+      this.appendBasicAnnotationDataTo(annotationData);
+      this.appendCompoundPathTo(annotationData);
+      this.appendKeypointsTo(annotationData);
+      this.appendSessionsTo(annotationData);
+      return annotationData;
+    },
+    appendMetadataTo(annotationJson) {
       let metadata = this.$refs.metadata.export();
       if (this.name.length > 0) metadata.name = this.name;
-      let annotationData = {
-        id: this.getAnnotationId(),
-        isbbox: this.getAnnotationIsBBox(),
-        color: this.getAnnotationColor(),
-        metadata: metadata
-      };
+      annotationJson['metadata'] = metadata;
+    },
+    appendBasicAnnotationDataTo(annotationJson) {
+      annotationJson['id'] = this.getAnnotationId();
+      annotationJson['isbbox'] = this.getAnnotationIsBBox();
+      annotationJson['color'] = this.getAnnotationColor();
+    },
+    appendCompoundPathTo(annotationJson) {
+      if (this.isNullCompoundPath()) {
+        this.createCompoundPath();
+      }
 
       this.simplifyPath();
       this.setCompoundPathFullySelected(false);
@@ -808,24 +823,23 @@ export default {
         asString: false,
         precision: 1
       });
-
+      this.setCompoundPathFullySelected(this.isCurrent);
+      if (this.getAnnotationPaperObject() !== json) {
+        annotationJson['compoundPath'] = json;
+      }
+    },
+    appendKeypointsTo(annotationJson) {
       if (!this.keypoints.isEmpty()) {
-        annotationData.keypoints = this.keypoints.exportJSON(
+        annotationJson['keypoints'] = this.keypoints.exportJSON(
           this.keypointLabels,
           this.getAnnotationWidth(),
           this.getAnnotationHeight()
         );
       }
-      this.setCompoundPathFullySelected(this.isCurrent);
-      if (this.getAnnotationPaperObject() !== json) {
-        annotationData.compoundPath = json;
-      }
-
-      // Export sessions and reset
-      annotationData.sessions = this.sessions;
+    },
+    appendSessionsTo(annotationJson) {
+      annotationJson['sessions'] = this.sessions;
       this.sessions = [];
-
-      return annotationData;
     },
     emitModify() {
       this.uuid = Math.random()
