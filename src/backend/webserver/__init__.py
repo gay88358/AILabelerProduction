@@ -62,10 +62,14 @@ def create_app():
 
 app = create_app()
 
-#logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger('gunicorn.error')
-app.logger.handlers = logger.handlers
-app.logger.setLevel(logging.INFO)
+logging.basicConfig(
+    filename='AILabeler.log', 
+    level=logging.DEBUG, 
+    format='%(asctime)s %(levelname)s %(name)s %(threadName)s: %(message)s'
+)
+#logger = logging.getLogger('gunicorn.error')
+#app.logger.handlers = logger.handlers
+#app.logger.setLevel(logging.INFO)
     
 
 if Config.INITIALIZE_FROM_FILE:

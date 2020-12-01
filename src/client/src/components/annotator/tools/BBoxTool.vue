@@ -80,12 +80,10 @@ export default {
       if (this.isNullPolygonPath() && this.$parent.checkAnnotationExist()) {
         this.$parent.createAnnotationOnCurrentCategory();
       }
-      
       if (this.isNullPolygonPath()) {
         this.createBBox(event.point);
         return;
       }
-
       this.updateCurrentBBox(event);
       if (this.canAddBBoxToAnnotation()) {
         this.addBBoxToAnnotation();

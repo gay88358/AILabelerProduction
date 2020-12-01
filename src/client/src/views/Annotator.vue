@@ -126,7 +126,7 @@
             :simplify="simplify"
             :categorysearch="search"
             :category="category"
-            :all-categories="categories"
+            :all-categories="vuexCategories"
             :opacity="shapeOpacity"
             :hover="hover"
             :index="index"
@@ -348,7 +348,6 @@ export default {
         topLeft: null,
         topRight: null
       },
-      categories: [],
       dataset: {
         annotate_url: ""
       },
@@ -380,6 +379,16 @@ export default {
         !!this.currentAnnotation.annotation.paper_object.length
       );
     },
+    // appendUserMetadataTo(data) {
+    //   data['user'] = {};
+    //   data['user']['bbox'] = this.$refs.bbox.export();
+    //   data['user']['polygon'] = this.$refs.polygon.export();
+    //   data['user']['eraser'] = this.$refs.eraser.export();
+    //   data['user']['brush'] = this.$refs.brush.export();
+    //   data['user']['magicwand'] = this.$refs.magicwand.export();
+    //   data['user']['select'] = this.$refs.select.export();
+    //   data['user']['settings'] = this.$refs.settings.export();
+    // },
     save(callback) {
       recordModifiedDataset(this.$store, this.dataset.name, this.dataset.id);
       let process = "Saving";
@@ -429,17 +438,13 @@ export default {
           }
         });
       }
-
       data.image.category_ids = this.image.categoryIds;
-
       axios
         .post("/api/annotator/data", JSON.stringify(data))
         .then(() => {
-          //TODO: updateUser
           if (callback != null) callback();
         })
         .finally(() => this.removeProcess(process));
-
     },
     onpinchstart(e) {
       e.preventDefault();
@@ -603,7 +608,6 @@ export default {
         this.setAnnotating(data);
         this.dataset = data.dataset;          
         this.updateAnnotatorData(data.categories);
-        this.setCategories(data.categories);
         this.setDataset(this.dataset);
         this.setPreferences(data.preferences);
         this.setTextTopLeft();
@@ -630,7 +634,35 @@ export default {
       let process = "Loading annotation data";
       this.addProcess(process);
       this.loading.data = true;
-      this.loadAnnotatorData(this.image.id, process, callback);
+      axios
+      .get("/api/annotator/data/" + this.image.id)
+      .then(response => {
+        let data = response.data;
+        this.loading.data = false;
+        this.setImageData(data);
+        this.setAnnotating(data);
+        this.dataset = data.dataset;          
+        this.updateAnnotatorData(data.categories);
+        this.setDataset(this.dataset);
+        this.setPreferences(data.preferences);
+        this.setTextTopLeft();
+
+        this.$nextTick(() => {
+          this.showAll();
+        });
+
+        if (callback != null) callback();
+      })
+      .catch(() => {
+        this.axiosReqestError(
+          "Could not find requested image",
+          "Redirecting to previous page."
+        );
+        this.backToLastPage();
+      })
+      .finally(() => this.removeProcess(process));
+
+      // this.loadAnnotatorData(this.image.id, process, callback);
     },
     setTextTopLeft() {
       if (this.text.topLeft != null) {
@@ -724,17 +756,13 @@ export default {
         }
       }
     },
-    setCategories(newCategories) {
-      this.categories = newCategories;
-    },
     categoryLength() {
       return this.vuexCategories.length;
-      // return this.categories.length;
     },
     decrementCategory() {
       if (this.current.category === -1) {
         this.current.category = this.categoryLength() - 1;
-        let annotationCount = this.currentCategory.category.annotations.length;
+        let annotationCount = this.currentCategory.annotationLength();
         if (annotationCount > 0) {
           this.current.annotation = annotationCount - 1;
         }
@@ -743,7 +771,7 @@ export default {
       }
     },
     incrementAnnotation() {
-      let annotationCount = this.currentCategory.category.annotations.length;
+      let annotationCount = this.currentCategory.annotationLength();
       if (this.current.annotation === annotationCount - 1) {
         this.incrementCategory();
         this.current.annotation = -1;
@@ -758,7 +786,7 @@ export default {
       }
     },
     decrementAnnotation() {
-      let annotationCount = this.currentCategory.category.annotations.length;
+      let annotationCount = this.currentCategory.annotationLength();
       if (this.current.annotation === -1) {
         this.current.annotation = annotationCount - 1;
       } else if (this.current.annotation === 0) {
@@ -1025,7 +1053,6 @@ export default {
   },
   computed: {
     vuexCategories() {
-      //return this.categories;
       return this.$store.getters.getCategories;
     },
     doneLoading() {
@@ -1033,7 +1060,7 @@ export default {
     },
     currentAnnotationLength() {
       if (this.currentCategory == null) return null;
-      return this.currentCategory.category.annotations.length;
+      return this.currentCategory.annotationLength();
     },
     currentKeypointLength() {
       if (this.currentAnnotation == null) return null;
@@ -1105,7 +1132,6 @@ export default {
     EventBus.$on(
         "selectedAnnotationUpdate",
         e => {
-          this.setCategories(this.$store.getters.getCategories);
         });
     this.$socket.emit("annotating", { image_id: this.image.id, active: true });
   },

@@ -263,6 +263,9 @@ export default {
         colors: [...this.category.keypoint_colors],
       };
     },
+    annotationLength() {
+      return this.category.annotations.length;
+    },
     /**
      * Created
      */

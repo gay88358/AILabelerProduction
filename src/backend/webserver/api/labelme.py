@@ -33,7 +33,13 @@ class LabelmeRequestParser:
         labelme.add_argument('dataset_id', required=True, location='json')
         labelme.add_argument('image_id', location='json')
         return labelme
-
+    
+    @staticmethod
+    def labelme_log():
+        labelme_log = reqparse.RequestParser()
+        labelme_log.add_argument('message', type=str, required=True, location='json')
+        return labelme_log
+        
 api = Namespace('labelme', description='labelme operations')
 
 @api.route('/')
@@ -54,7 +60,16 @@ class DefectCode(Resource):
             return []
         import json
         return json.dumps(result.value)
-        
+
+@api.route('/log')
+class LabelmeLog(Resource):
+    @api.expect(LabelmeRequestParser.labelme_log())
+    def post(self):
+        args = LabelmeRequestParser.labelme_log().parse_args()
+        message = args['message']
+        get_logger().info(message)
+        return "ok"
+
 @api.route('/create')
 class LabelmeId(Resource):
     @api.expect(LabelmeRequestParser.labelme_create_dataset())
