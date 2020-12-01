@@ -691,7 +691,6 @@ export default {
         onMouseDrag: event => {
           let keypoint = event.target.keypoint;
           if (!["Select", "Keypoints"].includes(this.activeTool)) return;
-
           this.keypoints.moveKeypoint(event.point, keypoint);
         }
       });

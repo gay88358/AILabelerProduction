@@ -25,6 +25,10 @@ class LogHandler {
     annotationShapeModified() {
         logToService('Annotation Shape Modified')
     }
+
+    changeSaved() {
+        logToService('Annotation Change Saved')
+    }
 }
 
 export const EventHandler = new LogHandler;

@@ -260,6 +260,7 @@ import KeypointPanel from "@/components/annotator/panels/KeypointPanel";
 import DEXTRPanel from "@/components/annotator/panels/DEXTRPanel";
 import { mapMutations, mapGetters } from "vuex";
 import { recordModifiedDataset, updateAnnotatorData, clearAnnotatorData } from '../models/actionDispatcher';
+import { EventHandler } from '../models/logHandler';
 
 export default {
   name: "Annotator",
@@ -443,6 +444,7 @@ export default {
         .post("/api/annotator/data", JSON.stringify(data))
         .then(() => {
           if (callback != null) callback();
+          EventHandler.changeSaved();
         })
         .finally(() => this.removeProcess(process));
     },
