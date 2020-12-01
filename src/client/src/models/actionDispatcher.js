@@ -16,7 +16,7 @@ export const updateAnnotationMetadata = (store, annotationClass) => {
         }
     );
 
-    EventHandler.annotationMetadataChanged();
+    EventHandler.annotationMetadataChanged(annotationClass);
 }
 
 export const deleteSelectedAnnotation = (store) => {

@@ -446,6 +446,12 @@ export default {
           if (callback != null) callback();
           EventHandler.changeSaved();
         })
+        .catch(() => {
+          this.axiosReqestError(
+            "Given StripID is lost, please enter url /#/datasets/{stripID} and restart",
+          );
+
+        })
         .finally(() => this.removeProcess(process));
     },
     onpinchstart(e) {

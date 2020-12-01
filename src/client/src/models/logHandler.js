@@ -14,8 +14,8 @@ class LogHandler {
         logToService('Annotation Deleted')
     }
     
-    annotationMetadataChanged() {
-        logToService('Annotation Metadata Changed')
+    annotationMetadataChanged(annotationClass) {
+        logToService(`Change the metadata of the annotation to ${annotationClass}`)
     }
     
     annotationAdded() {
