@@ -1,7 +1,6 @@
-
 import axios from "axios";
 
-const LoggerService = (message) => {
+const logToService = (message) => {
     axios.post(
         '/api/labelme/log', 
         {
@@ -12,15 +11,19 @@ const LoggerService = (message) => {
 
 class LogHandler {
     annotationDeleted() {
-        LoggerService('Annotation Deleted')
+        logToService('Annotation Deleted')
     }
     
     annotationMetadataChanged() {
-        LoggerService('Annotation Metadata Changed')
+        logToService('Annotation Metadata Changed')
     }
     
     annotationAdded() {
-        LoggerService('Annotation Added')
+        logToService('Annotation Added')
+    }
+
+    annotationShapeModified() {
+        logToService('Annotation Shape Modified')
     }
 }
 

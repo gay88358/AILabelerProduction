@@ -230,7 +230,6 @@ export default {
     };
   },
   methods: {
-    ...mapActions(['getDefectCodeCatalog']),
     show(index) {
       if (this.search.length === 0) return true;
       return this.filterFound.indexOf(index) > -1;
@@ -593,8 +592,6 @@ export default {
     $(this.$refs.category_settings).on(
       "hidden.bs.modal", this.resetCategorySettings);
     this.isMounted = true;
-    // performance issue
-    this.getDefectCodeCatalog()
   }
 };
 </script>

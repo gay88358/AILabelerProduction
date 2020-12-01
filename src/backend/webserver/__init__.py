@@ -23,7 +23,7 @@ from .api import blueprint as api
 from .util import query_util, thumbnails
 from .authentication import login_manager
 from .sockets import socketio
-
+from logging.handlers import RotatingFileHandler
 import threading
 import requests
 import logging
@@ -63,13 +63,17 @@ def create_app():
 app = create_app()
 
 logging.basicConfig(
-    filename='AILabeler.log', 
-    level=logging.DEBUG, 
+    handlers=[RotatingFileHandler('/worksapce/AILabeler.log', maxBytes=102400, backupCount=10)],
+    level=logging.INFO, 
     format='%(asctime)s %(levelname)s %(name)s %(threadName)s: %(message)s'
 )
-#logger = logging.getLogger('gunicorn.error')
-#app.logger.handlers = logger.handlers
-#app.logger.setLevel(logging.INFO)
+
+# logger = logging.getLogger('werkzeug')
+# logger.disabled = True
+# logger = logging.getLogger('gunicorn.error')
+# logger.disabled = True
+# app.logger.handlers = logger.handlers
+# app.logger.setLevel(logging.INFO)
     
 
 if Config.INITIALIZE_FROM_FILE:

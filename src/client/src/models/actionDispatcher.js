@@ -1,4 +1,5 @@
 
+import { EventHandler } from './logHandler';
 
 export const setSelectedAnnotation = (store, annotationId, categoryId) => {
     store.dispatch('setSelectedAnnotation', {
@@ -14,6 +15,8 @@ export const updateAnnotationMetadata = (store, annotationClass) => {
           annotationClass: annotationClass
         }
     );
+
+    EventHandler.annotationMetadataChanged();
 }
 
 export const deleteSelectedAnnotation = (store) => {

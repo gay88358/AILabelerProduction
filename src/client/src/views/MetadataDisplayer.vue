@@ -23,8 +23,6 @@
 
 
 <script>
-
-import { EventHandler } from '../models/logHandler';
 import { updateAnnotationMetadata, deleteSelectedAnnotation } from '../models/actionDispatcher';
 import { mapGetters } from "vuex";
 
@@ -43,7 +41,6 @@ export default {
           updateAnnotationMetadata(this.$store, this.defectCode);
           this.notifyAnnotationUpdated();
           this.clearDropdwonContent();
-          EventHandler.annotationMetadataChanged();
       },
       notifyAnnotationUpdated() {
           EventBus.$emit(

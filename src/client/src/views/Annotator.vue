@@ -1126,6 +1126,7 @@ export default {
     clearAnnotatorData(this.$store);
   },
   mounted() {
+    this.$store.dispatch('getDefectCodeCatalog');
     this.setDataset(null);
     this.initCanvas();
     this.getData();
