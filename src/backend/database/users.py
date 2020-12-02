@@ -184,20 +184,16 @@ class UserModel(DynamicDocument, UserMixin):
         self.save()
 
     def get_shared_folder_with(self, stripID):
-        if stripID == '':
+        if stripID == '' or stripID not in self.strip_dataset_name_list:
             err_msg = 'Given stripID: {} is invalid'.format(stripID)
             raise ValueError(err_msg)
 
-        if stripID in self.strip_dataset_name_list:
-            dataset_name_list = self.strip_dataset_name_list[stripID]
-            return SharedFolder("", dataset_name_list, self.mount_root)
-        err_msg = 'Given stripID: {} is invalid'.format(stripID)
-        raise ValueError(err_msg)
+        dataset_name_list = self.strip_dataset_name_list[stripID]
+        return SharedFolder("", dataset_name_list, self.mount_root)
 
     def get_dataset_name_list_with(self, stripID):
         if stripID in self.strip_dataset_name_list:
             return self.strip_dataset_name_list[stripID]
-            
         err_msg = 'Given stripID: {} is invalid'.format(stripID)
         raise ValueError(err_msg)
 

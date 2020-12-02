@@ -595,20 +595,27 @@ export default {
       });
       this.addUndo(action);
     },
+    isEmptyCompoundPathAndKeypoints() {
+      return this.compoundPath != null && this.compoundPath.isEmpty() && this.keypoints.isEmpty();
+    },
     simplifyPath() {
-      if (this.compoundPath != null && this.compoundPath.isEmpty() && this.keypoints.isEmpty()) {
+      if (this.isEmptyCompoundPathAndKeypoints()) {
           this.deleteAnnotation();
           return;
       }
-      let simplify = this.simplify;
-
       this.compoundPath.flatten(1);
-
       if (this.compoundPath instanceof paper.Path) {
         this.compoundPath = new paper.CompoundPath(this.compoundPath);
         this.updateCompoundPathData(this.index, this.categoryIndex);
       }
-
+      let newChildren = this.calculateCompoundPathChildren();
+      this.compoundPath.removeChildren();
+      this.compoundPath.addChildren(newChildren);
+      this.setCompoundPathFullySelected(this.isCurrent);
+      this.keypoints.bringToFront();
+      this.emitModify();
+    },
+    calculateCompoundPathChildren() {
       let newChildren = [];
       this.compoundPath.children.forEach(path => {
         let points = [];
@@ -616,19 +623,14 @@ export default {
         path.segments.forEach(seg => {
           points.push({ x: seg.point.x, y: seg.point.y });
         });
-        points = simplifyjs(points, simplify, true);
+        points = simplifyjs(points, this.simplify, true);
 
         let newPath = new paper.Path(points);
         newPath.closePath();
 
         newChildren.push(newPath);
       });
-
-      this.compoundPath.removeChildren();
-      this.compoundPath.addChildren(newChildren);
-      this.setCompoundPathFullySelected(this.isCurrent);
-      this.keypoints.bringToFront();
-      this.emitModify();
+      return newChildren;
     },
     undoCompound() {
       if (this.pervious.length == 0) return;
@@ -817,10 +819,7 @@ export default {
 
       this.simplifyPath();
       this.setCompoundPathFullySelected(false);
-      let json = this.compoundPath.exportJSON({
-        asString: false,
-        precision: 1
-      });
+      let json = this.exportCompoundPathJson();
       this.setCompoundPathFullySelected(this.isCurrent);
       if (this.getAnnotationPaperObject() !== json) {
         annotationJson['compoundPath'] = json;
@@ -839,16 +838,19 @@ export default {
       annotationJson['sessions'] = this.sessions;
       this.sessions = [];
     },
+    exportCompoundPathJson() {
+      return this.compoundPath.exportJSON({
+        asString: false,
+        precision: 1
+      })
+    },
     emitModify() {
       this.uuid = Math.random()
         .toString(36)
         .replace(/[^a-z]+/g, "");
       
       this.setAnnotationPaperObject(
-        this.compoundPath.exportJSON({
-          asString: false,
-          precision: 1
-        })
+        this.exportCompoundPathJson()
       );
 
       this.$socket.emit("annotation", {
