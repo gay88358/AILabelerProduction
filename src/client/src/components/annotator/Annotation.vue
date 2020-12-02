@@ -386,71 +386,77 @@ export default {
     getAnnotationColor() {
       return this.annotation.color;
     },
-    createCompoundPath(json, segments) {
-
-      json = json || null;
-      if (json != null) {
-        let noCompoundPathOrMatrix = json.length !== 2;
-        if (noCompoundPathOrMatrix) {
-          json = null;
-        }
+    checkJson(json) {
+      // consolidate expression to simplify nested condition checking
+      if (json == null || this.noCompoundPathOrMatrix(json)) {
+        return null;
       }
-
-      segments = segments || null;
-      if (segments != null) {
-        let noSegments = segments.length === 0;
-        if (noSegments) {
-          segments = null;
-        }
-      }
-
-      this.clearAnnotationOnCanvas();
-      this.compoundPath = new paper.CompoundPath();
-
-      this.compoundPath.onDoubleClick = () => {
-        if (this.activeTool !== "Select") return;
-        $(`#annotationSettings${this.getAnnotationId()}`).modal("show");
-      };
-
+      return json;
+    },
+    noCompoundPathOrMatrix(json) {
+      return json.length !== 2
+    },
+    checkSegments(segments) {
+      // consolidate expression to simplify nested condition checking
+      if (segments == null || segments.length === 0)
+        return null;
+      return segments;
+    },
+    createKeypoints(categoryName) {
       this.keypoints = new Keypoints(this.keypointEdges, this.keypointLabels,
         this.keypointColors, {
           annotationId: this.getAnnotationId(),
-          categoryName: this.$parent.category.name,
+          categoryName: categoryName,
         });
       this.keypoints.radius = this.scale * 6;
       this.keypoints.lineWidth = this.scale * 2;
-
+    },
+    addAllAnnotationKeypoints() {
       let keypoints = this.getAnnotationKeypoints();
       if (keypoints) {
         for (let i = 0; i < keypoints.length; i += 3) {
           let x = keypoints[i] - this.getAnnotationWidth() / 2,
             y = keypoints[i + 1] - this.getAnnotationHeight() / 2,
             v = keypoints[i + 2];
-
           if (keypoints[i] === 0 && keypoints[i + 1] === 0 && v === 0) continue;
-
           this.addKeypoint(new paper.Point(x, y), v, i / 3 + 1);
         }
       }
+    },
+    createCompoundPathWithCallback() {
+      this.compoundPath = new paper.CompoundPath();
+      this.compoundPath.onDoubleClick = () => {
+        if (this.activeTool !== "Select") return;
+        $(`#annotationSettings${this.getAnnotationId()}`).modal("show");
+      };
+      this.compoundPath.onClick = () => {
+        this.$emit("click", this.index);
+      };
 
-      // why this: compound path contains segment
-      // so if compound path contains segment, we don't need to load segments into compound path
-      // if we don't have compound path, we need to load segments into compoundpath
-      if (json != null) {
-        this.compoundPath.importJSON(json);
-      } else if (segments != null) {
-        this.loadSegmentsIntoCompoundpath(segments, this.compoundPath);
-      }
-
+      this.createKeypoints(this.$parent.category.name);
+      this.addAllAnnotationKeypoints();
+    },
+    createCompoundPath(json, segments) {
+      this.clearAnnotationOnCanvas();
+      // component setup
+      this.createCompoundPathWithCallback();
+      this.loadJsonOrSegmentIntoCompoundPath(json, segments);
       this.updateCompoundPathData(this.index, this.categoryIndex);
       this.setCompoundPathFullySelected(this.isCurrent);
       this.setCompoundPathOpacity(this.opacity);
 
       this.setColor();
-
-      this.compoundPath.onClick = () => {
-        this.$emit("click", this.index);
-      };
+    },
+    loadJsonOrSegmentIntoCompoundPath(json, segments) {
+      // so if compoundPath contains segment, we don't need to load segments into compoundPath
+      // if we don't have compound path (which means we don't have segments), then we need to load segments into compoundPath
+      json = this.checkJson(json);
+      segments = this.checkSegments(segments);
+      if (json != null) {
+        this.compoundPath.importJSON(json);
+      } else if (segments != null) {
+        this.loadSegmentsIntoCompoundpath(segments, this.compoundPath);
+      }
     },
     setCompoundPathOpacity(newOpacity) {
       this.compoundPath.opacity = newOpacity;
