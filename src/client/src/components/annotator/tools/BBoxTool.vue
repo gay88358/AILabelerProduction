@@ -164,8 +164,7 @@ export default {
       if (!this.getColorAuto()) return;
 
       this.color.circle.position = point;
-      let raster = this.$parent.image.raster;
-      let color = raster.getAverageColor(this.color.circle);
+      let color = this.$parent.image.raster.getAverageColor(this.color.circle);
       if (color) {
         this.polygon.pathOptions.strokeColor = invertColor(
           color.toCSS(true),

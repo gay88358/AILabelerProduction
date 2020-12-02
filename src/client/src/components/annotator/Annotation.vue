@@ -335,7 +335,7 @@ export default {
     initAnnotation() {
       this.deleteMetaName();
       this.removeCompoundPath();
-      this.createCompoundPath(
+      this.clearCavasAndCreateCompoundPath(
         this.getAnnotationPaperObject(),
         this.getAnnotationSegmentation()
       );
@@ -423,7 +423,13 @@ export default {
         }
       }
     },
-    createCompoundPathWithCallback() {
+    createCompoundPathAndKeypoints() {
+      this.createCompoundPath();
+      // keypoints
+      this.createKeypoints(this.$parent.category.name);
+      this.addAllAnnotationKeypoints();
+    },
+    createCompoundPath() {
       this.compoundPath = new paper.CompoundPath();
       this.compoundPath.onDoubleClick = () => {
         if (this.activeTool !== "Select") return;
@@ -432,14 +438,12 @@ export default {
       this.compoundPath.onClick = () => {
         this.$emit("click", this.index);
       };
-
-      this.createKeypoints(this.$parent.category.name);
-      this.addAllAnnotationKeypoints();
     },
-    createCompoundPath(json, segments) {
+    clearCavasAndCreateCompoundPath(json, segments) {
       this.clearAnnotationOnCanvas();
       // component setup
-      this.createCompoundPathWithCallback();
+      this.createCompoundPathAndKeypoints();
+      
       this.loadJsonOrSegmentIntoCompoundPath(json, segments);
       this.updateCompoundPathData(this.index, this.categoryIndex);
       this.setCompoundPathFullySelected(this.isCurrent);
@@ -580,7 +584,7 @@ export default {
     },
     getCompoundPath() {
       if (this.isNullCompoundPath()) {
-        this.createCompoundPath();
+        this.clearCavasAndCreateCompoundPath();
       }
       return this.compoundPath;
     },
@@ -695,12 +699,12 @@ export default {
           if (!this.$parent.isCurrent) return;
           if (!["Select", "Keypoints"].includes(this.activeTool)) return;
           this.currentKeypoint = event.target.keypoint;
-          let id = `#keypointSettings${this.getAnnotationId()}`;
           let indexLabel = this.currentKeypoint.indexLabel;
 
           this.keypoint.tag = indexLabel == -1 ? [] : [indexLabel.toString()];
           this.keypoint.visibility = this.currentKeypoint.visibility;
-
+          
+          let id = `#keypointSettings${this.getAnnotationId()}`;
           $(id).modal("show");
         },
         onMouseDrag: event => {
@@ -743,7 +747,7 @@ export default {
      * @param {isBBox} isBBox mark annotation as bbox.
      */
     unite(compound, simplify = true, undoable = true, isBBox = false) {
-      if (this.isNullCompoundPath()) this.createCompoundPath();
+      if (this.isNullCompoundPath()) this.clearCavasAndCreateCompoundPath();
 
       let newCompound = this.getCompoundPath().unite(compound);
       newCompound.strokeColor = null;
@@ -771,7 +775,7 @@ export default {
      * @param {undoable} undoable add an undo action
      */
     subtract(compound, simplify = true, undoable = true) {
-      if (this.isNullCompoundPath()) this.createCompoundPath();
+      if (this.isNullCompoundPath()) this.clearCavasAndCreateCompoundPath();
       
       let newCompound = this.compoundPath.subtract(compound);
       newCompound.onDoubleClick = this.compoundPath.onDoubleClick;
@@ -828,7 +832,7 @@ export default {
     },
     appendCompoundPathTo(annotationJson) {
       if (this.isNullCompoundPath()) {
-        this.createCompoundPath();
+        this.clearCavasAndCreateCompoundPath();
       }
       this.simplifyPath();
       this.setCompoundPathFullySelected(false);
@@ -1098,7 +1102,7 @@ export default {
       if (annotation.id != this.getAnnotationId()) return;
 
       if (data.action == "modify") {
-        this.createCompoundPath(
+        this.clearCavasAndCreateCompoundPath(
           annotation.paper_object,
           annotation.segmentation
         );

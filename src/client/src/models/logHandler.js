@@ -25,7 +25,7 @@ class LogHandler {
     annotationShapeModified() {
         logToService('Annotation Shape Modified')
     }
-
+    
     changeSaved() {
         logToService('Annotation Change Saved')
     }
