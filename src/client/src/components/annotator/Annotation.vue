@@ -387,16 +387,19 @@ export default {
       return this.annotation.color;
     },
     createCompoundPath(json, segments) {
+
       json = json || null;
       if (json != null) {
-        if (json.length !== 2) {
+        let noCompoundPathOrMatrix = json.length !== 2;
+        if (noCompoundPathOrMatrix) {
           json = null;
         }
       }
 
       segments = segments || null;
       if (segments != null) {
-        if (segments.length === 0) {
+        let noSegments = segments.length === 0;
+        if (noSegments) {
           segments = null;
         }
       }
@@ -408,6 +411,7 @@ export default {
         if (this.activeTool !== "Select") return;
         $(`#annotationSettings${this.getAnnotationId()}`).modal("show");
       };
+
       this.keypoints = new Keypoints(this.keypointEdges, this.keypointLabels,
         this.keypointColors, {
           annotationId: this.getAnnotationId(),
@@ -429,6 +433,9 @@ export default {
         }
       }
 
+      // why this: compound path contains segment
+      // so if compound path contains segment, we don't need to load segments into compound path
+      // if we don't have compound path, we need to load segments into compoundpath
       if (json != null) {
         this.compoundPath.importJSON(json);
       } else if (segments != null) {
@@ -437,13 +444,16 @@ export default {
 
       this.updateCompoundPathData(this.index, this.categoryIndex);
       this.setCompoundPathFullySelected(this.isCurrent);
-      this.compoundPath.opacity = this.opacity;
+      this.setCompoundPathOpacity(this.opacity);
 
       this.setColor();
 
       this.compoundPath.onClick = () => {
         this.$emit("click", this.index);
       };
+    },
+    setCompoundPathOpacity(newOpacity) {
+      this.compoundPath.opacity = newOpacity;
     },
     loadSegmentsIntoCompoundpath(segments, compoundPath) {
         for (let i = 0; i < segments.length; i++) {
@@ -495,9 +505,6 @@ export default {
     },
     removeKeypoints() {
       if (this.isKeypointsNotNull()) {
-        // this.keypoints._keypoints.forEach( keypoint => {
-        //   this.keypoints.deleteKeypoint(keypoint);
-        // });
         this.keypoints.remove();
       }
     },
@@ -514,7 +521,6 @@ export default {
         this.getAnnotationId(),
         this.getCategoryId()
       )
-
       
       if (this.keypointLabels.length) {
         this.showKeypoints = showKeypoints;
@@ -604,10 +610,12 @@ export default {
           return;
       }
       this.compoundPath.flatten(1);
+
       if (this.compoundPath instanceof paper.Path) {
         this.compoundPath = new paper.CompoundPath(this.compoundPath);
         this.updateCompoundPathData(this.index, this.categoryIndex);
       }
+
       let newChildren = this.calculateCompoundPathChildren();
       this.compoundPath.removeChildren();
       this.compoundPath.addChildren(newChildren);
@@ -619,7 +627,6 @@ export default {
       let newChildren = [];
       this.compoundPath.children.forEach(path => {
         let points = [];
-
         path.segments.forEach(seg => {
           points.push({ x: seg.point.x, y: seg.point.y });
         });
@@ -627,7 +634,6 @@ export default {
 
         let newPath = new paper.Path(points);
         newPath.closePath();
-
         newChildren.push(newPath);
       });
       return newChildren;
@@ -639,7 +645,8 @@ export default {
       this.setCompoundPathFullySelected(this.isCurrent);
     },
     addKeypoint(point, visibility, label) {
-      if (label == null && this.keypoints.contains(point)) return;
+      let isDuplicatePoint = this.keypoints.contains(point); 
+      if (label == null && isDuplicatePoint) return;
 
       visibility = visibility || parseInt(this.keypoint.next.visibility);
       label = label || parseInt(this.keypoint.next.label);
@@ -696,10 +703,11 @@ export default {
           this.keypoints.moveKeypoint(event.point, keypoint);
         }
       });
-
       this.keypoints.addKeypoint(keypoint);
       this.isEmpty = this.compoundPath.isEmpty() && this.keypoints.isEmpty();
-      
+      this.updateKeypointLabel(label);
+    },
+    updateKeypointLabel(label) {
       let unusedLabels = this.notUsedKeypointLabels;
       delete unusedLabels[String(label)];
       let unusedLabelKeys = Object.keys(unusedLabels);
@@ -816,7 +824,6 @@ export default {
       if (this.isNullCompoundPath()) {
         this.createCompoundPath();
       }
-
       this.simplifyPath();
       this.setCompoundPathFullySelected(false);
       let json = this.exportCompoundPathJson();

@@ -55,35 +55,62 @@ export default {
       return {
         completeDistance: this.polygon.completeDistance,
         minDistance: this.polygon.minDistance,
-        blackOrWhite: this.color.blackOrWhite,
-        auto: this.color.auto,
-        radius: this.color.radius
+        blackOrWhite: this.getColorBlackOrWhite(),
+        auto: this.getColorAuto(),
+        radius: this.getColorRadius()
       };
     },
     setPreferences(pref) {
-      this.color.blackOrWhite = pref.blackOrWhite || this.color.blackOrWhite;
-      this.color.auto = pref.auto || this.color.auto;
-      this.color.radius = pref.radius || this.color.radius;
+      let newColorBlackOrWhite = pref.blackOrWhite || this.getColorBlackOrWhite();
+      this.setColorBlackOrWhite(newColorBlackOrWhite);
+
+      let newColorAuto = pref.auto || this.getColorAuto();
+      this.setColorAuto(newColorAuto);
+
+      let newColorRadius = pref.radius || this.getColorRadius();
+      this.setColorRadius(newColorRadius);
+    },
+    setColorBlackOrWhite(newColorBlackOrWhite) {
+      this.color.blackOrWhite = newColorBlackOrWhite;
+    },
+    getColorBlackOrWhite() {
+      return this.color.blackOrWhite;
+    },
+    setColorRadius(newColorRadius) {
+      this.color.radius = newColorRadius;
+    },
+    getColorRadius() {
+      return this.color.radius;
+    },
+    getColorAuto() {
+      return this.color.auto;
+    },
+    setColorAuto(newColorAuto) {
+      this.color.auto = newColorAuto;
     },
     /**
      * Frees current bbox
      */
     deleteBbox() {
-      if (this.isNullPolygonPath()) return;
+      let noBbox = this.isNullPolygonPath();
+      if (noBbox) return;
+
       this.removePolygon();
       this.removeColor();
     },
     isNullPolygonPath() {
       return this.polygon.path == null;
     },
-    onMouseDown(event) {
+    onMouseDown(event) {      
       if (this.isNullPolygonPath() && this.$parent.checkAnnotationExist()) {
         this.$parent.createAnnotationOnCurrentCategory();
       }
+      
       if (this.isNullPolygonPath()) {
         this.createBBox(event.point);
         return;
       }
+
       this.updateCurrentBBox(event);
       if (this.canAddBBoxToAnnotation()) {
         this.addBBoxToAnnotation();
@@ -134,7 +161,7 @@ export default {
     autoStrokeColor(point) {
       if (this.color.circle == null) return;
       if (this.isNullPolygonPath()) return;
-      if (!this.color.auto) return;
+      if (!this.getColorAuto()) return;
 
       this.color.circle.position = point;
       let raster = this.$parent.image.raster;
@@ -142,7 +169,7 @@ export default {
       if (color) {
         this.polygon.pathOptions.strokeColor = invertColor(
           color.toCSS(true),
-          this.color.blackOrWhite
+          this.getColorBlackOrWhite()
         );
       }
     },
