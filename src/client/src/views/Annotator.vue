@@ -394,8 +394,23 @@ export default {
       recordModifiedDataset(this.$store, this.dataset.name, this.dataset.id);
       let process = "Saving";
       this.addProcess(process);
-      let refs = this.$refs;
+      let data = this.prepareSaveData();  
+      axios
+        .post("/api/annotator/data", JSON.stringify(data))
+        .then(() => {
+          if (callback != null) callback();
+          EventHandler.changeSaved();
+        })
+        .catch(() => {
+          this.axiosReqestError(
+            "Given StripID is lost, please enter url /#/datasets/{stripID} and restart",
+          );
 
+        })
+        .finally(() => this.removeProcess(process));
+    },
+    prepareSaveData() {
+      let refs = this.$refs;
       let data = {
         mode: this.mode,
         user: {
@@ -440,19 +455,7 @@ export default {
         });
       }
       data.image.category_ids = this.image.categoryIds;
-      axios
-        .post("/api/annotator/data", JSON.stringify(data))
-        .then(() => {
-          if (callback != null) callback();
-          EventHandler.changeSaved();
-        })
-        .catch(() => {
-          this.axiosReqestError(
-            "Given StripID is lost, please enter url /#/datasets/{stripID} and restart",
-          );
-
-        })
-        .finally(() => this.removeProcess(process));
+      return data;
     },
     onpinchstart(e) {
       e.preventDefault();

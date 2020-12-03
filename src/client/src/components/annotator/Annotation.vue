@@ -372,6 +372,8 @@ export default {
       return this.annotation.paper_object;
     },
     setAnnotationPaperObject(paper_object) {
+      // given annotation's point & segments data
+      // so that the annotation can be displayed on the canvas
       this.annotation.paper_objec = paper_object;
     },
     getAnnotation() {
@@ -423,11 +425,19 @@ export default {
         }
       }
     },
-    createCompoundPathAndKeypoints() {
+    clearCavasAndCreateCompoundPath(json, segments) {
+      this.clearAnnotationOnCanvas();
+      this.createCompoundPathAndKeypoints(json, segments);
+      this.setColor();
+    },
+    createCompoundPathAndKeypoints(json, segments) {
       this.createCompoundPath();
-      // keypoints
       this.createKeypoints(this.$parent.category.name);
       this.addAllAnnotationKeypoints();
+      this.loadJsonOrSegmentIntoCompoundPath(json, segments);
+      this.updateCompoundPathData(this.index, this.categoryIndex);
+      this.setCompoundPathFullySelected(this.isCurrent);
+      this.setCompoundPathOpacity(this.opacity);
     },
     createCompoundPath() {
       this.compoundPath = new paper.CompoundPath();
@@ -438,18 +448,6 @@ export default {
       this.compoundPath.onClick = () => {
         this.$emit("click", this.index);
       };
-    },
-    clearCavasAndCreateCompoundPath(json, segments) {
-      this.clearAnnotationOnCanvas();
-      // component setup
-      this.createCompoundPathAndKeypoints();
-      
-      this.loadJsonOrSegmentIntoCompoundPath(json, segments);
-      this.updateCompoundPathData(this.index, this.categoryIndex);
-      this.setCompoundPathFullySelected(this.isCurrent);
-      this.setCompoundPathOpacity(this.opacity);
-
-      this.setColor();
     },
     loadJsonOrSegmentIntoCompoundPath(json, segments) {
       // so if compoundPath contains segment, we don't need to load segments into compoundPath
@@ -746,17 +744,20 @@ export default {
      * @param {undoable} undoable add an undo action.
      * @param {isBBox} isBBox mark annotation as bbox.
      */
-    unite(compound, simplify = true, undoable = true, isBBox = false) {
-      if (this.isNullCompoundPath()) this.clearCavasAndCreateCompoundPath();
-
+    unitCompound(compound) {
       let newCompound = this.getCompoundPath().unite(compound);
       newCompound.strokeColor = null;
       newCompound.strokeWidth = 0;
       newCompound.onDoubleClick = this.getCompoundPath().onDoubleClick;
       newCompound.onClick = this.getCompoundPath().onClick;
+      return newCompound;
+    },
+    unite(compound, simplify = true, undoable = true, isBBox = false) {
+      if (this.isNullCompoundPath()) this.clearCavasAndCreateCompoundPath();
+
+      let newCompound = this.unitCompound(compound);
       this.setAnnotationIsBBox(isBBox);
 
-      
       if (undoable) this.createUndoAction("Unite");
 
       this.removeCurrentCompoundPath();
@@ -862,19 +863,21 @@ export default {
       })
     },
     emitModify() {
-      this.uuid = Math.random()
-        .toString(36)
-        .replace(/[^a-z]+/g, "");
       
       this.setAnnotationPaperObject(
         this.exportCompoundPathJson()
       );
-
+      this.uuid = this.getUUID();
       this.$socket.emit("annotation", {
         uuid: this.uuid,
         action: "modify",
         annotation: this.getAnnotation()
       });
+    },
+    getUUID() {
+      return Math.random()
+        .toString(36)
+        .replace(/[^a-z]+/g, "");
     },
     getKeypointLabel(keypoint) {
       return keypoint && keypoint.keypoints.labels[keypoint.indexLabel - 1];
