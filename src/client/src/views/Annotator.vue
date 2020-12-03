@@ -394,9 +394,9 @@ export default {
       recordModifiedDataset(this.$store, this.dataset.name, this.dataset.id);
       let process = "Saving";
       this.addProcess(process);
-      let data = this.prepareSaveData();  
+
       axios
-        .post("/api/annotator/data", JSON.stringify(data))
+        .post("/api/annotator/data", this.prepareSaveData())
         .then(() => {
           if (callback != null) callback();
           EventHandler.changeSaved();
@@ -405,12 +405,12 @@ export default {
           this.axiosReqestError(
             "Given StripID is lost, please enter url /#/datasets/{stripID} and restart",
           );
-
         })
-        .finally(() => this.removeProcess(process));
+        .finally(
+          () => this.removeProcess(process)
+        );
     },
     prepareSaveData() {
-      let refs = this.$refs;
       let data = {
         mode: this.mode,
         user: {
@@ -440,9 +440,9 @@ export default {
         stripID: this.$store.getters.getCurrentStripID
       };
 
-      if (refs.category != null && this.mode === "segment") {
+      if (this.$refs.category != null && this.mode === "segment") {
         this.image.categoryIds = [];
-        refs.category.forEach(category => {
+        this.$refs.category.forEach(category => {
           let categoryData = category.export();
           data.categories.push(categoryData);
 
@@ -455,12 +455,11 @@ export default {
         });
       }
       data.image.category_ids = this.image.categoryIds;
-      return data;
+      return JSON.stringify(data);
     },
     onpinchstart(e) {
       e.preventDefault();
       if (!this.doneLoading) return;
-      let view = this.paper.view;
       this.pinching.old_zoom = this.paper.view.zoom;
       return false;
     },
@@ -476,11 +475,7 @@ export default {
       let pc = viewPosition.subtract(this.paper.view.center);
       let a = viewPosition.subtract(pc.multiply(beta)).subtract(this.paper.view.center);  
       let transform = {zoom: curr_zoom, offset: a}
-      if (transform.zoom < 10 && transform.zoom > 0.01) {
-        this.image.scale = 1 / transform.zoom;
-        this.paper.view.zoom = transform.zoom;
-        this.paper.view.center = view.center.add(transform.offset);
-      }
+      this.transformView(transform, view);
       return false;
     },
     onwheel(e) {
@@ -501,16 +496,26 @@ export default {
         let viewPosition = view.viewToProject(
           new paper.Point(e.offsetX, e.offsetY)
         );
-
         let transform = this.changeZoom(e.deltaY, viewPosition);
-        if (transform.zoom < 10 && transform.zoom > 0.01) {
-          this.image.scale = 1 / transform.zoom;
-          this.paper.view.zoom = transform.zoom;
-          this.paper.view.center = view.center.add(transform.offset);
-        }
+        this.transformView(transform, view);
       }
-
       return false;
+    },
+    transformView(transform, view) {
+      if (this.canTransformZoom(transform)) {
+        this.transformImageScale(transform);
+        this.transformPaperZoom(transform, view);
+      }
+    },
+    transformImageScale(transform) {
+      this.image.scale = 1 / transform.zoom;
+    },
+    transformPaperZoom(transform, view) {
+      this.paper.view.zoom = transform.zoom;
+      this.paper.view.center = view.center.add(transform.offset);
+    },
+    canTransformZoom(transform) {
+      return transform.zoom < 10 && transform.zoom > 0.01;
     },
     fit() {
       let canvas = document.getElementById("editor");
