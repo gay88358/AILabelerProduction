@@ -745,7 +745,6 @@ export default {
     allCategoryComponents() {
       return this.$refs.category;
     },
-    // Current Annotation Operations
     uniteCurrentAnnotation(compound, simplify = true, undoable = true, isBBox = false) {
       if (this.currentAnnotation == null) return;
       this.currentAnnotation.unite(compound, simplify, undoable, isBBox);

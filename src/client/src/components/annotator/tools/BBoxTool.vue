@@ -6,6 +6,7 @@ import UndoAction from "@/undo";
 import { invertColor } from "@/libs/colors";
 import { BBox } from "@/libs/bbox";
 import { mapMutations } from "vuex";
+import {  polygonRecord } from "./polygonRecord";
 
 export default {
   name: "BBoxTool",
@@ -35,6 +36,7 @@ export default {
           strokeWidth: 1
         }
       },
+      polygonR: polygonRecord,
       color: {
         blackOrWhite: true,
         auto: true,
@@ -99,9 +101,18 @@ export default {
       this.removeColor();
     },
     isNullPolygonPath() {
-      return this.polygon.path == null;
+      return this.getPolygonPath() == null;
     },
-    onMouseDown(event) {      
+    getPolygonPath() {
+      return this.polygon.path;
+    },
+    setPolygonPath(newPath) {
+      this.polygon.path = newPath;
+    },
+    setPolygonPathToNull() {
+
+    },
+    onMouseDown(event) {   
       if (this.isNullPolygonPath() && this.$parent.checkAnnotationExist()) {
         this.$parent.createAnnotationOnCurrentCategory();
       }
@@ -117,7 +128,7 @@ export default {
       }
     },
     createBBox(point) {
-      this.polygon.path = this.createPaperPath();
+      this.setPolygonPath(this.createPaperPath());
       this.bbox = new BBox(point);
       this.addPointsToPolygonPath();
     },
@@ -132,7 +143,7 @@ export default {
       if (!this.canAddBBoxToAnnotation())
         throw new Error("Check can add bbox to annotation before add bbox to annotation");
 
-      this.addAnnotation(this.polygon.path);
+      this.addAnnotation(this.getPolygonPath());
       this.removePolygon();
       this.removeColor();
       this.removeUndos(this.actionTypes.ADD_POINTS);
@@ -140,11 +151,25 @@ export default {
     addAnnotation(path) {
       this.$parent.uniteCurrentAnnotation(path, true, true, true);
     },
+    createExamplePath() {
+      // encapsulate paper path creation details,
+      // isolate bbox tool from such details
+      let result = this.createPaperPath();
+      result.segments = [
+          [-117.97236,-189.34937],
+          [-117.97236,-319.93514],
+          [-232.23491,-319.93514]
+        ]
+      result.applyMatrix = true;
+      result.strokeColor = [0, 0, 0];
+      result.strokeWidth = 4.89697;
+      return result;
+    },
     removePolygon() {
-      this.polygon.path.fillColor = "black";
-      this.polygon.path.closePath();
-      this.polygon.path.remove();
-      this.polygon.path = null;
+      this.getPolygonPath().fillColor = "black";
+      this.getPolygonPath().closePath();
+      this.getPolygonPath().remove();
+      this.setPolygonPath(null);
     },
     removeColor() {
       if (this.color.circle) {
@@ -166,7 +191,7 @@ export default {
       this.color.circle.position = point;
       let color = this.$parent.image.raster.getAverageColor(this.color.circle);
       if (color) {
-        this.polygon.pathOptions.strokeColor = invertColor(
+        this.getPolygonPathOptions().strokeColor = invertColor(
           color.toCSS(true),
           this.getColorBlackOrWhite()
         );
@@ -177,21 +202,27 @@ export default {
       this.modifyBBox(event);
     },
     removeLastBBox() {
-      this.polygon.path.removeSegments();
+      this.getPolygonPath().removeSegments();
     },
     modifyBBox(event) {
-      this.polygon.path = this.createPaperPath();
+      this.setPolygonPath(this.createPaperPath());
       this.changePointsOfBBox(event);
       this.addPointsToPolygonPath();
     },
+    getPolygon() {
+      return this.polygon;
+    },
+    getPolygonPathOptions() {
+      return this.polygon.pathOptions;
+    },
     createPaperPath() {
-      return new paper.Path(this.polygon.pathOptions);
+      return new paper.Path(this.getPolygonPathOptions());
     },
     changePointsOfBBox(event) {
       this.bbox.modifyPoint(event.point);
     },
     addPointsToPolygonPath() {
-      this.bbox.addPointsTo(this.polygon.path);
+      this.bbox.addPointsTo(this.getPolygonPath());
     },
     /**
      * Undo points
@@ -202,10 +233,10 @@ export default {
       let points = args.points;
       let length = this.polygonSegmentLength();
 
-      this.polygon.path.removeSegments(length - points, length);
+      this.getPolygonPath().removeSegments(length - points, length);
     },
     polygonSegmentLength() {
-      return this.polygon.path.segments.length;
+      return this.getPolygonPath().segments.length;
     }
   },
   computed: {
@@ -224,17 +255,17 @@ export default {
      * Change width of stroke based on zoom of image
      */
     scale(newScale) {
-      this.polygon.pathOptions.strokeWidth = newScale * this.scaleFactor;
-      if (this.polygon.path != null)
-        this.polygon.path.strokeWidth = newScale * this.scaleFactor;
+      this.getPolygonPathOptions().strokeWidth = newScale * this.scaleFactor;
+      if (this.getPolygonPath() != null)
+        this.getPolygonPath().strokeWidth = newScale * this.scaleFactor;
     },
     "polygon.pathOptions.strokeColor"(newColor) {
       if (this.isNullPolygonPath()) return;
 
-      this.polygon.path.strokeColor = newColor;
+      this.getPolygonPath().strokeColor = newColor;
     },
     "color.auto"(value) {
-      if (value && this.polygon.path) {
+      if (value && this.getPolygonPath()) {
         this.color.circle = new paper.Path.Rectangle(
           new paper.Point(0, 0),
           new paper.Size(10, 10)
