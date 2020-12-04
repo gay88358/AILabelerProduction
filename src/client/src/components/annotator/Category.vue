@@ -362,7 +362,7 @@ export default {
         this.keypoint.edges.splice(index, 1);
         let annotations = this.$refs.annotation;
         if (annotations) {
-          annotations.forEach(a => a.keypoints.removeLine(edge));
+          annotations.forEach(a => a.removeLineOfKeypoints(edge));
         }
       }
     },
@@ -463,9 +463,9 @@ export default {
             if (a.compoundPath) {
               a.compoundPath.fillColor = this.color;
             }
-            if (a.keypoints) {
-              a.keypoints.color = this.darkHSL;
-              a.keypoints.bringToFront();
+            if (a.getKeypoints()) {
+              a.setKeypointsColor(this.darkHSL);
+              a.bringKeypointsToFront();
             }
           }
         });
@@ -549,8 +549,8 @@ export default {
       if (annotations == null) return;
 
       annotations.forEach(a => {
-        a.keypoints.visible = newVisible;
-        a.isVisible = newVisible;
+        a.setKeypointsVisible(newVisible);
+        a.setVisible(newVisible);
       });
       this.setColor();
     },

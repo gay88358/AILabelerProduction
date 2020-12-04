@@ -29,7 +29,7 @@ services:
       - FILE_WATCHER=true
       - FLASK_APP=webserver
       - FLASK_ENV=development
-      - DEBUG=true
+      - DEBUG=false
       - PYTHONUNBUFFERED=0
     ports:
       - ${AIL_BACKEND_PORT}:5000
@@ -42,6 +42,7 @@ services:
       - "./src/backend/sharedFolder:/worksapce/sharedFolder"
       - "./src/datasets:/datasets"
       - "./src/models:/models"
+      - "./src/backend/AILabeler.log:/worksapce/AILabeler.log"
       - "${AIL_STORAGE_PATH}:/worksapce/sharedFolder/ATWEX"
     depends_on:
       - database
