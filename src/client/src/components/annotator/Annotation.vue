@@ -404,14 +404,59 @@ export default {
         return null;
       return segments;
     },
-    createKeypoints(categoryName) {
-      this.keypoints = new Keypoints(this.keypointEdges, this.keypointLabels,
+    getCompoundPath() {
+      if (this.isNullCompoundPath()) {
+        this.clearCavasAndCreateCompoundPath();
+      }
+      return this.compoundPath;
+    },
+    clearCavasAndCreateCompoundPath(json, segments) {
+      this.clearAnnotationOnCanvas();
+      this.createCompoundPathAndKeypoints(json, segments);
+      this.setColor();
+    },
+    clearAnnotationOnCanvas() {
+      this.removeCompoundPath();
+      if (this.isKeypointsNotNull()) {
+        this.keypoints.remove();
+      }
+    },
+    removeCompoundPath() {
+      if (this.isNullCompoundPath()) {
+        return;
+      }
+      this.getCompoundPath().remove();
+    },
+    createCompoundPathAndKeypoints(json, segments) {
+      this.compoundPath = this.createCompoundPath(this.getAnnotationId(), this.index);
+      this.keypoints = this.createKeypoints(this.$parent.category.name, this.getAnnotationId());
+      
+      this.addAllAnnotationKeypoints();
+      this.loadJsonOrSegmentIntoCompoundPath(json, segments);
+      this.updateCompoundPathData(this.index, this.categoryIndex);
+      this.setCompoundPathFullySelected(this.isCurrent);
+      this.setCompoundPathOpacity(this.opacity);
+    },
+    createCompoundPath(annotationId, annotationIndex) {
+      let compoundPath = new paper.CompoundPath();
+      compoundPath.onDoubleClick = () => {
+        if (this.activeTool !== "Select") return;
+        $(`#annotationSettings${annotationId}`).modal("show");
+      };
+      compoundPath.onClick = () => {
+        this.$emit("click", annotationIndex);
+      };
+      return compoundPath;
+    },
+    createKeypoints(categoryName, annotationId) {
+      let keypoints = new Keypoints(this.keypointEdges, this.keypointLabels,
         this.keypointColors, {
-          annotationId: this.getAnnotationId(),
+          annotationId: annotationId,
           categoryName: categoryName,
         });
-      this.keypoints.radius = this.scale * 6;
-      this.keypoints.lineWidth = this.scale * 2;
+      keypoints.radius = this.scale * 6;
+      keypoints.lineWidth = this.scale * 2;
+      return keypoints;
     },
     addAllAnnotationKeypoints() {
       let keypoints = this.getAnnotationKeypoints();
@@ -425,38 +470,16 @@ export default {
         }
       }
     },
-    clearCavasAndCreateCompoundPath(json, segments) {
-      this.clearAnnotationOnCanvas();
-      this.createCompoundPathAndKeypoints(json, segments);
-      this.setColor();
-    },
-    createCompoundPathAndKeypoints(json, segments) {
-      this.createCompoundPath();
-      this.createKeypoints(this.$parent.category.name);
-      this.addAllAnnotationKeypoints();
-      this.loadJsonOrSegmentIntoCompoundPath(json, segments);
-      this.updateCompoundPathData(this.index, this.categoryIndex);
-      this.setCompoundPathFullySelected(this.isCurrent);
-      this.setCompoundPathOpacity(this.opacity);
-    },
-    createCompoundPath() {
-      this.compoundPath = new paper.CompoundPath();
-      this.compoundPath.onDoubleClick = () => {
-        if (this.activeTool !== "Select") return;
-        $(`#annotationSettings${this.getAnnotationId()}`).modal("show");
-      };
-      this.compoundPath.onClick = () => {
-        this.$emit("click", this.index);
-      };
-    },
     loadJsonOrSegmentIntoCompoundPath(json, segments) {
       // so if compoundPath contains segment, we don't need to load segments into compoundPath
       // if we don't have compound path (which means we don't have segments), then we need to load segments into compoundPath
       json = this.checkJson(json);
-      segments = this.checkSegments(segments);
       if (json != null) {
         this.compoundPath.importJSON(json);
-      } else if (segments != null) {
+        return;
+      }
+      segments = this.checkSegments(segments);
+      if (segments != null) {
         this.loadSegmentsIntoCompoundpath(segments, this.compoundPath);
       }
     },
@@ -501,21 +524,7 @@ export default {
       this.$parent.category.annotations.splice(this.index, 1);
       this.clearAnnotationOnCanvas();
     },
-    clearAnnotationOnCanvas() {
-      this.removeCompoundPath();
-      this.removeKeypoints();
-    },
-    removeCompoundPath() {
-      if (this.isNullCompoundPath()) {
-        return;
-      }
-      this.compoundPath.remove();
-    },
-    removeKeypoints() {
-      if (this.isKeypointsNotNull()) {
-        this.keypoints.remove();
-      }
-    },
+    
     startShowKeypoints() {
       this.showKeypoints = true;
     },
@@ -580,12 +589,7 @@ export default {
     isNullCompoundPath() {
       return this.compoundPath == null;
     },
-    getCompoundPath() {
-      if (this.isNullCompoundPath()) {
-        this.clearCavasAndCreateCompoundPath();
-      }
-      return this.compoundPath;
-    },
+    
     setCompoundPath(newCompoundPath) {
       this.compoundPath = newCompoundPath;
     },
