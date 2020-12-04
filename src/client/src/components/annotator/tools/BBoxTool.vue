@@ -29,11 +29,11 @@ export default {
       cursor: "copy",
       bbox: null,
       polygon: {
-        path: null,
-        guidance: true,
+        //path: null,
+        //guidance: true,
         pathOptions: {
           strokeColor: "black",
-          strokeWidth: 1
+          //strokeWidth: 1
         }
       },
       polygonR: polygonRecord,
@@ -55,8 +55,8 @@ export default {
     ...mapMutations(["addUndo", "removeUndos"]),
     export() {
       return {
-        completeDistance: this.polygon.completeDistance,
-        minDistance: this.polygon.minDistance,
+        completeDistance: this.getCompleteDistance(),
+        minDistance: this.getMinDistance(),
         blackOrWhite: this.getColorBlackOrWhite(),
         auto: this.getColorAuto(),
         radius: this.getColorRadius()
@@ -104,13 +104,28 @@ export default {
       return this.getPolygonPath() == null;
     },
     getPolygonPath() {
-      return this.polygon.path;
+      return this.polygonR.getPolygonPath();
+    },
+    getCompleteDistance() {
+      return this.polygonR.getCompleteDistance();
+    },
+    getMinDistance() {
+      return this.polygonR.getMinDistance();
+    },
+    polygonSegmentLength() {
+      return this.polygonR.polygonSegmentLength();
     },
     setPolygonPath(newPath) {
-      this.polygon.path = newPath;
+      this.polygonR.setPolygonPath(newPath);
     },
-    setPolygonPathToNull() {
-
+    setPolygonPathOptionsStrokeWidth(newStrokeWidth) {
+      this.polygonR.setPolygonPathOptionsStrokeWidth(newStrokeWidth);
+    },
+    getPolygonPathOptions() {
+      return this.polygonR.getPolygonPathOptions();
+    },
+    removePolygon() {
+      this.polygonR.removePolygonPath();
     },
     onMouseDown(event) {   
       if (this.isNullPolygonPath() && this.$parent.checkAnnotationExist()) {
@@ -165,12 +180,6 @@ export default {
       result.strokeWidth = 4.89697;
       return result;
     },
-    removePolygon() {
-      this.getPolygonPath().fillColor = "black";
-      this.getPolygonPath().closePath();
-      this.getPolygonPath().remove();
-      this.setPolygonPath(null);
-    },
     removeColor() {
       if (this.color.circle) {
         this.color.circle.remove();
@@ -202,18 +211,13 @@ export default {
       this.modifyBBox(event);
     },
     removeLastBBox() {
-      this.getPolygonPath().removeSegments();
+      this.polygonR.removeAllSegments();
+      // this.getPolygonPath().removeSegments();
     },
     modifyBBox(event) {
       this.setPolygonPath(this.createPaperPath());
       this.changePointsOfBBox(event);
       this.addPointsToPolygonPath();
-    },
-    getPolygon() {
-      return this.polygon;
-    },
-    getPolygonPathOptions() {
-      return this.polygon.pathOptions;
     },
     createPaperPath() {
       return new paper.Path(this.getPolygonPathOptions());
@@ -231,13 +235,8 @@ export default {
       if (this.isNullPolygonPath()) return;
 
       let points = args.points;
-      let length = this.polygonSegmentLength();
-
-      this.getPolygonPath().removeSegments(length - points, length);
+      this.polygonR.removeSegments(points);
     },
-    polygonSegmentLength() {
-      return this.getPolygonPath().segments.length;
-    }
   },
   computed: {
     isDisabled() {
@@ -255,14 +254,14 @@ export default {
      * Change width of stroke based on zoom of image
      */
     scale(newScale) {
-      this.getPolygonPathOptions().strokeWidth = newScale * this.scaleFactor;
-      if (this.getPolygonPath() != null)
-        this.getPolygonPath().strokeWidth = newScale * this.scaleFactor;
+      this.setPolygonPathOptionsStrokeWidth(newScale * this.scaleFactor);
+      if (this.isNullPolygonPath() == false)
+        this.polygonR.setPolygonPathStrokeWidth(newScale * this.scaleFactor);
     },
     "polygon.pathOptions.strokeColor"(newColor) {
       if (this.isNullPolygonPath()) return;
 
-      this.getPolygonPath().strokeColor = newColor;
+      this.polygonR.setPolygonPathStrokeColor(newColor);
     },
     "color.auto"(value) {
       if (value && this.getPolygonPath()) {
