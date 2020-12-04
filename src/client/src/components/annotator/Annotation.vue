@@ -225,6 +225,7 @@ import JQuery from "jquery";
 import { setSelectedAnnotation } from "../../models/actionDispatcher";
 import { Keypoint, Keypoints, VisibilityOptions } from "@/libs/keypoints";
 import { mapMutations } from "vuex";
+import { keypointsRecord } from "./keypointsRecord";
 import UndoAction from "@/undo";
 import TagsInput from "@/components/TagsInput";
 import Metadata from "@/components/Metadata";
@@ -297,6 +298,7 @@ export default {
   },
   data() {
     return {
+      keypointsRecord: keypointsRecord,
       isVisible: true,
       showKeypoints: false,
       color: this.getAnnotationColor(),
@@ -348,7 +350,13 @@ export default {
       } 
     },
     isKeypointsNotNull() {
-      return this.keypoints != null;
+      return this.getKeypoints() != null;
+    },
+    bringKeypointsToFront() {
+      this.keypointsRecord.bringKeypointsToFront();
+    },
+    removeLineOfKeypoints(edge) {
+      this.getKeypoints().removeLine(edge);
     },
     getAnnotationCreator() {
       return this.annotation.creator;
@@ -418,7 +426,7 @@ export default {
     clearAnnotationOnCanvas() {
       this.removeCompoundPath();
       if (this.isKeypointsNotNull()) {
-        this.keypoints.remove();
+        this.getKeypoints().remove();
       }
     },
     removeCompoundPath() {
@@ -429,8 +437,8 @@ export default {
     },
     createCompoundPathAndKeypoints(json, segments) {
       this.compoundPath = this.createCompoundPath(this.getAnnotationId(), this.index);
-      this.keypoints = this.createKeypoints(this.$parent.category.name, this.getAnnotationId());
       
+      this.setKeypointsR(this.createKeypoints(this.$parent.category.name, this.getAnnotationId()));
       this.addAllAnnotationKeypoints();
       this.loadJsonOrSegmentIntoCompoundPath(json, segments);
       this.updateCompoundPathData(this.index, this.categoryIndex);
@@ -549,7 +557,7 @@ export default {
     onAnnotationKeypointClick(labelIndex) {
       if (this.isKeypointLabeled(labelIndex)) {
         this.keypoint.tag = [String(labelIndex+1)];
-        this.currentKeypoint = this.keypoints._labelled[this.keypoint.tag];
+        this.currentKeypoint = this.getKeypointsLabel(this.keypoint.tag);
       }
       if (this.isVisible) {
         this.$emit("keypoint-click", labelIndex);
@@ -558,16 +566,17 @@ export default {
     onAnnotationKeypointSettingsClick(labelIndex) {
       this.keypoint.tag = [String(labelIndex+1)];
       let indexLabel = parseInt(String(this.keypoint.tag));
-      if (this.keypoints && indexLabel in this.keypoints._labelled) {
-        let labelled = this.keypoints._labelled[indexLabel];
+      if (this.getKeypoints() && indexLabel in this.containsKeypointsLabel()) {
+        let labelled = this.getKeypointsLabel(indexLabel);
         this.currentKeypoint = labelled;
       }
       this.keypoint.visibility = this.getKeypointVisibility(labelIndex);
     },
     onDeleteKeypointClick(labelIndex) {
       let label = String(labelIndex + 1);
-      if (label in this.keypoints._labelled) {
-        this.deleteKeypoint(this.keypoints._labelled[label]);
+      if (label in this.containsKeypointsLabel()) {
+        let keypointsToDelete = this.getKeypointsLabel(label);
+        this.keypointsRecord.deleteKeypoint(keypointsToDelete);
       }
     },
     onMouseEnter() {
@@ -614,7 +623,7 @@ export default {
       this.addUndo(action);
     },
     isEmptyCompoundPathAndKeypoints() {
-      return this.compoundPath != null && this.compoundPath.isEmpty() && this.keypoints.isEmpty();
+      return this.compoundPath != null && this.compoundPath.isEmpty() && this.isEmptyKeypoints();
     },
     simplifyPath() {
       if (this.isEmptyCompoundPathAndKeypoints()) {
@@ -632,7 +641,7 @@ export default {
       this.compoundPath.removeChildren();
       this.compoundPath.addChildren(newChildren);
       this.setCompoundPathFullySelected(this.isCurrent);
-      this.keypoints.bringToFront();
+      this.bringKeypointsToFront();
       this.emitModify();
     },
     calculateCompoundPathChildren() {
@@ -657,7 +666,7 @@ export default {
       this.setCompoundPathFullySelected(this.isCurrent);
     },
     addKeypoint(point, visibility, label) {
-      let isDuplicatePoint = this.keypoints.contains(point); 
+      let isDuplicatePoint = this.keypointsRecord.contains(point);
       if (label == null && isDuplicatePoint) return;
 
       visibility = visibility || parseInt(this.keypoint.next.visibility);
@@ -684,10 +693,10 @@ export default {
           if (this.currentKeypoint) {
             let i1 = this.currentKeypoint.indexLabel;
             let i2 = keypoint.indexLabel;
-            if (this.keypoints && i1 > 0 && i2 > 0) {
+            if (this.getKeypoints() && i1 > 0 && i2 > 0) {
               let edge = [i1, i2];
 
-              if (!this.keypoints.getLine(edge)) {
+              if (!this.getKeypoints().getLine(edge)) {
                 this.$parent.addKeypointEdge(edge);
               } else {
                 this.$parent.removeKeypointEdge(edge);
@@ -712,11 +721,12 @@ export default {
         onMouseDrag: event => {
           let keypoint = event.target.keypoint;
           if (!["Select", "Keypoints"].includes(this.activeTool)) return;
-          this.keypoints.moveKeypoint(event.point, keypoint);
+          this.getKeypoints().moveKeypoint(event.point, keypoint);
         }
       });
-      this.keypoints.addKeypoint(keypoint);
-      this.isEmpty = this.compoundPath.isEmpty() && this.keypoints.isEmpty();
+      this.keypointsRecord.addKeypoint(keypoint)
+      // this.getKeypoints().addKeypoint(keypoint);
+      this.isEmpty = this.compoundPath.isEmpty() && this.isEmptyKeypoints();
       this.updateKeypointLabel(label);
     },
     updateKeypointLabel(label) {
@@ -737,9 +747,6 @@ export default {
         this.$emit('keypoints-complete');
       }
       this.tagRecomputeCounter++;
-    },
-    deleteKeypoint(keypoint) {
-      this.keypoints.deleteKeypoint(keypoint);
     },
     /**
      * Unites current annotation path with anyother path.
@@ -766,8 +773,7 @@ export default {
 
       this.removeCurrentCompoundPath();
       this.setCompoundPath(newCompound);
-      this.keypoints.bringToFront();
-
+      this.bringKeypointsToFront();
       if (simplify) this.simplifyPath();
     },
     removeCurrentCompoundPath() {
@@ -788,7 +794,7 @@ export default {
 
       this.removeCompoundPath();;
       this.setCompoundPath(newCompound);
-      this.keypoints.bringToFront();
+      this.bringKeypointsToFront();
 
       if (simplify) this.simplifyPath();
     },
@@ -802,7 +808,7 @@ export default {
 
       this.compoundPath.opacity = this.opacity;
       this.compoundPath.fillColor = this.getAnnotationColor();
-      this.keypoints.color = this.darkHSL;
+      this.keypointsRecord.setKeypointsColor(this.darkHSL);
     },
     setCategory(event) {
       const newCategoryName = event.target.value;
@@ -848,12 +854,10 @@ export default {
       }
     },
     appendKeypointsTo(annotationJson) {
-      if (!this.keypoints.isEmpty()) {
-        annotationJson['keypoints'] = this.keypoints.exportJSON(
-          this.keypointLabels,
+      if (!this.isEmptyKeypoints()) {
+        annotationJson['keypoints'] = this.keypointsRecord.exportJSONKeypoints(this.keypointLabels,
           this.getAnnotationWidth(),
-          this.getAnnotationHeight()
-        );
+          this.getAnnotationHeight());
       }
     },
     appendSessionsTo(annotationJson) {
@@ -890,12 +894,36 @@ export default {
       return tag == (index + 1);
     },
     isKeypointLabeled(index) {
-      return this.keypoints && !!this.keypoints._labelled[index + 1];
+      return this.getKeypoints() && !!this.getKeypointsLabel(index + 1);
+    },
+    isEmptyKeypoints() {
+      return this.keypointsRecord.isEmptyKeypoints();
+    },
+    getKeypoints() {
+      return this.keypointsRecord.getKeypoints();
+    },
+    setKeypointsR(newKeypoints) {
+      this.keypointsRecord.setKeypoints(newKeypoints);
+    },
+    getKeypointsLabel(index) {
+      return this.keypointsRecord.getKeypointsLabel(index);
+    },
+    containsKeypointsLabel() {
+      return this.keypointsRecord.containsKeypointsLabel();
+    },
+    setKeypointsColor(newColor) {
+      this.keypointsRecord.setKeypointsColor(newColor);
+    },
+    setKeypointsVisible(newVisible) {
+      this.keypointsRecord.setKeypointsVisible(newVisible);
+    },
+    setVisible(newVisible) {
+      this.visible = newVisible;
     },
     getKeypointVisibility(index) {
       let visibility = 0;
-      if (this.keypoints && this.keypoints._labelled) {
-        let labelled = this.keypoints._labelled[index + 1];
+      if (this.getKeypoints() && this.containsKeypointsLabel()) {
+        let labelled = this.getKeypointsLabel(index + 1);
         if (labelled) {
           visibility = labelled.visibility;
         }
@@ -948,7 +976,7 @@ export default {
 
           if (labelIndex > -1) {
             this.keypoint.tag = [String(labelIndex+1)];
-            this.currentKeypoint = this.keypoints._labelled[this.keypoint.tag];
+            this.currentKeypoint = this.getKeypointsLabel(this.keypoint.tag);
             this.$emit("keypoint-click", labelIndex);
           }
         }
@@ -964,17 +992,17 @@ export default {
       if (this.isNullCompoundPath()) return;
 
       this.compoundPath.visible = newVisible;
-      this.keypoints.visible = newVisible;
+      this.setKeypointsVisible(newVisible);
     },
     compoundPath() {
       if (this.isNullCompoundPath()) return;
 
       this.compoundPath.visible = this.isVisible;
       this.setColor();
-      this.isEmpty = this.compoundPath.isEmpty() && this.keypoints.isEmpty();
+      this.isEmpty = this.compoundPath.isEmpty() && this.isEmptyKeypoints();
     },
     keypoints() {
-      this.isEmpty = this.compoundPath.isEmpty() && this.keypoints.isEmpty();
+      this.isEmpty = this.compoundPath.isEmpty() && this.isEmptyKeypoints();
     },
     annotation() {
       this.initAnnotation();
@@ -1003,7 +1031,7 @@ export default {
     "keypoint.tag"(newVal) {
       let id = newVal.length === 0 ? -1 : newVal[0];
       if (id !== -1) {
-        this.currentKeypoint = this.keypoints._labelled[id];
+        this.currentKeypoint = this.getKeypointsLabel(id);
       }
       this.tagRecomputeCounter++;
     },
@@ -1012,16 +1040,16 @@ export default {
       this.currentKeypoint.visibility = newVal;
     },
     keypointEdges(newEdges) {
-      this.keypoints.color = this.darkHSL;
-      newEdges.forEach(e => this.keypoints.addEdge(e));
+      this.keypointsRecord.setKeypointsColor(this.darkHSL);
+      newEdges.forEach(e => this.getKeypoints().addEdge(e));
     },
     scale: {
       immediate: true,
       handler(scale) {
-        if (!this.keypoints) return;
+        if (!this.getKeypoints()) return;
 
-        this.keypoints.radius = scale * 6;
-        this.keypoints.lineWidth = scale * 2;
+        this.keypointsRecord.setKeypointsRadius(scale * 6);
+        this.keypointsRecord.setKeypointsLineWidth(scale * 2);
       }
     },
   },
@@ -1034,8 +1062,7 @@ export default {
     },
     isCurrent() {
       if (this.index === this.current && this.$parent.isCurrent) {
-        // if (this.compoundPath != null) this.compoundPath.bringToFront();
-        if (this.isKeypointsNotNull()) this.keypoints.bringToFront();
+        if (this.isKeypointsNotNull()) this.bringKeypointsToFront();
         return true;
       }
       return false;
@@ -1093,7 +1120,7 @@ export default {
 
       for (let i = 0; i < this.keypointLabels.length; i++) {
         // Include it tags if it is the current keypoint or not in use.
-        if (this.keypoints && !this.keypoints._labelled[i + 1]) {
+        if (this.getKeypoints() && !this.getKeypointsLabel(i + 1)) {
           tags[i + 1] = this.keypointLabels[i];
         }
       }
