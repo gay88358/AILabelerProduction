@@ -334,6 +334,15 @@ export default {
     metadataString() {
       return this.$refs.metadata.metadataString();
     },
+    setKeypointsVisible(newVisible) {
+      this.keypointsRecord.setKeypointsVisible(newVisible);
+    },
+    setKeypointsColor(newColor) {
+      this.keypointsRecord.setKeypointsColor(newColor);
+    },
+    bringKeypointsToFront() {
+      this.keypointsRecord.bringKeypointsToFront();
+    },
     initAnnotation() {
       this.deleteMetaName();
       this.removeCompoundPath();
@@ -350,10 +359,10 @@ export default {
       } 
     },
     isKeypointsNotNull() {
-      return this.getKeypoints() != null;
+      return this.keypointsRecord.isKeypointsNotNull();
     },
-    bringKeypointsToFront() {
-      this.keypointsRecord.bringKeypointsToFront();
+    isNullKeypoints() {
+      return this.keypointsRecord.isNullKeypoints();
     },
     getAnnotationCreator() {
       return this.annotation.creator;
@@ -434,8 +443,7 @@ export default {
     },
     createCompoundPathAndKeypoints(json, segments) {
       this.compoundPath = this.createCompoundPath(this.getAnnotationId(), this.index);
-      
-      this.setKeypointsR(this.createKeypoints(this.$parent.category.name, this.getAnnotationId()));
+      this.keypointsRecord.setKeypoints(this.createKeypoints(this.$parent.category.name, this.getAnnotationId()));
       this.addAllAnnotationKeypoints();
       this.loadJsonOrSegmentIntoCompoundPath(json, segments);
       this.updateCompoundPathData(this.index, this.categoryIndex);
@@ -563,7 +571,7 @@ export default {
     onAnnotationKeypointSettingsClick(labelIndex) {
       this.keypoint.tag = [String(labelIndex+1)];
       let indexLabel = parseInt(String(this.keypoint.tag));
-      if (this.getKeypoints() && indexLabel in this.containsKeypointsLabel()) {
+      if (this.isKeypointsNotNull() && indexLabel in this.containsKeypointsLabel()) {
         let labelled = this.getKeypointsLabel(indexLabel);
         this.currentKeypoint = labelled;
       }
@@ -595,7 +603,6 @@ export default {
     isNullCompoundPath() {
       return this.compoundPath == null;
     },
-    
     setCompoundPath(newCompoundPath) {
       this.compoundPath = newCompoundPath;
     },
@@ -638,7 +645,7 @@ export default {
       this.compoundPath.removeChildren();
       this.compoundPath.addChildren(newChildren);
       this.setCompoundPathFullySelected(this.isCurrent);
-      this.bringKeypointsToFront();
+      this.keypointsRecord.bringKeypointsToFront();
       this.emitModify();
     },
     calculateCompoundPathChildren() {
@@ -690,7 +697,7 @@ export default {
           if (this.currentKeypoint) {
             let i1 = this.currentKeypoint.indexLabel;
             let i2 = keypoint.indexLabel;
-            if (this.getKeypoints() && i1 > 0 && i2 > 0) {
+            if (this.isKeypointsNotNull() && i1 > 0 && i2 > 0) {
               let edge = [i1, i2];
 
               if (!this.keypointsRecord.getLine(edge)) {
@@ -769,7 +776,7 @@ export default {
 
       this.removeCurrentCompoundPath();
       this.setCompoundPath(newCompound);
-      this.bringKeypointsToFront();
+      this.keypointsRecord.bringKeypointsToFront();
       if (simplify) this.simplifyPath();
     },
     removeCurrentCompoundPath() {
@@ -790,7 +797,7 @@ export default {
 
       this.removeCompoundPath();;
       this.setCompoundPath(newCompound);
-      this.bringKeypointsToFront();
+      this.keypointsRecord.bringKeypointsToFront();
 
       if (simplify) this.simplifyPath();
     },
@@ -878,6 +885,7 @@ export default {
         annotation: this.getAnnotation()
       });
     },
+    
     getUUID() {
       return Math.random()
         .toString(36)
@@ -890,7 +898,7 @@ export default {
       return tag == (index + 1);
     },
     isKeypointLabeled(index) {
-      return this.getKeypoints() && !!this.getKeypointsLabel(index + 1);
+      return this.isKeypointsNotNull() && !!this.getKeypointsLabel(index + 1);
     },
     isEmptyKeypoints() {
       return this.keypointsRecord.isEmptyKeypoints();
@@ -898,20 +906,11 @@ export default {
     getKeypoints() {
       return this.keypointsRecord.getKeypoints();
     },
-    setKeypointsR(newKeypoints) {
-      this.keypointsRecord.setKeypoints(newKeypoints);
-    },
     getKeypointsLabel(index) {
       return this.keypointsRecord.getKeypointsLabel(index);
     },
     containsKeypointsLabel() {
       return this.keypointsRecord.containsKeypointsLabel();
-    },
-    setKeypointsColor(newColor) {
-      this.keypointsRecord.setKeypointsColor(newColor);
-    },
-    setKeypointsVisible(newVisible) {
-      this.keypointsRecord.setKeypointsVisible(newVisible);
     },
     setVisible(newVisible) {
       this.visible = newVisible;
@@ -921,7 +920,6 @@ export default {
     },
     getKeypointBackgroundColor(index) {
       if (this.isHover && this.$parent.isHover) return "#646c82";
-      // if (this.keypoint.tag == index + 1) return "#4b624c";
       let activeIndex = this.keypoint.next.label;
       if (this.activeTool === "Select") {
         activeIndex = this.keypoint.tag;
@@ -981,8 +979,10 @@ export default {
       if (this.isNullCompoundPath()) return;
 
       this.compoundPath.visible = newVisible;
-      this.setKeypointsVisible(newVisible);
+
+      this.keypointsRecord.setKeypointsVisible(newVisible);
     },
+
     compoundPath() {
       if (this.isNullCompoundPath()) return;
 
@@ -1035,7 +1035,7 @@ export default {
     scale: {
       immediate: true,
       handler(scale) {
-        if (!this.getKeypoints()) return;
+        if (this.isNullKeypoints()) return;
 
         this.keypointsRecord.setKeypointsRadius(scale * 6);
         this.keypointsRecord.setKeypointsLineWidth(scale * 2);
@@ -1051,7 +1051,7 @@ export default {
     },
     isCurrent() {
       if (this.index === this.current && this.$parent.isCurrent) {
-        if (this.isKeypointsNotNull()) this.bringKeypointsToFront();
+        if (this.isKeypointsNotNull()) this.keypointsRecord.bringKeypointsToFront();
         return true;
       }
       return false;
@@ -1109,7 +1109,8 @@ export default {
 
       for (let i = 0; i < this.keypointLabels.length; i++) {
         // Include it tags if it is the current keypoint or not in use.
-        if (this.getKeypoints() && !this.getKeypointsLabel(i + 1)) {
+        let keypointIsNotBeUsed = this.isKeypointsNotNull() && !this.getKeypointsLabel(i + 1);
+        if (keypointIsNotBeUsed) {
           tags[i + 1] = this.keypointLabels[i];
         }
       }

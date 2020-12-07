@@ -94,6 +94,14 @@ export default class KeypointsRecord {
         }
         return visibility;
     }
+
+    isKeypointsNotNull() {
+        return this.getKeypoints() != null;
+    }
+    
+    isNullKeypoints() {
+        return this.getKeypoints() == null;
+    }
 }
 
 
