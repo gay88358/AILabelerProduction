@@ -1114,15 +1114,18 @@ export default {
   },
   sockets: {
     annotating(data) {
-      if (data.image_id !== this.image.id) return;
+      let different_image = data.image_id !== this.image.id;
+      if (different_image) return;
 
       if (data.active) {
         let found = this.annotating.indexOf(data.username);
-        if (found < 0) {
+        let userNotExist = found < 0
+        if (userNotExist) {
           this.annotating.push(data.username);
         }
       } else {
-        this.annotating.splice(this.annotating.indexOf(data.username), 1);
+        let removeIndex = this.annotating.indexOf(data.username);
+        this.annotating.splice(removeIndex, 1);
       }
     }
   },
