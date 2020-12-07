@@ -461,7 +461,7 @@ export default {
         annotations.forEach(a => {
           if (a) {
             if (a.compoundPath) {
-              a.compoundPath.fillColor = this.color;
+              a.setCompoundPathFillColor(this.color);
             }
             if (a.getKeypoints()) {
               a.setKeypointsColor(this.darkHSL);
@@ -542,7 +542,9 @@ export default {
       let annotations = this.$refs.annotation;
       if (annotations == null) return;
 
-      annotations.forEach(a => (a.compoundPath.opacity = this.opacity));
+      annotations.forEach(a => {
+        a.setCompoundPathOpacity(this.opacity);
+      });
     },
     isVisible(newVisible) {
       let annotations = this.$refs.annotation;
