@@ -355,9 +355,6 @@ export default {
     bringKeypointsToFront() {
       this.keypointsRecord.bringKeypointsToFront();
     },
-    removeLineOfKeypoints(edge) {
-      this.getKeypoints().removeLine(edge);
-    },
     getAnnotationCreator() {
       return this.annotation.creator;
     },
@@ -696,7 +693,7 @@ export default {
             if (this.getKeypoints() && i1 > 0 && i2 > 0) {
               let edge = [i1, i2];
 
-              if (!this.getKeypoints().getLine(edge)) {
+              if (!this.keypointsRecord.getLine(edge)) {
                 this.$parent.addKeypointEdge(edge);
               } else {
                 this.$parent.removeKeypointEdge(edge);
@@ -920,14 +917,7 @@ export default {
       this.visible = newVisible;
     },
     getKeypointVisibility(index) {
-      let visibility = 0;
-      if (this.getKeypoints() && this.containsKeypointsLabel()) {
-        let labelled = this.getKeypointsLabel(index + 1);
-        if (labelled) {
-          visibility = labelled.visibility;
-        }
-      }
-      return visibility;
+      return this.keypointsRecord.getKeypointVisibility(index);
     },
     getKeypointBackgroundColor(index) {
       if (this.isHover && this.$parent.isHover) return "#646c82";

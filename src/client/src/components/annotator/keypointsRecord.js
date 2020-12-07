@@ -79,6 +79,21 @@ export default class KeypointsRecord {
     removeKeypoints() {
         this.getKeypoints().remove();
     }
+
+    getLine(edge) {
+        return this.getKeypoints().getLine(edge);
+    }
+
+    getKeypointVisibility(index) {
+        let visibility = 0;
+        if (this.getKeypoints() && this.containsKeypointsLabel()) {
+          let labelled = this.getKeypointsLabel(index + 1);
+          if (labelled) {
+            visibility = labelled.visibility;
+          }
+        }
+        return visibility;
+    }
 }
 
 
