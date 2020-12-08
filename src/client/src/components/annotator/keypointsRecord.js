@@ -77,7 +77,9 @@ export default class KeypointsRecord {
     }
 
     removeKeypoints() {
-        this.getKeypoints().remove();
+        if (this.isKeypointsNotNull()) {
+            this.getKeypoints().remove();
+        }
     }
 
     getLine(edge) {
@@ -101,6 +103,10 @@ export default class KeypointsRecord {
     
     isNullKeypoints() {
         return this.getKeypoints() == null;
+    }
+
+    isKeypointLabeled(index) {
+        return this.isKeypointsNotNull() && !!this.getKeypointsLabel(index + 1);
     }
 }
 
