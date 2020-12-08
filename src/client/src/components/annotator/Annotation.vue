@@ -656,13 +656,7 @@ export default {
       this.setCompoundPath(this.pervious.pop());
       this.setCompoundPathFullySelected(this.isCurrent);
     },
-    addKeypoint(point, visibility, label) {
-      let isDuplicatePoint = this.keypointsRecord.contains(point);
-      if (label == null && isDuplicatePoint) return;
-
-      visibility = visibility || parseInt(this.keypoint.next.visibility);
-      label = label || parseInt(this.keypoint.next.label);
-
+    createSingleKeypoint(point, visibility, label) {
       let keypoint = new Keypoint(point.x, point.y, {
         visibility: visibility || 0,
         indexLabel: label || -1,
@@ -713,6 +707,15 @@ export default {
           this.moveKeypoints(currentKeypoint, originalKeypoint);
         }
       });
+      return keypoint;
+    },
+    addKeypoint(point, visibility, label) {
+      let isDuplicatePoint = this.keypointsRecord.contains(point);
+      if (label == null && isDuplicatePoint) return;
+
+      visibility = visibility || parseInt(this.keypoint.next.visibility);
+      label = label || parseInt(this.keypoint.next.label);
+      let keypoint = this.createSingleKeypoint(point, visibility, label);
       this.keypointsRecord.addKeypoint(keypoint)
       this.isEmpty = this.compoundPath.isEmpty() && this.isEmptyKeypoints();
       this.updateKeypointLabel(label);
