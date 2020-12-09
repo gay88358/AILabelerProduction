@@ -732,14 +732,15 @@ export default {
     unite(compound, simplify = true, undoable = true, isBBox = false) {
       if (this.isNullCompoundPath()) this.clearCavasAndCreateCompoundPath();
 
-      let newCompound = this.compoundPathRecord.unitCompound(compound, this.getCompoundPath());
+      let originalCompoundPath = this.getCompoundPath();
+      let newCompound = this.compoundPathRecord.unitCompound(compound, originalCompoundPath);
       this.setAnnotationIsBBox(isBBox);
-      if (undoable) this.createUndoAction("Unite", this.compoundPath);
-
       this.cleanAndSetCompoundPath(newCompound);
       
       this.keypointsRecord.bringKeypointsToFront();
       if (simplify) this.simplifyPath();
+
+      if (undoable) this.createUndoAction("Unite", originalCompoundPath);
     },
     simplifyPath() { 
       if (this.isEmptyCompoundPathAndKeypoints()) {
