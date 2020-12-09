@@ -220,7 +220,6 @@
 <script>
 import paper from "paper";
 import axios from "axios";
-import simplifyjs from "simplify-js";
 import JQuery from "jquery";
 import { setSelectedAnnotation } from "../../models/actionDispatcher";
 import { Keypoint, Keypoints, VisibilityOptions } from "@/libs/keypoints";
@@ -364,10 +363,7 @@ export default {
       } 
     },
     removeCompoundPath() {
-      if (this.isNullCompoundPath()) {
-        return;
-      }
-      this.getCompoundPath().remove();
+      this.compoundPathRecord.removeCompoundPath(this.compoundPath);
     },
     clearCavasAndCreateCompoundPath(paperObjectJson, segments) {
       this.clearAnnotationOnCanvas();
@@ -380,7 +376,6 @@ export default {
     },
     createCompoundPathAndKeypoints(paperObjectJson, segments) {
       this.createCompoundPathAndSetup(paperObjectJson, segments);
-
       this.createKeypointsAndSetup(this.$parent.category.name, this.getAnnotationId());
     },
     createCompoundPathAndSetup(paperObjectJson, segments) {
@@ -431,7 +426,7 @@ export default {
     createKeypointsAndSetup(categoryName, annotationId) {
       let keypoints = this.createKeypoints(categoryName, annotationId);
       this.keypointsRecord.setKeypoints(keypoints);
-      this.addAnnotationKeypointsToCanvas();
+      // this.addAnnotationKeypointsToCanvas();
     },
     createKeypoints(categoryName, annotationId) {
       let keypoints = new Keypoints(this.keypointEdges, this.keypointLabels,
@@ -445,7 +440,7 @@ export default {
     },
     addAnnotationKeypointsToCanvas() {
       let keypoints = this.getAnnotationKeypoints();
-      if (!keypoints)
+      if (!keypoints || keypoints.length == 0)
         return;
 
       for (let i = 0; i < keypoints.length; i += 3) {
@@ -455,13 +450,13 @@ export default {
         
         let isZeroKeypoint = keypoints[i] === 0 && keypoints[i + 1] === 0 && v === 0;
         if (isZeroKeypoint) continue;
-        this.addKeypointToRecord(new paper.Point(x, y), visibility, i / 3 + 1);
+        let label = i / 3 + 1;
+        this.addKeypointToRecord(new paper.Point(x, y), visibility, label);
       }
     },
     addKeypointToRecord(point, visibility, label) {
       let isDuplicatePoint = this.keypointsRecord.contains(point);
       if (label == null && isDuplicatePoint) return;
-
       visibility = visibility || parseInt(this.keypoint.next.visibility);
       label = label || parseInt(this.keypoint.next.label);
       let keypoint = this.createSingleKeypoint(point, visibility, label);
@@ -733,26 +728,14 @@ export default {
     unite(compound, simplify = true, undoable = true, isBBox = false) {
       if (this.isNullCompoundPath()) this.clearCavasAndCreateCompoundPath();
 
-      let newCompound = this.unitCompound(compound);
+      let newCompound = this.compoundPathRecord.unitCompound(compound, this.getCompoundPath());
       this.setAnnotationIsBBox(isBBox);
-
       if (undoable) this.createUndoAction("Unite");
-
-      this.removeCurrentCompoundPath();
+      this.removeCompoundPath();
       this.setCompoundPath(newCompound);
+
       this.keypointsRecord.bringKeypointsToFront();
       if (simplify) this.simplifyPath();
-    },
-    unitCompound(compound) {
-      let newCompound = this.getCompoundPath().unite(compound);
-      newCompound.strokeColor = null;
-      newCompound.strokeWidth = 0;
-      newCompound.onDoubleClick = this.getCompoundPath().onDoubleClick;
-      newCompound.onClick = this.getCompoundPath().onClick;
-      return newCompound;
-    },
-    removeCurrentCompoundPath() {
-      this.getCompoundPath().remove();
     },
     simplifyPath() { 
       if (this.isEmptyCompoundPathAndKeypoints()) {
@@ -765,31 +748,11 @@ export default {
         this.compoundPath = new paper.CompoundPath(this.compoundPath);
         this.setCompoundPathAnnotationAndCategoryIndex(this.index, this.categoryIndex);
       }
+      this.compoundPathRecord.updateCompoundPathChildren(this.compoundPath, this.simplify);
 
-      this.updateCompoundPathChildren(); // domain
       this.setCompoundPathFullySelected(this.isCurrent);
       this.keypointsRecord.bringKeypointsToFront();
       this.emitModify();
-    },
-    updateCompoundPathChildren() {
-      let newChildren = this.calculateCompoundPathChildren(this.compoundPath, this.simplify);
-      this.compoundPath.removeChildren();
-      this.compoundPath.addChildren(newChildren);
-    },
-    calculateCompoundPathChildren(compoundPath, simplifyNumber) {
-      let newChildren = [];
-      compoundPath.children.forEach(path => {
-        let points = [];
-        path.segments.forEach(seg => {
-          points.push({ x: seg.point.x, y: seg.point.y });
-        });
-        points = simplifyjs(points, simplifyNumber, true);
-
-        let newPath = new paper.Path(points);
-        newPath.closePath();
-        newChildren.push(newPath);
-      });
-      return newChildren;
     },
     emitModify() {  
       this.setAnnotationPaperObject(
@@ -816,7 +779,7 @@ export default {
       newCompound.onDoubleClick = this.compoundPath.onDoubleClick;
       if (undoable) this.createUndoAction("Subtract");
 
-      this.removeCompoundPath();;
+      this.removeCompoundPath();
       this.setCompoundPath(newCompound);
       this.keypointsRecord.bringKeypointsToFront();
 

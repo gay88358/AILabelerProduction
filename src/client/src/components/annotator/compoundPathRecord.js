@@ -1,5 +1,6 @@
 import paper from "paper";
 
+import simplifyjs from "simplify-js";
 
 export class CompoundPathBuilder {
     constructor(onDoucleClickCallback, onClickCallback, paperObjectJson, segments, center) {
@@ -72,6 +73,46 @@ class CompoundPathRecord {
         this.compoundPath = null;
     }
 
+    updateCompoundPathChildren(compoundPath, simplifyNumber) {
+        let newChildren = this.calculateCompoundPathChildren(compoundPath, simplifyNumber);
+        compoundPath.removeChildren();
+        compoundPath.addChildren(newChildren);
+    }
+  
+    calculateCompoundPathChildren(compoundPath, simplifyNumber) {
+        let newChildren = [];
+        compoundPath.children.forEach(path => {
+          let points = [];
+          path.segments.forEach(seg => {
+            points.push({ x: seg.point.x, y: seg.point.y });
+          });
+          points = simplifyjs(points, simplifyNumber, true);
+  
+          let newPath = new paper.Path(points);
+          newPath.closePath();
+          newChildren.push(newPath);
+        });
+        return newChildren;
+    }
+  
+
+    unitCompound(newCompound, originalCompound) {
+        let result = originalCompound.unite(newCompound);
+        result.strokeColor = null;
+        result.strokeWidth = 0;
+        result.onDoubleClick = originalCompound.onDoubleClick;
+        result.onClick = originalCompound.onClick;
+        return result;
+    }
+  
+
+    removeCompoundPath(compoundPath) {
+        if (compoundPath == null) {
+          return;
+        }
+        compoundPath.remove();
+      }
+  
     setCompoundPath(compoundPath) {
         this.compoundPath = compoundPath;
     }
