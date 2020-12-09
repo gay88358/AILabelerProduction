@@ -385,9 +385,7 @@ export default {
       }
     },
     highlightColor() {
-      if (this.isNullCompoundPath()) return;
-      this.setCompoundPathOpacity(this.opacity);
-      this.setCompoundPathFillColor(this.getAnnotationColor());
+      this.compoundPathRecord.highlightColor(this.compoundPath, this.opacity, this.getAnnotationColor());
       this.keypointsRecord.setKeypointsColor(this.darkHSL);
     },
     createCompoundPathAndSetup(paperObjectJson, segments) {

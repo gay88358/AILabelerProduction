@@ -193,6 +193,17 @@ class CompoundPathRecord {
             return null;
         return segments;
     }
+
+    highlightColor(compoundPath, opacity, annotationColor) {
+        if (compoundPath == null) return;
+        this.setCompoundPathOpacity(compoundPath, opacity);
+        this.setCompoundPathFillColor(compoundPath, annotationColor);
+    }
+
+    setCompoundPathFillColor(compoundPath, newFillColor) {
+        compoundPath.fillColor = newFillColor;
+    }
+
 }
 
 export const compoundPathRecord = new CompoundPathRecord();
