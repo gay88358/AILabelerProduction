@@ -386,12 +386,6 @@ export default {
     },
     highlightColor() {
       if (this.isNullCompoundPath()) return;
-
-      if (!this.$parent.showAnnotations) {
-        this.$parent.updateAnnotationsColor();
-        return;
-      }
-
       this.setCompoundPathOpacity(this.opacity);
       this.setCompoundPathFillColor(this.getAnnotationColor());
       this.keypointsRecord.setKeypointsColor(this.darkHSL);

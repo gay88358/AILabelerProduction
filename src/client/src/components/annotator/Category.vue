@@ -445,23 +445,23 @@ export default {
       if (ref == null) return null;
       return this.$refs.annotation[index];
     },
-    highlishtAnnotations(annotations) {
-      annotations.forEach(a => a.highlightColor());
-    },
-    darkAnnotations(annotations) {
-      annotations.forEach(a => a.darkColor(this.color, this.darkHSL));
-    },
     updateAnnotationsColor() {
       let annotations = this.$refs.annotation;
       let noAnnotations = annotations == null;
       if (noAnnotations || !this.isVisible) return;
 
-      let categorySelected = this.showAnnotations;
-      if (categorySelected) {
+      let categoryIsSelected = this.showAnnotations;
+      if (categoryIsSelected) {
         this.highlishtAnnotations(annotations);
       } else {
         this.darkAnnotations(annotations);
       }
+    },
+    highlishtAnnotations(annotations) {
+      annotations.forEach(a => a.highlightColor());
+    },
+    darkAnnotations(annotations) {
+      annotations.forEach(a => a.darkColor(this.color, this.darkHSL));
     },
     annotationDeleted(index) {
       if (this.selectedAnnotation >= index) {
