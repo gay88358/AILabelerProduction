@@ -73,6 +73,26 @@ class CompoundPathRecord {
         this.compoundPath = null;
     }
 
+    setCompoundPathAnnotationAndCategoryIndex(compoundPath, annotationIndex, categoryIndex) {
+        compoundPath.data.annotationId = annotationIndex;
+        compoundPath.data.categoryId = categoryIndex;
+    }  
+
+    setCompoundPathFullySelected(compoundPath, isFullySelected) {
+        compoundPath.fullySelected = isFullySelected;
+    }
+    
+    setCompoundPathOpacity(compoundPath, newOpacity) {
+        compoundPath.opacity = newOpacity;
+    }
+  
+    copyCompoundPath(compoundPath) {
+        let result = compoundPath.clone();
+        result.fullySelected = false;
+        result.visible = false;
+        return result;
+    }
+  
     updateCompoundPathChildren(compoundPath, simplifyNumber) {
         let newChildren = this.calculateCompoundPathChildren(compoundPath, simplifyNumber);
         compoundPath.removeChildren();
@@ -80,19 +100,23 @@ class CompoundPathRecord {
     }
   
     calculateCompoundPathChildren(compoundPath, simplifyNumber) {
-        let newChildren = [];
-        compoundPath.children.forEach(path => {
-          let points = [];
-          path.segments.forEach(seg => {
-            points.push({ x: seg.point.x, y: seg.point.y });
-          });
-          points = simplifyjs(points, simplifyNumber, true);
-  
-          let newPath = new paper.Path(points);
-          newPath.closePath();
-          newChildren.push(newPath);
+        return compoundPath
+            .children
+            .map(
+                path => this._toPaperPath(path, simplifyNumber)
+            )
+    }
+
+    _toPaperPath(path, simplifyNumber) {
+        let points = [];
+        path.segments.forEach(seg => {
+          points.push({ x: seg.point.x, y: seg.point.y });
         });
-        return newChildren;
+        points = simplifyjs(points, simplifyNumber, true);
+
+        let result = new paper.Path(points);
+        result.closePath();
+        return result;
     }
   
 

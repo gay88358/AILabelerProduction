@@ -435,7 +435,7 @@ export default {
      * Creates paperjs group
      */
     initCategory() {
-      this.setColor();
+      this.updateAnnotationsColor();
     },
     /**
      * @returns {Annotation} returns annotation and provided index
@@ -445,30 +445,22 @@ export default {
       if (ref == null) return null;
       return this.$refs.annotation[index];
     },
-    /**
-     * Sets color of current group depending on state.
-     * Show annotation colors if showAnnotations is true,
-     * Show as group color if showAnnotations is false
-     */
-    setColor() {
+    highlishtAnnotations(annotations) {
+      annotations.forEach(a => a.highlightColor());
+    },
+    darkAnnotations(annotations) {
+      annotations.forEach(a => a.darkColor(this.color, this.darkHSL));
+    },
+    updateAnnotationsColor() {
       let annotations = this.$refs.annotation;
-      if (annotations == null) return;
-      if (!this.isVisible) return;
+      let noAnnotations = annotations == null;
+      if (noAnnotations || !this.isVisible) return;
 
-      if (this.showAnnotations) {
-        annotations.forEach(a => a.setColor());
+      let categorySelected = this.showAnnotations;
+      if (categorySelected) {
+        this.highlishtAnnotations(annotations);
       } else {
-        annotations.forEach(a => {
-          if (a) {
-            if (a.compoundPath) {
-              a.setCompoundPathFillColor(this.color);
-            }
-            if (a.getKeypoints()) {
-              a.setKeypointsColor(this.darkHSL);
-              a.bringKeypointsToFront();
-            }
-          }
-        });
+        this.darkAnnotations(annotations);
       }
     },
     annotationDeleted(index) {
@@ -536,7 +528,7 @@ export default {
   },
   watch: {
     color() {
-      this.setColor();
+      this.updateAnnotationsColor();
     },
     opacity() {
       let annotations = this.$refs.annotation;
@@ -554,7 +546,7 @@ export default {
         a.setKeypointsVisible(newVisible);
         a.setVisible(newVisible);
       });
-      this.setColor();
+      this.updateAnnotationsColor();
     },
     showAnnotations(showing) {
       if (!showing) {
@@ -564,7 +556,7 @@ export default {
           category: this.index
         });
       }
-      this.setColor();
+      this.updateAnnotationsColor();
     },
     category() {
       this.initCategory();
