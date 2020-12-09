@@ -687,6 +687,10 @@ export default {
     setCompoundPath(newCompoundPath) {
       this.compoundPath = newCompoundPath;
     },
+    cleanAndSetCompoundPath(newCompound) {
+      this.removeCompoundPath();
+      this.setCompoundPath(newCompound);
+    },
     setNullCompoundPath() {
       this.compoundPath = null;
     },
@@ -713,8 +717,8 @@ export default {
     },
     undoCompound() {
       if (this.pervious.length == 0) return;
-      this.removeCompoundPath();;
-      this.setCompoundPath(this.pervious.pop());
+
+      this.cleanAndSetCompoundPath(this.pervious.pop());
       this.setCompoundPathFullySelected(this.isCurrent);
     },
     /**
@@ -731,9 +735,9 @@ export default {
       let newCompound = this.compoundPathRecord.unitCompound(compound, this.getCompoundPath());
       this.setAnnotationIsBBox(isBBox);
       if (undoable) this.createUndoAction("Unite");
-      this.removeCompoundPath();
-      this.setCompoundPath(newCompound);
 
+      this.cleanAndSetCompoundPath(newCompound);
+      
       this.keypointsRecord.bringKeypointsToFront();
       if (simplify) this.simplifyPath();
     },
@@ -779,8 +783,8 @@ export default {
       newCompound.onDoubleClick = this.compoundPath.onDoubleClick;
       if (undoable) this.createUndoAction("Subtract");
 
-      this.removeCompoundPath();
-      this.setCompoundPath(newCompound);
+      
+      this.cleanAndSetCompoundPath(newCompound);
       this.keypointsRecord.bringKeypointsToFront();
 
       if (simplify) this.simplifyPath();
