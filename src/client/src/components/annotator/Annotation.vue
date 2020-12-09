@@ -700,8 +700,8 @@ export default {
     setNullCompoundPath() {
       this.compoundPath = null;
     },
-    createUndoAction(actionName) {
-      let copy = this.compoundPathRecord.copyCompoundPath(this.getCompoundPath());
+    createUndoAction(actionName, compoundPath) {
+      let copy = this.compoundPathRecord.copyCompoundPath(compoundPath);
 
       this.pervious.push(copy);
 
@@ -734,7 +734,7 @@ export default {
 
       let newCompound = this.compoundPathRecord.unitCompound(compound, this.getCompoundPath());
       this.setAnnotationIsBBox(isBBox);
-      if (undoable) this.createUndoAction("Unite");
+      if (undoable) this.createUndoAction("Unite", this.compoundPath);
 
       this.cleanAndSetCompoundPath(newCompound);
       
@@ -782,7 +782,7 @@ export default {
       
       let newCompound = this.compoundPath.subtract(compound);
       newCompound.onDoubleClick = this.compoundPath.onDoubleClick;
-      if (undoable) this.createUndoAction("Subtract");
+      if (undoable) this.createUndoAction("Subtract", this.compoundPath);
 
       
       this.cleanAndSetCompoundPath(newCompound);
