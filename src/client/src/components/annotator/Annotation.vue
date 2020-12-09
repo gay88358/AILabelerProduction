@@ -229,6 +229,7 @@ import UndoAction from "@/undo";
 import TagsInput from "@/components/TagsInput";
 import Metadata from "@/components/Metadata";
 import { CompoundPathBuilder, compoundPathRecord } from './compoundPathRecord';
+import { singleAnnotationRecord } from './singleAnnotationRecord';
 
 let $ = JQuery;
 
@@ -298,6 +299,7 @@ export default {
   },
   data() {
     return {
+      singleAnnotationRecord: singleAnnotationRecord,
       keypointsRecord: keypointsRecord,
       isVisible: true,
       showKeypoints: false,
@@ -562,42 +564,40 @@ export default {
       this.tagRecomputeCounter++;
     },
     getAnnotationCreator() {
-      return this.annotation.creator;
+      return this.singleAnnotationRecord.getAnnotationCreator(this.annotation);
     },
     getAnnotationId() {
-      return this.annotation.id;
+      return this.singleAnnotationRecord.getAnnotationId(this.annotation);
     },
     getAnnotationWidth() {
-      return this.annotation.width;
+      return this.singleAnnotationRecord.getAnnotationWidth(this.annotation);
     },
     getAnnotationHeight() {
-      return this.annotation.height;
+      return this.singleAnnotationRecord.getAnnotationHeight(this.annotation);
     },
     setAnnotationIsBBox(isBBox) {
-      this.annotation.isbbox = isBBox;
+      this.singleAnnotationRecord.setAnnotationIsBBox(isBBox);
     },
     getAnnotationIsBBox() {
-      return this.annotation.isbbox;
+      return this.singleAnnotationRecord.getAnnotationIsBBox();
     },
     getAnnotationPaperObject() {
-      return this.annotation.paper_object;
+      return this.singleAnnotationRecord.getAnnotationPaperObject();
     },
     setAnnotationPaperObject(paper_object) {
-      // given annotation's point & segments data
-      // so that the annotation can be displayed on the canvas
-      this.annotation.paper_objec = paper_object;
+      this.singleAnnotationRecord.setAnnotationPaperObject(paper_object);
     },
     getAnnotation() {
       return this.annotation;
     },
     getAnnotationKeypoints() {
-      return this.annotation.keypoints;
+      return this.singleAnnotationRecord.getAnnotationKeypoints();
     },
     getAnnotationSegmentation() {
-      return this.annotation.segmentation;
+      return this.singleAnnotationRecord.getAnnotationSegmentation();
     },
     getAnnotationColor() {
-      return this.annotation.color;
+      return this.singleAnnotationRecord.getAnnotationColor();
     },
     getCompoundPath() {
       if (this.isNullCompoundPath()) {
@@ -724,7 +724,7 @@ export default {
     },
     /**
      * Unites current annotation path with anyother path.
-     * @param {paper.CompoundPath} compound compound to unite current annotation path with
+     * @param {paper.CompoundPath} compound compound with whoch the current annotation path unite
      * @param {boolean} simplify simplify compound after unite
      * @param {undoable} undoable add an undo action.
      * @param {isBBox} isBBox mark annotation as bbox.
@@ -734,8 +734,9 @@ export default {
 
       let originalCompoundPath = this.getCompoundPath();
       let newCompound = this.compoundPathRecord.unitCompound(compound, originalCompoundPath);
-      this.setAnnotationIsBBox(isBBox);
       this.cleanAndSetCompoundPath(newCompound);
+      
+      this.setAnnotationIsBBox(isBBox);
       
       this.keypointsRecord.bringKeypointsToFront();
       if (simplify) this.simplifyPath();
@@ -758,9 +759,9 @@ export default {
 
       this.setCompoundPathFullySelected(this.isCurrent);
       this.keypointsRecord.bringKeypointsToFront();
-      this.emitModify();
+      this.emitAnnotationModified();
     },
-    emitModify() {  
+    emitAnnotationModified() {  
       this.setAnnotationPaperObject(
         this.exportCompoundPathJson()
       );
