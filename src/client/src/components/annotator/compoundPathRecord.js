@@ -79,6 +79,9 @@ class CompoundPathRecord {
     }  
 
     setCompoundPathFullySelected(compoundPath, isFullySelected) {
+        // select the compound path, so we can see its handles
+        // isFullySelected: true => display handles on the path
+        // false => remove handles on the path
         compoundPath.fullySelected = isFullySelected;
     }
     
@@ -159,6 +162,7 @@ class CompoundPathRecord {
           let point = new paper.Point(x, y);
           result.add(point.subtract(center));
         }
+        // closePath connects the first and last segments
         result.closePath();
         return result;
     }

@@ -45,6 +45,7 @@ export default class KeypointsRecord {
     }
   
     bringKeypointsToFront() {
+        console.log(`keypoint size${this.getKeypoints().length}`);
         this.getKeypoints().bringToFront();
     }
 

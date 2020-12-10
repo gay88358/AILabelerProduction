@@ -400,7 +400,7 @@ export default {
       )
       .withAnnotationIndex(this.index)
       .withCategoryIndex(this.categoryIndex)
-      .withFullySelected(this.isCurrent)
+      .withFullySelected(this.isAnnotationSelected)
       .withOpacity(this.opacity)
       .build()
     },
@@ -434,10 +434,13 @@ export default {
     setCompoundPathOpacity(newOpacity) {
       this.compoundPathRecord.setCompoundPathOpacity(this.compoundPath, newOpacity);
     },
-    createKeypointsAndSetup(categoryName, annotationId) {
-      let keypoints = this.createKeypoints(categoryName, annotationId);
+    createKeypointsAndSetup(annotationId) {
+      let keypoints = this.createKeypoints(this.getCategoryName(), annotationId);
       this.keypointsRecord.setKeypoints(keypoints);
       // this.addAnnotationKeypointsToCanvas();
+    },
+    getCategoryName() {
+      return this.$parent.category.name;
     },
     createKeypoints(categoryName, annotationId) {
       let keypoints = new Keypoints(this.keypointEdges, this.keypointLabels,
@@ -576,28 +579,28 @@ export default {
       return this.singleAnnotationRecord.getAnnotationHeight(this.annotation);
     },
     setAnnotationIsBBox(isBBox) {
-      this.singleAnnotationRecord.setAnnotationIsBBox(isBBox);
+      this.singleAnnotationRecord.setAnnotationIsBBox(this.annotation, isBBox);
     },
     getAnnotationIsBBox() {
-      return this.singleAnnotationRecord.getAnnotationIsBBox();
+      return this.singleAnnotationRecord.getAnnotationIsBBox(this.annotation);
     },
     getAnnotationPaperObject() {
-      return this.singleAnnotationRecord.getAnnotationPaperObject();
+      return this.singleAnnotationRecord.getAnnotationPaperObject(this.annotation);
     },
     setAnnotationPaperObject(paper_object) {
-      this.singleAnnotationRecord.setAnnotationPaperObject(paper_object);
+      this.singleAnnotationRecord.setAnnotationPaperObject(this.annotation, paper_object);
     },
     getAnnotation() {
       return this.annotation;
     },
     getAnnotationKeypoints() {
-      return this.singleAnnotationRecord.getAnnotationKeypoints();
+      return this.singleAnnotationRecord.getAnnotationKeypoints(this.annotation);
     },
     getAnnotationSegmentation() {
-      return this.singleAnnotationRecord.getAnnotationSegmentation();
+      return this.singleAnnotationRecord.getAnnotationSegmentation(this.annotation);
     },
     getAnnotationColor() {
-      return this.singleAnnotationRecord.getAnnotationColor();
+      return singleAnnotationRecord.getAnnotationColor(this.annotation);
     },
     getCompoundPath() {
       if (this.isNullCompoundPath()) {
@@ -720,7 +723,7 @@ export default {
       if (this.pervious.length == 0) return;
 
       this.cleanAndSetCompoundPath(this.pervious.pop());
-      this.setCompoundPathFullySelected(this.isCurrent);
+      this.setCompoundPathFullySelected(this.isAnnotationSelected);
     },
     /**
      * Unites current annotation path with anyother path.
@@ -733,6 +736,7 @@ export default {
       if (this.isNullCompoundPath()) this.clearCavasAndCreateCompoundPath();
 
       let originalCompoundPath = this.getCompoundPath();
+
       let newCompound = this.compoundPathRecord.unitCompound(compound, originalCompoundPath);
       this.cleanAndSetCompoundPath(newCompound);
       
@@ -757,7 +761,7 @@ export default {
       
       this.compoundPathRecord.updateCompoundPathChildren(this.compoundPath, this.simplify);
 
-      this.setCompoundPathFullySelected(this.isCurrent);
+      this.setCompoundPathFullySelected(this.isAnnotationSelected);
       this.keypointsRecord.bringKeypointsToFront();
       this.emitAnnotationModified();
     },
@@ -836,7 +840,7 @@ export default {
       this.simplifyPath();
       this.setCompoundPathFullySelected(false);
       let json = this.exportCompoundPathJson();
-      this.setCompoundPathFullySelected(this.isCurrent);
+      this.setCompoundPathFullySelected(this.isAnnotationSelected);
 
       let paperObjectUpdated = this.getAnnotationPaperObject() !== json;
       if (paperObjectUpdated) {
@@ -898,7 +902,7 @@ export default {
       if (this.activeTool === "Select") {
         activeIndex = this.keypoint.tag;
       }
-      if (this.isCurrent && activeIndex == index + 1) return "rgb(30, 86, 36)";
+      if (this.isAnnotationSelected && activeIndex == index + 1) return "rgb(30, 86, 36)";
 
       return "#383c4a";
     }
@@ -914,7 +918,7 @@ export default {
       }
     },
     activeTool(tool) {
-      if (this.isCurrent) {
+      if (this.isAnnotationSelected) {
         this.session.tools.push(tool);
       
         if (tool === "Keypoints") {
@@ -967,7 +971,7 @@ export default {
     annotation() {
       this.initAnnotation();
     },
-    isCurrent(current, wasCurrent) {
+    isAnnotationSelected(current, wasCurrent) {
       if (current) {
         // Start new session
         this.session.start = Date.now();
@@ -982,7 +986,7 @@ export default {
       }
 
       if (this.isNullCompoundPath()) return;
-      this.setCompoundPathFullySelected(this.isCurrent);
+      this.setCompoundPathFullySelected(this.isAnnotationSelected);
     },
     currentKeypoint(point, old) {
       if (old) old.selected = false;
@@ -1026,8 +1030,10 @@ export default {
     categoryIndex() {
       return this.$parent.index;
     },
-    isCurrent() {
-      if (this.index === this.current && this.$parent.isCurrent) {
+    isAnnotationSelected() {
+      let isSelected = this.index === this.current;
+      let isParentCategorySelected = this.$parent.isCurrent;
+      if (isSelected && isParentCategorySelected) {
         if (this.isKeypointsNotNull()) this.keypointsRecord.bringKeypointsToFront();
         return true;
       }
@@ -1062,7 +1068,7 @@ export default {
     backgroundColor() {
       if (this.isHover && this.$parent.isHover) return "#646c82";
 
-      if (this.isCurrent) return "#4b624c";
+      if (this.isAnnotationSelected) return "#4b624c";
 
       return "inherit";
     },
@@ -1115,6 +1121,8 @@ export default {
     }
   },
   mounted() {
+    //let a = new paper.CompoundPath();
+    
     this.initAnnotation();
     $(`#keypointSettings${this.getAnnotationId()}`).on("hidden.bs.modal", () => {
       this.currentKeypoint = null;

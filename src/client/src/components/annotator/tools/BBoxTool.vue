@@ -1,12 +1,12 @@
 <script>
 import paper from "paper";
 import tool from "@/mixins/toolBar/tool";
-import UndoAction from "@/undo";
 
 import { invertColor } from "@/libs/colors";
 import { BBox } from "@/libs/bbox";
 import { mapMutations } from "vuex";
 import {  polygonRecord } from "./polygonRecord";
+import { CompoundPathBuilder, compoundPathRecord } from '../compoundPathRecord';
 
 export default {
   name: "BBoxTool",
@@ -145,7 +145,7 @@ export default {
     createBBox(point) {
       this.setPolygonPath(this.createPaperPath());
       this.bbox = new BBox(point);
-      this.addPointsToPolygonPath();
+      this.addBBoxPointsToPolygonPath();
     },
     /**
      * Closes current polygon and unites it with current annotaiton.
@@ -159,12 +159,38 @@ export default {
         throw new Error("Check can add bbox to annotation before add bbox to annotation");
 
       this.addAnnotation(this.getPolygonPath());
+      this.removeData();
+    },
+    removeData() {
       this.removePolygon();
       this.removeColor();
       this.removeUndos(this.actionTypes.ADD_POINTS);
     },
-    addAnnotation(path) {
+    addAnnotation(path) {   
       this.$parent.uniteCurrentAnnotation(path, true, true, true);
+    },
+    createExampleCompoundPath(path) {
+      let initialCompoundPath = new CompoundPathBuilder(
+        null,
+        null,        
+        null, 
+        null,
+        new paper.Point(1202 / 2, 1208 / 2)
+      )
+      .withAnnotationIndex(-1)
+      .withCategoryIndex(-1)
+      .withFullySelected(true)
+      .withOpacity(true)
+      .build()
+
+      let pathItem = compoundPathRecord.unitCompound(
+        new paper.CompoundPath(path), 
+        initialCompoundPath
+      );
+
+      let result = new paper.CompoundPath(pathItem);
+      result.fillColor = "red";
+      return result;
     },
     createExamplePath() {
       // encapsulate paper path creation details,
@@ -178,6 +204,7 @@ export default {
       result.applyMatrix = true;
       result.strokeColor = [0, 0, 0];
       result.strokeWidth = 4.89697;
+      result.closed = true;
       return result;
     },
     removeColor() {
@@ -217,7 +244,7 @@ export default {
     modifyBBox(event) {
       this.setPolygonPath(this.createPaperPath());
       this.changePointsOfBBox(event);
-      this.addPointsToPolygonPath();
+      this.addBBoxPointsToPolygonPath();
     },
     createPaperPath() {
       return new paper.Path(this.getPolygonPathOptions());
@@ -225,7 +252,7 @@ export default {
     changePointsOfBBox(event) {
       this.bbox.modifyPoint(event.point);
     },
-    addPointsToPolygonPath() {
+    addBBoxPointsToPolygonPath() {
       this.bbox.addPointsTo(this.getPolygonPath());
     },
     /**
