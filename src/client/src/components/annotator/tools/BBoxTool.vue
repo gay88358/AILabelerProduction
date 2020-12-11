@@ -166,7 +166,7 @@ export default {
       this.removeColor();
       this.removeUndos(this.actionTypes.ADD_POINTS);
     },
-    addAnnotation(path) {   
+    addAnnotation(path) {
       this.$parent.uniteCurrentAnnotation(path, true, true, true);
     },
     createExampleCompoundPath(path) {
@@ -187,7 +187,6 @@ export default {
         new paper.CompoundPath(path), 
         initialCompoundPath
       );
-
       let result = new paper.CompoundPath(pathItem);
       result.fillColor = "red";
       return result;
