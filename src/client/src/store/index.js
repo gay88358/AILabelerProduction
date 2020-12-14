@@ -5,6 +5,7 @@ import user from "./user";
 import info from "./info";
 import datasetsData from "./datasets";
 import annotator from "./annotator";
+import currentInfo from "./currentInfo";
 
 Vue.use(Vuex);
 
@@ -13,7 +14,8 @@ export default new Vuex.Store({
     user,
     info,
     datasetsData,
-    annotator
+    annotator,
+    currentInfo
   },
   state: {
     process: [],

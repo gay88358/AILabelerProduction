@@ -204,6 +204,7 @@ export default {
     ...mapMutations(["addProcess", "removeProcess"]),
     onImageClick() {
       let identifier = this.dataset.id;
+      this.$store.dispatch('updateCurrentDatasetId', this.dataset.id);
       this.$router.push({ name: "dataset", params: { identifier } });
     },
     onShare() {

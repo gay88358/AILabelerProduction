@@ -116,6 +116,7 @@ export default {
       link.remove();
     },
     openAnnotator() {
+      this.$store.dispatch('updateCurrentImageId', this.image.id);
       this.$router.push({
         name: "annotate",
         params: { identifier: this.image.id }

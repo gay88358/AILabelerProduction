@@ -417,6 +417,8 @@ export default {
      * Event Handler for category click
      */
     displayAnnotation() {
+      this.$store.dispatch('updateCurrentCategoryId', this.category.id);
+
       let indices = {
         annotation: this.selectedAnnotation,
         category: this.index,

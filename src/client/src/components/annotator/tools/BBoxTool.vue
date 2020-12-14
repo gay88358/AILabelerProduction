@@ -7,6 +7,7 @@ import { BBox } from "@/libs/bbox";
 import { mapMutations } from "vuex";
 import {  polygonRecord } from "./polygonRecord";
 import { CompoundPathBuilder, compoundPathRecord } from '../compoundPathRecord';
+import { annotationMapper } from '../annotationMapper';
 
 export default {
   name: "BBoxTool",
@@ -166,7 +167,16 @@ export default {
       this.removeColor();
       this.removeUndos(this.actionTypes.ADD_POINTS);
     },
+    mapAnnotationFrom(compoundPath) {
+      return annotationMapper.mapAnnotationFrom(compoundPath, this.$store);
+    },
     addAnnotation(path) {
+      // let annotation = annotationMapper.createAnnotation(this.createExampleCompoundPath(), this.$store);
+      // console.log(annotation);
+  
+      let compound = this.createExampleCompoundPath(this.createExamplePath());
+      let annotation = this.mapAnnotationFrom(compound);
+      
       this.$parent.uniteCurrentAnnotation(path, true, true, true);
     },
     createExampleCompoundPath(path) {
