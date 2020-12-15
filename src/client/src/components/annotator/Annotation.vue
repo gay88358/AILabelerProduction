@@ -391,6 +391,8 @@ export default {
       this.keypointsRecord.setKeypointsColor(this.darkHSL);
     },
     createCompoundPathAndSetup(paperObjectJson, segments) {
+
+      
       this.compoundPath = new CompoundPathBuilder(        
         this.displayAnnotationSettingCallback(this.getAnnotationId()), 
         this.highlightAnnotationCallback(this.index),

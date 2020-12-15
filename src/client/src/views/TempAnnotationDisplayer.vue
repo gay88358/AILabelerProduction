@@ -4,7 +4,7 @@
         <div class="col-sm">
           <label>Temp Annotation</label>
           <div v-for="(annotation) in getTempAnnotations" :key="annotation.id">
-            <input type="checkbox" v-model="addedAnnotations" value="annotation.id"/>
+            <input type="checkbox" v-model="addedAnnotationIdList" :value="annotation.id"/>
             <label>{{ annotation.id }}</label>
           </div>
         </div>
@@ -24,12 +24,13 @@ export default {
   name: "TempAnnotationDisplayer",
   data() {
       return {
-        addedAnnotations: []
+        addedAnnotationIdList: []
       }
   },
   methods: {
     saveAddedAnnotation() {
-      this.$store.dispatch('saveTempAnnotations');
+      console.log(this.addedAnnotationIdList);
+      this.$store.dispatch('saveTempAnnotations', this.addedAnnotationIdList);
     }
   },
   computed: {

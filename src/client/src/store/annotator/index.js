@@ -82,10 +82,18 @@ const mutations = {
     },
     ADD_TEMP_ANNOTATION(state, tempAnnotation) {
         state.tempAnnotations.push(tempAnnotation);
-        // state.annotatorData.addAnnotation(tempAnnotation);
     },
-    SAVE_TEMP_ANNOTATIONS(state) {
-        state.tempAnnotations.forEach(ta => state.annotatorData.addAnnotation(ta));
+    SAVE_TEMP_ANNOTATIONS(state, addedAnnotationIdList) {
+        let addedTempAnnotations = state.tempAnnotations
+            .filter(ta => addedAnnotationIdList.includes(ta.id));
+        
+        if (addedTempAnnotations.length !== 2) {
+            throw new Error('FUUUUUCK');
+        }
+        
+        addedTempAnnotations
+            .forEach(ta => state.annotatorData.addAnnotation(ta));
+
         state.tempAnnotations = [];
     }
 }
@@ -122,8 +130,8 @@ const actions = {
     addTempAnnotation({ commit }, tempAnnotation) {
         commit('ADD_TEMP_ANNOTATION', tempAnnotation);
     },
-    saveTempAnnotations({ commit }) {
-        commit('SAVE_TEMP_ANNOTATIONS');
+    saveTempAnnotations({ commit }, addedAnnotationIdList) {
+        commit('SAVE_TEMP_ANNOTATIONS', addedAnnotationIdList);
     }
 }
 
