@@ -2,6 +2,7 @@
 import { CompoundPathBuilder, compoundPathRecord } from './compoundPathRecord';
 
 class AnnotationMapper {
+    static annotationIdCounter = 0;
 
     createAnnotation(path, store) {
         let compoundPath = this.createCompoundPath(path);
@@ -33,6 +34,7 @@ class AnnotationMapper {
     
     mapAnnotationFrom(compoundPath, store) {
         let result = {}
+        AnnotationMapper.annotationIdCounter += 1;
         this.appendBoxArea(result); // ok
         this.appendIdentity(result, store);
         this.appendDataPoints(result, compoundPath); // ok
@@ -49,12 +51,12 @@ class AnnotationMapper {
     appendIdentity(result, store) {      
         result['category_id'] = store.getters.getCurrentCategoryId; // current category_id
         result['dataset_id'] = store.getters.getCurrentDatasetId;
-        result['id'] = 0 // generate from database
+        result['id'] = AnnotationMapper.annotationIdCounter // generate from database
         result['image_id'] = store.getters.getCurrentImageId;
     }
 
     appendDataPoints(result, compoundPath) {
-        result['paper_object'] = compoundPath;
+        result['paper_object'] = ["CompoundPath", compoundPath];
         result['segmentation'] = [];
         result['keypoints'] = [];
     }

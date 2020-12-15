@@ -16,6 +16,11 @@ class Annotator {
         this.VIM_300_CODE = "Vim300_Code";
     }
 
+    addAnnotation(annotation) {
+        // only for experiment 
+        this.annotatorData[0].annotations.push(annotation);
+    }
+
     setSelectedAnnotationAndCategory(categoryId, annotationId) {
         this.currentAnnotationData = this.findAnnotation(categoryId, annotationId);
         this.currentCategoryName = this.getCategoryName(categoryId);

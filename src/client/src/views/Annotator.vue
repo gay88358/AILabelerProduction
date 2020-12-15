@@ -150,10 +150,8 @@
         </div>
       </div>
 
+     <TempAnnotationDisplayer></TempAnnotationDisplayer> 
      <MetadataDisplayer></MetadataDisplayer> 
-
-      
-
 
       <div v-show="mode == 'segment'">
         <hr />
@@ -224,6 +222,8 @@ import axios from "axios";
 import toastrs from "@/mixins/toastrs";
 import shortcuts from "@/mixins/shortcuts";
 import MetadataDisplayer from "@/views/MetadataDisplayer";
+import TempAnnotationDisplayer from "./TempAnnotationDisplayer";
+
 import FileTitle from "@/components/annotator/FileTitle";
 import Category from "@/components/annotator/Category";
 import Label from "@/components/annotator/Label";
@@ -295,7 +295,8 @@ export default {
     AnnotateButton,
     DEXTRTool,
     DEXTRPanel,
-    MetadataDisplayer
+    MetadataDisplayer,
+    TempAnnotationDisplayer
   },
   mixins: [toastrs, shortcuts],
   props: {

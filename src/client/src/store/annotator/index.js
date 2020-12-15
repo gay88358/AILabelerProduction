@@ -1,7 +1,6 @@
 import Annotator from './annotatorObject';
 import axios from "axios";
 
-
 class DefectCodeCatalog {
     constructor(defectCodeCatalogDocument) {
         this.defectCodeCatalogDocument = defectCodeCatalogDocument
@@ -56,6 +55,7 @@ const state = {
     annotatorData: new NullAnnotator(),
     selectedCategoryName: "",
     defectCodeCatalog: [],
+    tempAnnotations: []
 }
 
 const mutations = {
@@ -79,6 +79,14 @@ const mutations = {
     },
     CLEAR_ANNOTATOR_DATA(state) {
         state.annotatorData = new NullAnnotator();
+    },
+    ADD_TEMP_ANNOTATION(state, tempAnnotation) {
+        state.tempAnnotations.push(tempAnnotation);
+        // state.annotatorData.addAnnotation(tempAnnotation);
+    },
+    SAVE_TEMP_ANNOTATIONS(state) {
+        state.tempAnnotations.forEach(ta => state.annotatorData.addAnnotation(ta));
+        state.tempAnnotations = [];
     }
 }
 
@@ -110,9 +118,14 @@ const actions = {
     },
     clearAnnotatorData({ commit }) {
         commit('CLEAR_ANNOTATOR_DATA');
+    },
+    addTempAnnotation({ commit }, tempAnnotation) {
+        commit('ADD_TEMP_ANNOTATION', tempAnnotation);
+    },
+    saveTempAnnotations({ commit }) {
+        commit('SAVE_TEMP_ANNOTATIONS');
     }
 }
-
 
 const getters = {
     getDefectCodeOfSelectedAnnotation: state => {
@@ -133,7 +146,9 @@ const getters = {
     getDefectCodeList: (state) => (categoryName) => {
         return new DefectCodeCatalog(state.defectCodeCatalog)
         .getDefectCodeListBy(categoryName)
-    }
+    },
+    containsTempAnnotation: (state) => state.tempAnnotations.length > 0,
+    getTempAnnotations:(state) => state.tempAnnotations
 }
 
 const annotatorDataModule = {
