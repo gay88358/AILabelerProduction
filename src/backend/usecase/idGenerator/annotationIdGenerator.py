@@ -14,6 +14,11 @@ class AnnotationIdGenerator:
         increment_size = self.cache_size + 1
         self.mongo_counters.increment_annotation_model_id(increment_size, versionId)
 
+
+class ConcurrencyReadException(ValueError):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)
+
 class MongoengineCounters:
     def __init__(self, mongo_factory):
         self.mongo_factory = mongo_factory
@@ -24,7 +29,11 @@ class MongoengineCounters:
         return result['next']
 
     def increment_annotation_model_id(self, increment_size, versionId):
-        self._collection().update_one({'_id': "annotation_model.id", 'next': versionId}, {'$inc': {'next': increment_size }})
+        result = self._collection().update_one({'_id': "annotation_model.id", 'next': versionId}, {'$inc': {'next': increment_size }})
+        print(result.matched_count)
+        concurrency_read = result.matched_count == 0
+        if concurrency_read:
+            raise ConcurrencyReadException('Two user attempt to update annotationId simultaneously, conflict happened')
 
     def update_annotation_model_id(self, id):
         self._collection().update_one({'_id': "annotation_model.id"}, {'$set': {'next': id }})
@@ -68,4 +77,4 @@ class MongoClientFactory:
                 return i
         raise ValueError('Given delimiter:{} is not found in the given host_url', delimiter)
     
-__all__ = ['AnnotationIdGenerator', 'MongoengineCounters', 'MongoClientFactory']
+__all__ = ['AnnotationIdGenerator', 'MongoengineCounters', 'MongoClientFactory', 'ConcurrencyReadException']
