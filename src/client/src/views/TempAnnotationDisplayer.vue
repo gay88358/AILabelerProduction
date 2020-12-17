@@ -29,7 +29,6 @@ export default {
   },
   methods: {
     saveAddedAnnotation() {
-      console.log(this.addedAnnotationIdList);
       this.$store.dispatch('saveTempAnnotations', this.addedAnnotationIdList);
     }
   },

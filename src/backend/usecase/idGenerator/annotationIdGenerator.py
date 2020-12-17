@@ -7,12 +7,12 @@ class AnnotationIdGenerator:
     
     def get_key_range(self):
         current_key = self.mongo_counters.find_current_annotation_model_id()
-        self.update_current_key_with_cache_size()
+        self.update_current_key_with_cache_size(current_key)
         return [current_key, current_key + self.cache_size]
 
-    def update_current_key_with_cache_size(self):
+    def update_current_key_with_cache_size(self, versionId):
         increment_size = self.cache_size + 1
-        self.mongo_counters.increment_annotation_model_id(increment_size)
+        self.mongo_counters.increment_annotation_model_id(increment_size, versionId)
 
 class MongoengineCounters:
     def __init__(self, mongo_factory):
@@ -23,8 +23,8 @@ class MongoengineCounters:
         result = self._collection().find_one({'_id': "annotation_model.id"})
         return result['next']
 
-    def increment_annotation_model_id(self, increment_size):
-        self._collection().update_one({'_id': "annotation_model.id"}, {'$inc': {'next': increment_size }})
+    def increment_annotation_model_id(self, increment_size, versionId):
+        self._collection().update_one({'_id': "annotation_model.id", 'next': versionId}, {'$inc': {'next': increment_size }})
 
     def update_annotation_model_id(self, id):
         self._collection().update_one({'_id': "annotation_model.id"}, {'$set': {'next': id }})
@@ -41,7 +41,6 @@ class MongoengineCounters:
 
     def _db(self):
         return self.mongo_factory.create_mongo_db_object()
-
 
 class MongoClientFactory:
     def __init__(self, mongo_host):

@@ -1,8 +1,42 @@
 
 import { CompoundPathBuilder, compoundPathRecord } from './compoundPathRecord';
+import axios from "axios";
+
+
+class AnnotationIdGateway {
+    constructor() {
+        this.currentId = -1;
+        this.maxId = -1;
+    }
+
+    async nextId() {
+        let currentIdInitialized = this.currentId != -1
+        let currentIdLessThanCache = this.currentId < this.maxId;
+        if (!currentIdInitialized || !currentIdLessThanCache) {
+            await this.resolveId();
+        }
+        this.currentId += 1;
+        return this.currentId;
+    }
+
+    async resolveId() {
+        let response = await this.fetchIdRange();
+        let range = response.data;
+        this.currentId = range[0];
+        this.maxId = range[1];
+    }
+
+    async fetchIdRange() {
+        let url = "/api/labelme/annotationIdentity";
+        return axios.get(url);
+    }
+}
+
 
 class AnnotationMapper {
-    static annotationIdCounter = 0;
+    constructor() {
+        this.idGateway = new AnnotationIdGateway()
+    }
 
     createAnnotation(path, store) {
         let compoundPath = this.createCompoundPath(path);
@@ -32,11 +66,10 @@ class AnnotationMapper {
         return result;
     }
     
-    mapAnnotationFrom(compoundPath, store) {
+    async mapAnnotationFrom(compoundPath, store) {
         let result = {}
-        AnnotationMapper.annotationIdCounter += 1;
         this.appendBoxArea(result); // ok
-        this.appendIdentity(result, store);
+        await this.appendIdentity(result, store);
         this.appendDataPoints(result, compoundPath); // ok
         this.appendImageSize(result); 
         this.appendOtherData(result); // ok
@@ -48,10 +81,11 @@ class AnnotationMapper {
         result['bbox'] = [0, 0, 0, 0] // polygon path four points
     }
     
-    appendIdentity(result, store) {      
+    async appendIdentity(result, store) {      
         result['category_id'] = store.getters.getCurrentCategoryId; // current category_id
         result['dataset_id'] = store.getters.getCurrentDatasetId;
-        result['id'] = AnnotationMapper.annotationIdCounter // generate from database
+        let annotationId = await this.idGateway.nextId();
+        result['id'] = annotationId // generate from database
         result['image_id'] = store.getters.getCurrentImageId;
     }
 

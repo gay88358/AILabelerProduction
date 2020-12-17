@@ -1,5 +1,4 @@
 import pytest
-from pymongo import MongoClient 
 from usecase.idGenerator.annotationIdGenerator import *
     
 @pytest.fixture()

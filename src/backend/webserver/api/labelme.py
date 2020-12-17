@@ -1,4 +1,5 @@
 
+from config.config import Config
 from usecase.importLabelme.datasetRepository import DatasetRepository
 from flask_restplus import Namespace, Resource, reqparse
 from flask_login import current_user
@@ -10,7 +11,7 @@ from usecase.importLabelme.scanningImagesAndJsonUsecase import ScanningImagesAnd
 from usecase.importLabelme.addSharedFolderUsecase import AddSharedFolderUsecase
 from usecase.importLabelme.loadDefectCode.defectCodeParser import DefectCodeLoader
 from usecase.user.createUserUsecase import CreateUserUsecase
-
+from usecase.idGenerator.annotationIdGenerator import *
 from .userInfo import *
 from .common.response import *
 from .common.logger import *
@@ -53,13 +54,12 @@ class Labelme(Resource):
 @api.route('/annotationIdentity')
 class AnnotationIdentitySet(Resource):
     def get(self):
-        from pymongo import MongoClient
-        
         get_logger().info("Fetch annotation identity")
-        start = 0
-        end = 333
-        return [start, end]
-
+        factory = MongoClientFactory(Config.MONGODB_HOST)
+        mongo_counters = MongoengineCounters(factory)
+        cache_size = 40
+        id_generator = AnnotationIdGenerator(cache_size, mongo_counters)
+        return id_generator.get_key_range()
 
 @api.route('/defect_code')
 class DefectCode(Resource):

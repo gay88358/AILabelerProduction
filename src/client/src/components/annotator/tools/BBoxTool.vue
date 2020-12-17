@@ -128,7 +128,7 @@ export default {
     removePolygon() {
       this.polygonR.removePolygonPath();
     },
-    onMouseDown(event) {   
+    async onMouseDown(event) {   
       if (this.isNullPolygonPath() && this.$parent.checkAnnotationExist()) {
         this.$parent.createAnnotationOnCurrentCategory();
       }
@@ -140,7 +140,7 @@ export default {
 
       this.updateCurrentBBox(event);
       if (this.canAddBBoxToAnnotation()) {
-        this.addBBoxToAnnotation();
+        await this.addBBoxToAnnotation();
       }
     },
     createBBox(point) {
@@ -155,11 +155,11 @@ export default {
     canAddBBoxToAnnotation() {
       return !this.isNullPolygonPath();
     },
-    addBBoxToAnnotation() {
+    async addBBoxToAnnotation() {
       if (!this.canAddBBoxToAnnotation())
         throw new Error("Check can add bbox to annotation before add bbox to annotation");
 
-      this.addAnnotation(this.getPolygonPath());
+      await this.addAnnotation(this.getPolygonPath());
       this.removeData();
     },
     removeData() {
@@ -170,9 +170,9 @@ export default {
     mapAnnotationFrom(compoundPath) {
       return annotationMapper.mapAnnotationFrom(compoundPath, this.$store);
     },
-    addAnnotation(path) {  
+    async addAnnotation(path) {  
       let compound = this.createCompoundPath(this.createExamplePath());
-      let annotation = this.mapAnnotationFrom(compound);
+      let annotation = await this.mapAnnotationFrom(compound);
       this.$store.dispatch('addTempAnnotation', annotation);
       // this.$parent.uniteCurrentAnnotation(path, true, true, true);
     },
