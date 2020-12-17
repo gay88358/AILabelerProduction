@@ -1,5 +1,24 @@
 from pymongo import MongoClient 
 
+
+class ConcurrencyReadException(ValueError):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)
+
+class AnnotationRetryIdGenerator:
+    def __init__(self, id_generator):
+        self.id_generator = id_generator
+    
+    def get_key_range(self):
+        count = 0
+        RETRY_TIMES = 5
+        while count < RETRY_TIMES:
+            try:
+                return self.id_generator.get_key_range()
+            except ConcurrencyReadException:
+                count += 1
+        raise ValueError('Can not generate annotation key range')
+
 class AnnotationIdGenerator:
     def __init__(self, cache_size, mongo_counters):
         self.cache_size = cache_size
@@ -7,17 +26,13 @@ class AnnotationIdGenerator:
     
     def get_key_range(self):
         current_key = self.mongo_counters.find_current_annotation_model_id()
-        self.update_current_key_with_cache_size(current_key)
+        self._update_current_key_with_cache_size(current_key)
         return [current_key, current_key + self.cache_size]
 
-    def update_current_key_with_cache_size(self, versionId):
+    def _update_current_key_with_cache_size(self, versionId):
         increment_size = self.cache_size + 1
         self.mongo_counters.increment_annotation_model_id(increment_size, versionId)
 
-
-class ConcurrencyReadException(ValueError):
-    def __init__(self, *args: object) -> None:
-        super().__init__(*args)
 
 class MongoengineCounters:
     def __init__(self, mongo_factory):

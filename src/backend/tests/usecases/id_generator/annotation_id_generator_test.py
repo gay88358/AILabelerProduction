@@ -48,4 +48,3 @@ class TestCase:
         assert id_generator.get_key_range() == [100, 140]
         assert id_generator.get_key_range() == [141, 181]
         assert id_generator.get_key_range() == [182, 222]
-        #assert 1 == 2
