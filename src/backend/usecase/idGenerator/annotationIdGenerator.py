@@ -17,7 +17,8 @@ class AnnotationRetryIdGenerator:
                 return self.id_generator.get_key_range()
             except ConcurrencyReadException:
                 count += 1
-        raise ValueError('Can not generate annotation key range')
+
+        raise ValueError('Two user attempt to update annotationId simultaneously, conflict happened')
 
 class AnnotationIdGenerator:
     def __init__(self, cache_size, mongo_counters):
@@ -45,7 +46,6 @@ class MongoengineCounters:
 
     def increment_annotation_model_id(self, increment_size, versionId):
         result = self._collection().update_one({'_id': "annotation_model.id", 'next': versionId}, {'$inc': {'next': increment_size }})
-        print(result.matched_count)
         concurrency_read = result.matched_count == 0
         if concurrency_read:
             raise ConcurrencyReadException('Two user attempt to update annotationId simultaneously, conflict happened')
@@ -92,4 +92,9 @@ class MongoClientFactory:
                 return i
         raise ValueError('Given delimiter:{} is not found in the given host_url', delimiter)
     
-__all__ = ['AnnotationIdGenerator', 'MongoengineCounters', 'MongoClientFactory', 'ConcurrencyReadException']
+__all__ = ['AnnotationIdGenerator', 
+    'MongoengineCounters', 
+    'MongoClientFactory', 
+    'ConcurrencyReadException',
+    'AnnotationRetryIdGenerator',
+]

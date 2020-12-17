@@ -25,7 +25,27 @@ class FakeMongoengineCounters(MongoengineCounters):
     def should_happen_concurrency_read(self):
         self.is_concurrency_read = True
 
+class StubAnnotationIdGenerator:
+    def __init__(self):
+        self.invoke_times = 0
+
+    def get_key_range(self):
+        self.invoke_times += 1
+        raise ConcurrencyReadException
+
 class TestCase:
+
+    def test_retry_when_concurrency_read_happened(self, mongo_counters):
+        stub = StubAnnotationIdGenerator()
+        retry_generator = AnnotationRetryIdGenerator(stub)
+        try:
+            retry_generator.get_key_range()
+        except ValueError:
+            pass
+        self.assert_retry_times(stub)
+        
+    def assert_retry_times(self, stub):
+        assert stub.invoke_times == 5
 
     def test_read_concurrency_should_throw_exception(self, mongo_counters):
         cache_size = 40
