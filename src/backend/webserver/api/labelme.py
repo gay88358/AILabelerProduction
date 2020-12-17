@@ -50,9 +50,21 @@ class Labelme(Resource):
             "success": "ok"
         }
 
+@api.route('/annotationIdentity')
+class AnnotationIdentitySet(Resource):
+    def get(self):
+        from pymongo import MongoClient
+        
+        get_logger().info("Fetch annotation identity")
+        start = 0
+        end = 333
+        return [start, end]
+
+
 @api.route('/defect_code')
 class DefectCode(Resource):
     def get(self):
+
         get_logger().info("DefectCode Loading")
         result = DefectCodeLoader.create()\
             .map(lambda loader: loader.load_defect_code())

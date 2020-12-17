@@ -172,9 +172,8 @@ export default {
     },
     addAnnotation(path) {  
       let compound = this.createCompoundPath(this.createExamplePath());
-      let annotation = this.mapAnnotationFrom(compound);      
+      let annotation = this.mapAnnotationFrom(compound);
       this.$store.dispatch('addTempAnnotation', annotation);
-
       // this.$parent.uniteCurrentAnnotation(path, true, true, true);
     },
     createCompoundPath(path) {

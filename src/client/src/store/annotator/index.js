@@ -86,11 +86,7 @@ const mutations = {
     SAVE_TEMP_ANNOTATIONS(state, addedAnnotationIdList) {
         let addedTempAnnotations = state.tempAnnotations
             .filter(ta => addedAnnotationIdList.includes(ta.id));
-        
-        if (addedTempAnnotations.length !== 2) {
-            throw new Error('FUUUUUCK');
-        }
-        
+            
         addedTempAnnotations
             .forEach(ta => state.annotatorData.addAnnotation(ta));
 
