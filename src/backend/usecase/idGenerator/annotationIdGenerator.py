@@ -1,6 +1,5 @@
 from pymongo import MongoClient 
 
-
 class ConcurrencyReadException(ValueError):
     def __init__(self, *args: object) -> None:
         super().__init__(*args)
@@ -17,7 +16,6 @@ class AnnotationRetryIdGenerator:
                 return self.id_generator.get_key_range()
             except ConcurrencyReadException:
                 count += 1
-
         raise ValueError('Two user attempt to update annotationId simultaneously, conflict happened')
 
 class AnnotationIdGenerator:
@@ -27,6 +25,7 @@ class AnnotationIdGenerator:
     
     def get_key_range(self):
         current_key = self.mongo_counters.find_current_annotation_model_id()
+        print(current_key)
         self._update_current_key_with_cache_size(current_key)
         return [current_key, current_key + self.cache_size]
 

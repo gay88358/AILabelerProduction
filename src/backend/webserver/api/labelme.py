@@ -59,7 +59,8 @@ class AnnotationIdentitySet(Resource):
         mongo_counters = MongoengineCounters(factory)
         cache_size = 40
         id_generator = AnnotationIdGenerator(cache_size, mongo_counters)
-        return id_generator.get_key_range()
+        retry_id_generator = AnnotationRetryIdGenerator(id_generator)
+        return retry_id_generator.get_key_range()
 
 @api.route('/defect_code')
 class DefectCode(Resource):
