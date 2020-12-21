@@ -20,18 +20,42 @@ class Annotation:
     def get_shape(self, index):
         shape = {   
                     'Type': self.get_shape_type(index),
-                    'Score': self.document['metadata']['Score'],
-                    'manualPoints': self.document['metadata']['manualPoints'],
-                    'iou': self.document['metadata']['iou'],
-                    'vertex_color': self.document['metadata']['vertex_color'],
-                    'line_color': self.document['metadata']['line_color'],
-                    'fill_color': self.document['metadata']['fill_color'],
-                    'IgnoreShapes': self.document['metadata']['IgnoreShapes'],
+                    'Score': self.get_score(),
+                    'manualPoints': self.get_manual_points(),
+                    'iou': self.get_iou(),
+                    'vertex_color': self.get_vertex_color(),
+                    'line_color': self.get_line_color(),
+                    'fill_color': self.get_fill_color(),
+                    'IgnoreShapes': self.get_ignore_shapes(),
                     'points': self.get_points_array(index),
                 }
         self.append_attributes_to(shape)
         return shape
     
+    def get_score(self):
+        return self.get_metadata().get('Score', 0)
+
+    def get_manual_points(self):
+        return self.get_metadata().get('manualPoints', [])
+    
+    def get_iou(self):
+        return self.get_metadata().get('iou', [])
+    
+    def get_vertex_color(self):
+        return self.get_metadata().get('vertex_color', [])
+    
+    def get_line_color(self):
+        return self.get_metadata().get('line_color', [])
+    
+    def get_fill_color(self):
+        return self.get_metadata().get('fill_color', [])
+    
+    def get_ignore_shapes(self):
+        return self.get_metadata().get('IgnoreShapes', [])
+
+    def get_metadata(self):
+        return self.document['metadata']
+
     def append_attributes_to(self, shape):
         shape['Attributes'] = {}
 
