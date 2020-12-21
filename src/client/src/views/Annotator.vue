@@ -1163,6 +1163,7 @@ export default {
 </script>
 
 <style scoped>
+
 .alert {
   bottom: 0;
   width: 50%;

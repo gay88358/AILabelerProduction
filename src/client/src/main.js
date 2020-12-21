@@ -16,6 +16,7 @@ import "bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "vue-toastr-2/dist/vue-toastr-2.min.css";
 import "vue-loading-overlay/dist/vue-loading.css";
+import "@/assets/font-awesome.css";
 
 Vue.config.productionTip = false;
 

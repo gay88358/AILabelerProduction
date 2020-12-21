@@ -111,6 +111,7 @@ export default {
 @import "./assets/tagsStyle.css";
 @import "./assets/tooltip.css";
 
+
 #app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
