@@ -31,5 +31,9 @@ Bug Fixed:
 - Add error handling for Label.json file is not included in dataset folder
 - Add error handling for the name of the json file is not equals to Label.json
 
+v1.0.0.4
 
+Date of Release: 2020/12/21
+Features:
+- Load font-awesome from local file system
 
