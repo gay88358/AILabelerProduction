@@ -171,10 +171,10 @@ export default {
       return annotationMapper.mapAnnotationFrom(compoundPath, this.$store);
     },
     async addAnnotation(path) {  
-      let compound = this.createCompoundPath(this.createExamplePath());
-      let annotation = await this.mapAnnotationFrom(compound);
-      this.$store.dispatch('addTempAnnotation', annotation);
-      // this.$parent.uniteCurrentAnnotation(path, true, true, true);
+      // let compound = this.createCompoundPath(this.createExamplePath());
+      // let annotation = await this.mapAnnotationFrom(compound);
+      // this.$store.dispatch('addTempAnnotation', annotation);
+      this.$parent.uniteCurrentAnnotation(path, true, true, true);
     },
     createCompoundPath(path) {
       let initialCompoundPath = new CompoundPathBuilder(
