@@ -63,7 +63,7 @@ def create_app():
 app = create_app()
 
 logging.basicConfig(
-    handlers=[RotatingFileHandler('/worksapce/AILabeler.log', maxBytes=102400, backupCount=10)],
+    handlers=[RotatingFileHandler('/worksapce/AILabeler.log', maxBytes=10240000000, backupCount=10)],
     level=logging.INFO, 
     format='%(asctime)s %(levelname)s %(name)s %(threadName)s: %(message)s'
 )
