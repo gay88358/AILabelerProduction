@@ -1,10 +1,40 @@
 from .typeChecker.typeChecker import *
-
 from .segmentation import Segmentation
+
+# Metadata class is used to encapsulate metadata json data structure
+# Encapsulate data structure can prevent the duplication of metadata json data structure
+# When json data structure change, you only need to modify one place
+# That is the application of object oriented programming's encapsulate concept  
+class Metadata:
+    def __init__(self, document):
+        self.metadata_record = document['metadata']
+
+    def get_score(self):
+        return self.metadata_record.get('Score', 0)
+
+    def get_manual_points(self):
+        return self.metadata_record.get('manualPoints', [])
+
+    def get_iou(self):
+        return self.metadata_record.get('iou', [])
+    
+    def get_vertex_color(self):
+        return self.metadata_record.get('vertex_color', [])
+    
+    def get_line_color(self):
+        return self.metadata_record.get('line_color', [])
+    
+    def get_fill_color(self):
+        return self.metadata_record.get('fill_color', [])
+    
+    def get_ignore_shapes(self):
+        return self.metadata_record.get('IgnoreShapes', [])
+
 
 class Annotation:
     def __init__(self, jsonDocument):
         self.document = jsonDocument
+        self.metadata = Metadata(self.document)
         self.typeCheckers = []
         self.typeCheckers.append(RectangleTypeChecker())
         self.typeCheckers.append(CircleTypeChecker())
@@ -20,41 +50,17 @@ class Annotation:
     def get_shape(self, index):
         shape = {   
                     'Type': self.get_shape_type(index),
-                    'Score': self.get_score(),
-                    'manualPoints': self.get_manual_points(),
-                    'iou': self.get_iou(),
-                    'vertex_color': self.get_vertex_color(),
-                    'line_color': self.get_line_color(),
-                    'fill_color': self.get_fill_color(),
-                    'IgnoreShapes': self.get_ignore_shapes(),
+                    'Score': self.metadata.get_score(),
+                    'manualPoints': self.metadata.get_manual_points(),
+                    'iou': self.metadata.get_iou(),
+                    'vertex_color': self.metadata.get_vertex_color(),
+                    'line_color': self.metadata.get_line_color(),
+                    'fill_color': self.metadata.get_fill_color(),
+                    'IgnoreShapes': self.metadata.get_ignore_shapes(),
                     'points': self.get_points_array(index),
                 }
         self.append_attributes_to(shape)
         return shape
-    
-    def get_score(self):
-        return self.get_metadata().get('Score', 0)
-
-    def get_manual_points(self):
-        return self.get_metadata().get('manualPoints', [])
-    
-    def get_iou(self):
-        return self.get_metadata().get('iou', [])
-    
-    def get_vertex_color(self):
-        return self.get_metadata().get('vertex_color', [])
-    
-    def get_line_color(self):
-        return self.get_metadata().get('line_color', [])
-    
-    def get_fill_color(self):
-        return self.get_metadata().get('fill_color', [])
-    
-    def get_ignore_shapes(self):
-        return self.get_metadata().get('IgnoreShapes', [])
-
-    def get_metadata(self):
-        return self.document['metadata']
 
     def append_attributes_to(self, shape):
         shape['Attributes'] = {}
