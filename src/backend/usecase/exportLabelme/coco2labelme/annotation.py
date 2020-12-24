@@ -79,7 +79,14 @@ class Annotation:
 
     
     def get_points_array(self, index):
-        return self.segmentation.get_points_array(index)
+        result = self.segmentation.get_points_array(index)
+        if self.get_metadata().get('Type', "") == 'circle':
+            # restore 2 points (diameter)
+            sort_res = sorted(result)
+            result = []
+            result.append(sort_res[0])
+            result.append(sort_res[-1])
+        return result
 
     def get_segmentation_size(self):
         return self.segmentation.get_segmentation_size()
