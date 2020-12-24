@@ -30,6 +30,8 @@ class Metadata:
     def get_ignore_shapes(self):
         return self.metadata_record.get('IgnoreShapes', [])
 
+    def get_type(self):
+        return self.metadata_record.get('Type', "") 
 
 class Annotation:
     def __init__(self, jsonDocument):
@@ -80,7 +82,7 @@ class Annotation:
     
     def get_points_array(self, index):
         result = self.segmentation.get_points_array(index)
-        if self.get_metadata().get('Type', "") == 'circle':
+        if self.metadata.get_type() == 'circle':
             # restore 2 points (diameter)
             sort_res = sorted(result)
             result = []

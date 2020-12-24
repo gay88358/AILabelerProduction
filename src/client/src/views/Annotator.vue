@@ -1136,7 +1136,8 @@ export default {
         image_id: this.image.id,
         active: false
       });
-      this.save(next);
+      next()
+      // this.save(next);
     });
   },
   beforeMount() {
