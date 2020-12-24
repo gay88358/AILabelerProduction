@@ -32,7 +32,7 @@ services:
       - DEBUG=false
       - PYTHONUNBUFFERED=0
     ports:
-      - ${AIL_BACKEND_PORT}:5000
+      - "${AIL_BACKEND_PORT}:5000"
     volumes:
       - "./src/backend/config:/workspace/config"
       - "./src/backend/webserver:/workspace/webserver"
