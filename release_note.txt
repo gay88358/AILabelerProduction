@@ -37,3 +37,9 @@ Date of Release: 2020/12/21
 Features:
 - Load font-awesome from local file system
 
+v1.0.0.5
+
+Date of Release: 2020/12/24
+Features:
+- fix that show annotation of circle type
+
