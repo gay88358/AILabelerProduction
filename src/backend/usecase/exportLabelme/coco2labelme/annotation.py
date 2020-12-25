@@ -38,6 +38,7 @@ class Annotation:
         self.document = jsonDocument
         self.metadata = Metadata(self.document)
         self.typeCheckers = []
+        self.typeCheckers.append(NormalTypeChecker())
         self.typeCheckers.append(RectangleTypeChecker())
         self.typeCheckers.append(CircleTypeChecker())
         self.typeCheckers.append(PolygonTypeChecker())
@@ -74,7 +75,6 @@ class Annotation:
                 shape['Attributes'][key] = value
 
     def get_shape_type(self, index):
-        
         for checker in self.typeCheckers:
             if checker.is_given_type(index, self.document):
                 return checker.get_type()

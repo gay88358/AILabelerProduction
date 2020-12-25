@@ -149,7 +149,7 @@ class Labelme2CoCoConverter:
     def get_segmentation(self, shape):    
         if shape.get_type() == 'circle':
             return self.generate_circle_points(shape)
-        else:
+        else: # the shape except for the circle generate by original pointss
             return self.generate_points(shape)
     
     def generate_points(self, shape):
@@ -169,8 +169,10 @@ class Labelme2CoCoConverter:
         o_x = (x1 + x2) / 2
         o_y = (y1 + y2) / 2
         for i in range(36):
-            result.append(o_x + math.sin(math.pi / 18 * i) * r)
-            result.append(o_y + math.cos(math.pi / 18 * i) * r)
+            x = o_x + math.sin(math.pi / 18 * i) * r
+            y = o_y + math.cos(math.pi / 18 * i) * r
+            result.append(x)
+            result.append(y)
         return result
 
     def find_all_shapes(self):

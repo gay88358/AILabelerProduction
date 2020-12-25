@@ -33,6 +33,24 @@ class TypeChecker:
     def calculateEdge(self, p1, p2):
         return math.sqrt(math.pow(p1['x'] - p2['x'], 2) + math.pow(p1['y'] - p2['y'], 2))
 
+
+class NormalTypeChecker(TypeChecker):
+    def __init__(self):
+        pass
+
+    def is_given_type(self, index, document):
+        if 'metadata' not in document:
+            return False
+        
+        metadata = document['metadata']
+        if 'Type' not in metadata:
+            return False
+        self.setDocument(document)
+        return True
+
+    def get_type(self):
+        return self.document['metadata']['Type']
+
 class CircleTypeChecker(TypeChecker):
     def __init__(self):
         pass
