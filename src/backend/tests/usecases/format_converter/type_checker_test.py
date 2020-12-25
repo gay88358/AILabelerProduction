@@ -23,7 +23,6 @@ class TestCase:
 
     def create_coco_document(self):
         result = {}
-        result['segmentation'] = []
         result['metadata'] = {}
         result['metadata']['Type'] = 'Circle'
         return result   

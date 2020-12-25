@@ -3,12 +3,30 @@ import json
 
 from ..segmentation import Segmentation
 
+class NormalTypeChecker:
+    def __init__(self):
+        self.document = None
+
+    def is_given_type(self, index, document):
+        if 'metadata' not in document:
+            return False
+        
+        metadata = document['metadata']
+        if 'Type' not in metadata:
+            return False
+        self.document = document
+        return True
+
+    def get_type(self):
+        return self.document['metadata']['Type']
+
+
 class TypeChecker:
     def __init__(self, document):
         self.document = document
         self.seg = None
         
-    def is_given_type(self):
+    def is_given_type(self, index, document):
         # abstract method for overwrite
         pass
 
@@ -22,7 +40,6 @@ class TypeChecker:
     def number_of_points_in_segmentationAt(self, index):
         return self.seg.number_of_points_in_segmentationAt(index)
      
-   
     def setDocument(self, document):
         self.document = document
         self.seg = Segmentation(self.document['segmentation'])
@@ -33,23 +50,6 @@ class TypeChecker:
     def calculateEdge(self, p1, p2):
         return math.sqrt(math.pow(p1['x'] - p2['x'], 2) + math.pow(p1['y'] - p2['y'], 2))
 
-
-class NormalTypeChecker(TypeChecker):
-    def __init__(self):
-        pass
-
-    def is_given_type(self, index, document):
-        if 'metadata' not in document:
-            return False
-        
-        metadata = document['metadata']
-        if 'Type' not in metadata:
-            return False
-        self.setDocument(document)
-        return True
-
-    def get_type(self):
-        return self.document['metadata']['Type']
 
 class CircleTypeChecker(TypeChecker):
     def __init__(self):
@@ -103,26 +103,6 @@ class CircleTypeChecker(TypeChecker):
     def get_type(self):
         return "circle"
 
-if __name__ == "__main__":
-    checker = CircleTypeChecker()
-    coco_json_string = '{"images":[{"id":3,"dataset_id":2,"path":"/datasets/Dog/index.jpeg","width":198,"height":255,"file_name":"index.jpeg"}],"categories":[{"id":1,"name":"dog","supercategory":"","color":"#de19c9","metadata":{},"keypoint_colors":[]}],"annotations":[{"id":18,"image_id":3,"category_id":1,"segmentation":[[77.1,99.1,77.1,147.7,41.1,147.7,41.1,99.1]],"area":1764,"bbox":[41,99,36,49],"iscrowd":false,"isbbox":true,"color":"#af2704","keypoints":[],"metadata":{}},{"id":19,"image_id":3,"category_id":1,"segmentation":[[101.3,137.3,103.7,125.6,110.1,116,119.6,109.6,131.3,107.3,143,109.6,152.5,116,159,125.6,161.3,137.3,159,148.9,152.5,158.5,143,164.9,131.3,167.3,119.6,164.9,110.1,158.5,103.7,148.9],[64.1,55.3,77.5,45.8,91.4,54.9,133.9,49.2,137.4,65.3,127,83,90.5,96.5,83.2,78.7,68.9,70.9,67.1,59.6,65,57]],"area":5012,"bbox":[64,46,97,121],"iscrowd":false,"isbbox":false,"color":"#0fba58","keypoints":[],"metadata":{}}]}'
-    coco_json = json.loads(coco_json_string)
-    result = checker.is_given_type(0, coco_json['annotations'][1])
-    assert result == True
-    result = checker.is_given_type(1, coco_json['annotations'][1])
-    assert result == False
-
-
-class PolygonTypeChecker(TypeChecker):
-    def __init__(self):
-        pass
-
-    def is_given_type(self, index, document):
-        return True
-    
-    def get_type(self):
-        return 'polygon'
-
 class RectangleTypeChecker(TypeChecker):
     def __init__(self):
         pass
@@ -154,4 +134,12 @@ class RectangleTypeChecker(TypeChecker):
     def calculateEdge(self, p1, p2):
         return math.sqrt(math.pow(p1['x'] - p2['x'], 2) + math.pow(p1['y'] - p2['y'], 2))
 
+class PolygonTypeChecker(TypeChecker):
+    def __init__(self):
+        pass
+
+    def is_given_type(self, index, document):
+        return True
     
+    def get_type(self):
+        return 'polygon'
