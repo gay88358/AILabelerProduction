@@ -87,6 +87,7 @@ const mutations = {
         let addedTempAnnotations = state.tempAnnotations
             .filter(ta => addedAnnotationIdList.includes(ta.id));
             
+        // add annotation by categoryId    
         addedTempAnnotations
             .forEach(ta => state.annotatorData.addAnnotation(ta));
 
