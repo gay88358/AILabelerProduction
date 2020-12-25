@@ -74,6 +74,7 @@ class Annotation:
                 shape['Attributes'][key] = value
 
     def get_shape_type(self, index):
+        
         for checker in self.typeCheckers:
             if checker.is_given_type(index, self.document):
                 return checker.get_type()
