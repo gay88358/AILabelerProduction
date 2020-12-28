@@ -147,26 +147,34 @@ class Labelme2CoCoConverter:
             annotation[key] = value
         
     def get_segmentation(self, shape):    
-        result = []
         if shape.get_type() == 'circle':
-            # gen circle points
-            x1, y1 = shape.get_points()[0]
-            x2, y2 = shape.get_points()[1]
-            r = ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** (1/2) / 2
-            o_x = (x1 + x2) / 2
-            o_y = (y1 + y2) / 2
-            for i in range(36):
-                result.append(o_x + math.sin(math.pi / 18 * i) * r)
-                result.append(o_y + math.cos(math.pi / 18 * i) * r)
-        else:
-            # for polygon
-            for point in shape.get_points():
-                x = point[0]
-                y = point[1]
-                result.append(x)
-                result.append(y)
-        return result
+            return self.generate_circle_points(shape)
+        else: # the shape except for the circle generate by original pointss
+            return self.generate_points(shape)
     
+    def generate_points(self, shape):
+        result = []
+        for point in shape.get_points():
+            x = point[0]
+            y = point[1]
+            result.append(x)
+            result.append(y)
+        return result
+
+    def generate_circle_points(self, shape):
+        result = []
+        x1, y1 = shape.get_points()[0]
+        x2, y2 = shape.get_points()[1]
+        r = ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** (1/2) / 2
+        o_x = (x1 + x2) / 2
+        o_y = (y1 + y2) / 2
+        for i in range(36):
+            x = o_x + math.sin(math.pi / 18 * i) * r
+            y = o_y + math.cos(math.pi / 18 * i) * r
+            result.append(x)
+            result.append(y)
+        return result
+
     def find_all_shapes(self):
         labels_document = self.labelme_document['Labels']
         result = []

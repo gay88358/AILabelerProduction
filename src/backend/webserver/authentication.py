@@ -63,6 +63,9 @@ class AnonymousUser(AnonymousUserMixin):
     def can_delete(self, model):
         return True
 
+    def get_username(self):
+        return "anonymous"
+
 
 login_manager.anonymous_user = AnonymousUser
 
