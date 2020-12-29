@@ -2,6 +2,7 @@
 import json
 from json import load
 import math
+import numpy as np
 
 from .bboxCalculator import BBoxCalculator
 
@@ -148,7 +149,8 @@ class Labelme2CoCoConverter:
         
     def get_segmentation(self, shape):    
         if shape.get_type() == 'circle':
-            return self.generate_circle_points(shape)
+            result = self.process_circle_type_points(shape)
+            return list(np.array(result).flat)
         else: # the shape except for the circle generate by original pointss
             return self.generate_points(shape)
     
@@ -161,18 +163,17 @@ class Labelme2CoCoConverter:
             result.append(y)
         return result
 
-    def generate_circle_points(self, shape):
+    def process_circle_type_points(self, shape):
         result = []
         x1, y1 = shape.get_points()[0]
         x2, y2 = shape.get_points()[1]
         r = ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** (1/2) / 2
         o_x = (x1 + x2) / 2
         o_y = (y1 + y2) / 2
-        for i in range(36):
-            x = o_x + math.sin(math.pi / 18 * i) * r
-            y = o_y + math.cos(math.pi / 18 * i) * r
-            result.append(x)
-            result.append(y)
+        for i in range(3):
+            x = o_x + math.cos(math.pi / 1.5 * i) * r
+            y = o_y + math.sin(math.pi / 1.5 * i) * r
+            result.append([x, y])
         return result
 
     def find_all_shapes(self):

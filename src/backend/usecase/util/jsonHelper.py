@@ -24,7 +24,7 @@ class JsonHelper:
     @staticmethod
     def write_json(json_file, json_document):
         with open(json_file, 'w') as outfile:
-            json.dump(json_document, outfile)
+            json.dump(json_document, outfile, indent=4)
 
     @staticmethod
     def write_json_str(json_file, json_document_str):
