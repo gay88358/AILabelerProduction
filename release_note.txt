@@ -43,3 +43,10 @@ Date of Release: 2020/12/24
 Features:
 - fix that show annotation of circle type
 
+v1.0.0.6
+
+Date of Release: 2020/12/29
+Features:
+- reduce nodes to 3x for circle type
+- output indent json format for label.json
+

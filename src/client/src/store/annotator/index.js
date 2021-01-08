@@ -84,10 +84,8 @@ const mutations = {
         state.tempAnnotations.push(tempAnnotation);
     },
     SAVE_TEMP_ANNOTATIONS(state, addedAnnotationIdList) {
-        let addedTempAnnotations = state.tempAnnotations
-            .filter(ta => addedAnnotationIdList.includes(ta.id));
-            
-        addedTempAnnotations
+        state.tempAnnotations
+            .filter(ta => addedAnnotationIdList.includes(ta.id))
             .forEach(ta => state.annotatorData.addAnnotation(ta));
 
         state.tempAnnotations = [];

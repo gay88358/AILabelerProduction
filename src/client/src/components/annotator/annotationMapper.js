@@ -32,7 +32,6 @@ class AnnotationIdGateway {
     }
 }
 
-
 class AnnotationMapper {
     constructor() {
         this.idGateway = new AnnotationIdGateway()
@@ -68,11 +67,11 @@ class AnnotationMapper {
     
     async mapAnnotationFrom(compoundPath, store) {
         let result = {}
-        this.appendBoxArea(result); // ok
+        this.appendBoxArea(result); 
         await this.appendIdentity(result, store);
-        this.appendDataPoints(result, compoundPath); // ok
+        this.appendDataPoints(result, compoundPath);
         this.appendImageSize(result); 
-        this.appendOtherData(result); // ok
+        this.appendOtherData(result);
         return result;
     }
 
